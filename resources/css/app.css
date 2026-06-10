@@ -1,0 +1,344 @@
+@import 'mdb-ui-kit/css/mdb.min.css';
+@import 'flatpickr/dist/flatpickr.min.css';
+@import 'flatpickr/dist/themes/dark.css';
+@import 'notyf/notyf.min.css';
+
+:root {
+    --neu-bg: #121212;
+    --neu-card: #1a1a1a;
+    --neu-shadow-light: #2a2a2a;
+    --neu-shadow-dark: #080808;
+    --neu-radius: 18px;
+    --yellow: #f0c000;
+    --yellow-hover: #ffd700;
+    --text-primary: #e8e8e8;
+    --text-secondary: #999;
+    --text-emphasis: #ffffff;
+}
+
+[data-theme="light"] {
+    --neu-bg: #e0e5ec;
+    --neu-card: #f0f5fa;
+    --neu-shadow-light: #ffffff;
+    --neu-shadow-dark: #a3b1c6;
+    --text-primary: #1a1a2e;
+    --text-secondary: #6c6c80;
+    --text-emphasis: #1a1a2e;
+    --yellow: #d4a800;
+    --yellow-hover: #e6b800;
+}
+
+body {
+    background-color: var(--neu-bg) !important;
+}
+
+.navbar {
+    background: var(--neu-card) !important;
+    box-shadow: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light) !important;
+    position: sticky !important;
+    top: 0;
+    z-index: 1020;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+    color: var(--text-primary) !important;
+}
+
+.navbar .navbar-brand {
+    font-weight: 700;
+    color: var(--yellow) !important;
+}
+
+.navbar .nav-link:hover {
+    color: var(--yellow) !important;
+}
+
+.neu-card {
+    background: var(--neu-card);
+    border: none !important;
+    border-radius: var(--neu-radius);
+    box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+    color: var(--text-primary);
+}
+
+.neu-card {
+    position: relative;
+}
+
+    .neu-card::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        width: 4px;
+        height: calc(100% - 40px);
+        background: var(--yellow);
+        border-radius: 0 4px 4px 0;
+        opacity: 0.5;
+    }
+
+
+
+.neu-card p, .neu-card h1, .neu-card h2, .neu-card h3, .neu-card h4, .neu-card h5 {
+    color: var(--text-primary);
+}
+
+.neu-btn {
+    border: none !important;
+    border-radius: 12px !important;
+    background: var(--neu-card) !important;
+    box-shadow: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
+    color: var(--text-primary) !important;
+    transition: all 0.15s ease;
+    padding: 0.5rem 1.5rem;
+}
+
+.neu-btn:hover {
+    box-shadow: 2px 2px 4px var(--neu-shadow-dark), -2px -2px 4px var(--neu-shadow-light);
+    color: var(--yellow) !important;
+}
+
+.neu-btn:active {
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
+}
+
+.neu-btn-primary {
+    background: var(--yellow) !important;
+    color: #121212 !important;
+    box-shadow: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
+    font-weight: 600;
+}
+
+.neu-btn-primary:hover {
+    background: var(--yellow-hover) !important;
+    color: #121212 !important;
+}
+
+.neu-btn-primary:active {
+    background: #d4a800 !important;
+}
+
+.neu-btn-danger {
+    background: #ff4444 !important;
+    color: #fff !important;
+}
+
+.neu-btn-warning {
+    background: var(--yellow) !important;
+    color: #121212 !important;
+    font-weight: 600;
+}
+
+.neu-btn-sm {
+    padding: 0.3rem 1rem;
+    font-size: 0.85rem;
+}
+
+.neu-input {
+    border: none !important;
+    border-radius: 12px !important;
+    background: var(--neu-card) !important;
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
+    padding: 0.6rem 1rem;
+    color: var(--text-primary) !important;
+    transition: box-shadow 0.15s ease;
+}
+
+.neu-input:focus {
+    box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light), 0 0 0 2px rgba(240, 192, 0, 0.2);
+    outline: none;
+}
+
+.neu-select {
+    border: none !important;
+    border-radius: 12px !important;
+    background: var(--neu-card) !important;
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
+    padding: 0.6rem 1rem;
+    color: var(--text-primary) !important;
+}
+
+.neu-textarea {
+    border: none !important;
+    border-radius: 12px !important;
+    background: var(--neu-card) !important;
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
+    padding: 0.6rem 1rem;
+    color: var(--text-primary) !important;
+}
+
+.neu-badge {
+    border-radius: 20px;
+    padding: 0.3rem 1rem;
+    font-weight: 500;
+    box-shadow: 2px 2px 4px var(--neu-shadow-dark), -2px -2px 4px var(--neu-shadow-light);
+}
+
+.neu-table {
+    background: transparent !important;
+}
+
+.neu-card .table-responsive {
+    padding-bottom: 400px;
+}
+
+.neu-table thead th {
+    background: transparent !important;
+    border: none !important;
+    color: var(--yellow);
+    font-weight: 600;
+    padding: 1rem 0.75rem;
+}
+
+.neu-table tbody th {
+    background: transparent !important;
+    border: none !important;
+    color: var(--yellow);
+    font-weight: 600;
+    padding: 0.9rem 0.75rem;
+    vertical-align: middle;
+}
+
+.neu-table td {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.9rem 0.75rem;
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+.neu-table tbody tr {
+    background: transparent !important;
+}
+
+.neu-table tbody tr:hover {
+    background: rgba(240, 192, 0, 0.06) !important;
+}
+
+.neu-alert {
+    border: none !important;
+    border-radius: 12px;
+    box-shadow: inset 2px 2px 4px var(--neu-shadow-dark), inset -2px -2px 4px var(--neu-shadow-light);
+}
+
+.neu-stat {
+    border-radius: var(--neu-radius);
+    box-shadow: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light);
+    background: var(--neu-card);
+    border: none;
+    transition: transform 0.15s ease;
+}
+
+.neu-stat:hover {
+    transform: translateY(-2px);
+}
+
+.neu-stat .stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
+    font-size: 1.3rem;
+}
+
+.neu-stat h5 {
+    color: var(--text-secondary) !important;
+}
+
+.neu-stat p {
+    color: var(--yellow) !important;
+}
+
+.neu-dropdown {
+    border: none !important;
+    border-radius: 12px !important;
+    background: var(--neu-card) !important;
+    box-shadow: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light);
+    margin-top: 8px !important;
+}
+
+.neu-dropdown .dropdown-item {
+    border-radius: 8px;
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    margin: 2px 4px;
+}
+
+.neu-dropdown .dropdown-item:hover {
+    background: rgba(240, 192, 0, 0.1);
+    color: var(--yellow);
+    box-shadow: inset 2px 2px 4px var(--neu-shadow-dark), inset -2px -2px 4px var(--neu-shadow-light);
+}
+
+a {
+    color: var(--yellow);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--yellow-hover);
+}
+
+label {
+    color: var(--text-primary) !important;
+}
+
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.table-borderless th {
+    color: var(--text-secondary) !important;
+}
+
+.table-borderless td {
+    color: var(--text-primary) !important;
+}
+
+.modal-content {
+    background: var(--neu-card);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 16px;
+    box-shadow: 8px 8px 16px var(--neu-shadow-dark), -8px -8px 16px var(--neu-shadow-light);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: transparent;
+}
+
+.modal-header .btn-close {
+    filter: var(--btn-close-filter, invert(1) brightness(200%));
+}
+
+[data-theme="light"] .modal-header .btn-close {
+    filter: var(--btn-close-filter, invert(0) brightness(100%));
+}
+
+.neu-input::placeholder,
+.neu-select::placeholder,
+.neu-textarea::placeholder,
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: var(--yellow) !important;
+    opacity: 0.7 !important;
+}
+
+[data-theme="light"] .neu-input::placeholder,
+[data-theme="light"] .neu-select::placeholder,
+[data-theme="light"] .neu-textarea::placeholder,
+[data-theme="light"] .form-control::placeholder,
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.8 !important;
+}
+
+
+
