@@ -10,6 +10,7 @@ use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\MedicoBloqueoController;
 use App\Http\Controllers\MedicoHorarioController;
 use App\Http\Controllers\ConsultaMedicaController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\RecetaController;
 use Illuminate\Support\Facades\Route;
 
@@ -82,6 +83,9 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/citas/{cita}/estado', [CitaController::class, 'updateEstado'])->name('citas.estado');
     Route::get('/citas/{cita}', [CitaController::class, 'show'])->name('citas.show');
+    Route::get('/chat/citas', [ChatController::class, 'citas'])->name('chat.citas');
+    Route::get('/citas/{cita}/chat', [ChatController::class, 'mensajes'])->name('chat.mensajes');
+    Route::post('/citas/{cita}/chat', [ChatController::class, 'send'])->name('chat.send');
 
     Route::get('/citas/{cita}/consulta-medica/detalle', [ConsultaMedicaController::class, 'show'])->name('consulta-medica.show');
 

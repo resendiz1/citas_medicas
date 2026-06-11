@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MensajeEnviado;
 use App\Models\CitaHistorial;
 use App\Models\CitaMedica;
+use App\Models\Mensaje;
 use App\Models\User;
 use App\Models\MedicoBloqueo;
 use App\Models\MedicoHorario;
@@ -138,6 +140,22 @@ class CitaController extends Controller
             'comentario'    => 'Cita creada por el paciente.',
         ]);
 
+        $mensaje = Mensaje::create([
+            'cita_id' => $cita->id,
+            'user_id' => auth()->id(),
+            'mensaje' => '🟢 Se ha agendado una cita para el ' . $cita->fecha_hora->format('d/m/Y H:i') . '. Motivo: ' . $cita->motivo,
+        ]);
+        broadcast(new MensajeEnviado(
+            [
+                'id'         => $mensaje->id,
+                'user_id'    => $mensaje->user_id,
+                'nombre'     => auth()->user()->name,
+                'mensaje'    => $mensaje->mensaje,
+                'created_at' => $mensaje->created_at->format('d/m/Y H:i'),
+            ],
+            $cita->id
+        ))->toOthers();
+
         try {
             $cita->medico->notify(new CitaEstadoNotificacion($cita, 'creada'));
         } catch (\Throwable $e) {
@@ -210,6 +228,29 @@ class CitaController extends Controller
             'estado_nuevo'    => $nuevoEstado,
             'comentario'      => $comentario ?: "Estado cambiado de {$estadoActual} a {$nuevoEstado}.",
         ]);
+
+        $mensajesChat = [
+            'confirmada' => '✅ Cita confirmada por ' . $user->name . '.',
+            'cancelada'  => '❌ Cita cancelada. ' . ($comentario ?: ''),
+            'finalizada' => '🏁 Consulta finalizada.',
+        ];
+        if (isset($mensajesChat[$nuevoEstado])) {
+            $msg = Mensaje::create([
+                'cita_id' => $cita->id,
+                'user_id' => $user->id,
+                'mensaje' => $mensajesChat[$nuevoEstado],
+            ]);
+            broadcast(new MensajeEnviado(
+                [
+                    'id'         => $msg->id,
+                    'user_id'    => $msg->user_id,
+                    'nombre'     => $user->name,
+                    'mensaje'    => $msg->mensaje,
+                    'created_at' => $msg->created_at->format('d/m/Y H:i'),
+                ],
+                $cita->id
+            ))->toOthers();
+        }
 
         try {
             if ($cita->paciente) {

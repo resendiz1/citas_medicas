@@ -50,6 +50,12 @@
 .fc .fc-day-today {
     background: rgba(240, 192, 0, 0.08) !important;
 }
+.fc .fc-day-selected {
+    background: rgba(240, 192, 0, 0.2) !important;
+    outline: 2px solid var(--yellow);
+    outline-offset: -2px;
+    border-radius: 6px;
+}
 .fc-day-disabled {
     opacity: 0.35;
     pointer-events: none;
@@ -188,11 +194,12 @@
 
         calendar.removeAllEvents();
 
-        calendar.setOption('dayCellClassNames', function (date) {
-            const dateStr = date.toISOString().slice(0, 10);
-            const diaSem = date.getDay();
+        calendar.setOption('dayCellClassNames', function (arg) {
+            const d = arg.date;
+            const dateStr = d.toISOString().slice(0, 10);
+            const diaSem = d.getDay();
             const esHoy = dateStr === new Date().toISOString().slice(0, 10);
-            if (date < new Date() && !esHoy) return ['fc-day-disabled'];
+            if (d < new Date() && !esHoy) return ['fc-day-disabled'];
 
             for (const r of ranges) {
                 if (dateStr >= r.from && dateStr <= r.to) return ['fc-day-disabled'];
@@ -326,6 +333,10 @@
 
                 if (bloqueado || !diasActivos.has(diaSem)) return;
 
+                document.querySelectorAll('.fc-day-selected').forEach(function (el) { el.classList.remove('fc-day-selected'); });
+                var dayCell = info.dayEl;
+                if (dayCell) dayCell.classList.add('fc-day-selected');
+
                 mostrarHorarios(medicoId, dateStr);
             }
         });
@@ -367,6 +378,7 @@
             document.getElementById('horarios-container').style.display = 'none';
             document.getElementById('horarios-list').innerHTML = '';
             document.getElementById('fecha_hora').value = '';
+            document.querySelectorAll('.fc-day-selected').forEach(function (el) { el.classList.remove('fc-day-selected'); });
             fechaSeleccionada = null;
             horaSeleccionada = null;
         }

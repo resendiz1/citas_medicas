@@ -332,6 +332,7 @@
                                             </div>
                                             <div class="d-flex flex-wrap gap-1">
                                                 <a href="{{ route('medico.paciente.show', $cita->paciente->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem">Perfil</a>
+                                                <a href="{{ route('citas.show', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:var(--yellow);color:#121212">Chat</a>
                                                 @if (!in_array($cita->estado, ['cancelada', 'no_asistio']))
                                                 @if ($cita->consultaMedica)
                                                     <a href="{{ route('consulta-medica.show', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff">Consulta</a>
@@ -355,6 +356,7 @@
                                         @elseif ($user->esPaciente())
                                             <div class="d-flex flex-wrap gap-1">
                                                 <a href="{{ route('citas.show', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem">Ver detalles</a>
+                                                <a href="{{ route('citas.show', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:var(--yellow);color:#121212">Chat</a>
                                                 @if ($cita->estado === 'pendiente')
                                                 <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                                     @csrf @method('PUT')

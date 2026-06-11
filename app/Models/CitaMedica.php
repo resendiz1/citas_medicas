@@ -54,4 +54,9 @@ class CitaMedica extends Model
     {
         return $this->hasOne(ConsultaMedica::class, 'cita_id');
     }
+
+    public function mensajes()
+    {
+        return $this->hasMany(Mensaje::class, 'cita_id');
+    }
 }

@@ -21,7 +21,9 @@
         "@fullcalendar/timegrid": "^6.1.20",
         "flatpickr": "^4.6.13",
         "fullcalendar": "^6.1.20",
+        "laravel-echo": "^2.3.7",
         "mdb-ui-kit": "^9.3.0",
-        "notyf": "^3.10.0"
+        "notyf": "^3.10.0",
+        "pusher-js": "^8.5.0"
     }
 }
