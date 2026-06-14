@@ -29,17 +29,31 @@ console.log('REVERB SCHEME:', import.meta.env.VITE_REVERB_SCHEME);
 
 window.Pusher = Pusher;
 
+
+// window.Echo = new Echo({
+//     broadcaster: 'reverb',
+//     key: import.meta.env.VITE_REVERB_APP_KEY,
+//     wsHost: import.meta.env.VITE_REVERB_HOST,
+//     wsPort: Number(import.meta.env.VITE_REVERB_PORT ?? 80),
+//     wssPort: Number(import.meta.env.VITE_REVERB_PORT ?? 443),
+//     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+//     enabledTransports: ['ws', 'wss'],
+// });
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
-    key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: import.meta.env.VITE_REVERB_HOST,
-    wsPort: Number(import.meta.env.VITE_REVERB_PORT ?? 80),
-    wssPort: Number(import.meta.env.VITE_REVERB_PORT ?? 443),
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    key: '9f3c8c0a7f1b2e4d9a6c2b8e1f0d3a55',
+    wsHost: 'successful-heart-production-501a.up.railway.app',
+    wsPort: 443,
+    wssPort: 443,
+    forceTLS: true,
     enabledTransports: ['ws', 'wss'],
 });
 
+
 console.log('ECHO CREADO:', window.Echo);
+
+
 
 
 
