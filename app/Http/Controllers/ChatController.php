@@ -30,6 +30,7 @@ class ChatController extends Controller
                     'con quien'    => $otro?->name ?? '—',
                     'fecha'        => $c->fecha_hora->format('d/m/Y H:i'),
                     'estado'       => $c->estado,
+                    'ultimo_id'    => $ultimo?->id,
                     'ultimo_msg'   => $ultimo?->mensaje ?? '',
                     'ultimo_time'  => $ultimo?->created_at?->diffForHumans() ?? '',
                 ];
@@ -65,7 +66,7 @@ class ChatController extends Controller
                     'user_id'    => $m->user_id,
                     'nombre'     => $m->user->name,
                     'mensaje'    => $m->mensaje,
-                    'created_at' => $m->created_at->format('d/m/Y H:i'),
+                    'created_at' => $m->created_at->diffForHumans(),
                 ];
             });
 
@@ -94,16 +95,20 @@ class ChatController extends Controller
             'mensaje' => $data['mensaje'],
         ]);
 
-        broadcast(new MensajeEnviado(
-            [
-                'id'         => $mensaje->id,
-                'user_id'    => $mensaje->user_id,
-                'nombre'     => $user->name,
-                'mensaje'    => $mensaje->mensaje,
-                'created_at' => $mensaje->created_at->format('d/m/Y H:i'),
-            ],
-            $citaId
-        ))->toOthers();
+        try {
+            broadcast(new MensajeEnviado(
+                [
+                    'id'         => $mensaje->id,
+                    'user_id'    => $mensaje->user_id,
+                    'nombre'     => $user->name,
+                    'mensaje'    => $mensaje->mensaje,
+                    'created_at' => $mensaje->created_at->diffForHumans(),
+                ],
+                $citaId
+            ))->toOthers();
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         $receptor = $user->id === $cita->paciente_id ? $cita->medico : $cita->paciente;
         if ($receptor) {
@@ -119,7 +124,7 @@ class ChatController extends Controller
             'user_id'    => $mensaje->user_id,
             'nombre'     => $user->name,
             'mensaje'    => $mensaje->mensaje,
-            'created_at' => $mensaje->created_at->format('d/m/Y H:i'),
+            'created_at' => $mensaje->created_at->diffForHumans(),
         ]);
     }
 }
