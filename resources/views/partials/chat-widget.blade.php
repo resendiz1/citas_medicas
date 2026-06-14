@@ -184,7 +184,7 @@
                     });
                 })
                 .catch(function () {});
-        }, 5000);
+        }, 2000);
     }
 
     function detenerPoll() {
@@ -220,7 +220,7 @@
                     if (Object.keys(chatNoLeidos).length > 0) actualizarBadge();
                 })
                 .catch(function () {});
-        }, 10000);
+        }, 6000);
     }
 
     function detenerBgPoll() {
