@@ -39,16 +39,21 @@
         if (document.hidden) {
             detenerPoll();
             detenerBgPoll();
-        } else if (chatCitaActual) {
-            iniciarPoll(chatCitaActual);
-            iniciarBgPoll();
+        } else {
+            if (chatCitaActual) iniciarPoll(chatCitaActual);
+            if (!chatBgInterval) iniciarBgPoll();
         }
     });
 
     function toggleChatWidget() {
         chatWidgetAbierto = !chatWidgetAbierto;
         document.getElementById('chat-panel').classList.toggle('d-none', !chatWidgetAbierto);
-        if (chatWidgetAbierto) abrirChat();
+        if (chatWidgetAbierto) {
+            abrirChat();
+        } else {
+            chatCitaActual = null;
+            detenerPoll();
+        }
     }
 
     function abrirChat() {
