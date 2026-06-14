@@ -19,14 +19,14 @@
             <div class="col-md-4">
                 <strong class="text-muted small">Estado</strong><br>
                 @switch($cita->estado)
-                    @case('pendiente') <span class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                    @case('confirmada') <span class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                    @case('en_espera') <span class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                    @case('en_consulta') <span class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                    @case('finalizada') <span class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                    @case('cancelada') <span class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                    @case('no_asistio') <span class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                    @case('reprogramada') <span class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                    @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
+                    @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
+                    @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
+                    @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
+                    @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
+                    @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
+                    @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
+                    @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
                 @endswitch
             </div>
             <div class="col-md-4">

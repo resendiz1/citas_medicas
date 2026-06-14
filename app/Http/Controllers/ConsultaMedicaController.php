@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CitaEstadoActualizado;
 use App\Models\CitaHistorial;
 use App\Models\CitaMedica;
 use App\Models\ConsultaMedica;
@@ -28,6 +29,11 @@ class ConsultaMedicaController extends Controller
                 'estado_nuevo'    => 'en_consulta',
                 'comentario'      => 'Inicio de consulta médica.',
             ]);
+            try {
+                broadcast(new CitaEstadoActualizado($cita->id, 'en_consulta', 'en_espera'))->toOthers();
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $consulta = $cita->consultaMedica;
@@ -155,6 +161,11 @@ class ConsultaMedicaController extends Controller
                 'estado_nuevo'    => 'finalizada',
                 'comentario'      => 'Consulta finalizada.',
             ]);
+            try {
+                broadcast(new CitaEstadoActualizado($cita->id, 'finalizada', 'en_consulta'))->toOthers();
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $msg = $cita->consultaMedica ? 'Consulta médica actualizada.' : 'Consulta médica guardada.';

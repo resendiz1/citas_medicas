@@ -29,6 +29,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/citas/check', [DashboardController::class, 'checkNuevas'])->name('dashboard.citas.check');
 
     Route::get('/notificaciones/poll', [NotificacionController::class, 'poll'])->name('notificaciones.poll');
 
@@ -82,6 +83,8 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::put('/citas/{cita}/estado', [CitaController::class, 'updateEstado'])->name('citas.estado');
+    Route::get('/citas/estados/poll', [CitaController::class, 'estadosPoll'])->name('citas.estados.poll');
+    Route::get('/citas/{cita}/acciones', [CitaController::class, 'acciones'])->name('citas.acciones');
     Route::get('/citas/{cita}', [CitaController::class, 'show'])->name('citas.show');
     Route::get('/chat/citas', [ChatController::class, 'citas'])->name('chat.citas');
     Route::get('/citas/{cita}/chat', [ChatController::class, 'mensajes'])->name('chat.mensajes');

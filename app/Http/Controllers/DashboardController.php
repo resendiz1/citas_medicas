@@ -4,9 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\CitaMedica;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    public function checkNuevas(Request $request)
+    {
+        $user = auth()->user();
+        $maxId = $request->integer('max_id', 0);
+
+        $query = CitaMedica::where('id', '>', $maxId);
+        if ($user->esMedico()) {
+            $query->where('medico_id', $user->id);
+        } elseif ($user->esPaciente()) {
+            $query->where('paciente_id', $user->id);
+        }
+        // admin/recepcionista: any cita
+
+        $nueva = $query->exists();
+        $nuevoMax = CitaMedica::when($user->esMedico(), fn($q) => $q->where('medico_id', $user->id))
+            ->when($user->esPaciente(), fn($q) => $q->where('paciente_id', $user->id))
+            ->max('id') ?? $maxId;
+
+        return response()->json([
+            'nuevas' => $nueva,
+            'max_id' => $nuevoMax,
+        ]);
+    }
+
     public function index()
     {
         $user = auth()->user();

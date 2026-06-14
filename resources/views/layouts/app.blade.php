@@ -7,6 +7,7 @@
     <title>@yield('title', config('app.name'))</title>
     @auth
         <meta name="notificaciones-poll" content="{{ route('notificaciones.poll') }}">
+        <meta name="user-id" content="{{ auth()->id() }}">
     @endauth
     @php
     $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);

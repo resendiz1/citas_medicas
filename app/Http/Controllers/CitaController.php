@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CitaCreada;
+use App\Events\CitaEstadoActualizado;
 use App\Events\MensajeEnviado;
 use App\Models\CitaHistorial;
 use App\Models\CitaMedica;
@@ -140,6 +142,25 @@ class CitaController extends Controller
             'comentario'    => 'Cita creada por el paciente.',
         ]);
 
+        try {
+            broadcast(new CitaCreada($cita->medico_id, [
+                'cita_id'    => $cita->id,
+                'paciente'   => auth()->user()->name,
+                'fecha'      => $cita->fecha_hora->format('d/m/Y H:i'),
+                'motivo'     => $cita->motivo,
+            ]))->toOthers();
+            if ($cita->paciente_id !== $cita->medico_id) {
+                broadcast(new CitaCreada($cita->paciente_id, [
+                    'cita_id'    => $cita->id,
+                    'medico'     => $cita->medico->name,
+                    'fecha'      => $cita->fecha_hora->format('d/m/Y H:i'),
+                    'motivo'     => $cita->motivo,
+                ]))->toOthers();
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         $mensaje = Mensaje::create([
             'cita_id' => $cita->id,
             'user_id' => auth()->id(),
@@ -229,6 +250,12 @@ class CitaController extends Controller
             'comentario'      => $comentario ?: "Estado cambiado de {$estadoActual} a {$nuevoEstado}.",
         ]);
 
+        try {
+            broadcast(new CitaEstadoActualizado($cita->id, $nuevoEstado, $estadoActual))->toOthers();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         $mensajesChat = [
             'confirmada' => '✅ Cita confirmada por ' . $user->name . '.',
             'cancelada'  => '❌ Cita cancelada. ' . ($comentario ?: ''),
@@ -264,6 +291,38 @@ class CitaController extends Controller
         }
 
         return redirect()->back()->with('success', 'Estado de la cita actualizado correctamente.');
+    }
+
+    public function acciones($id)
+    {
+        $cita = CitaMedica::with([
+            'paciente',
+            'medico.medicoPerfil.tipoMedico',
+            'consultaMedica',
+            'ultimaReceta',
+        ])->findOrFail($id);
+
+        $user = auth()->user();
+        if ($user->esPaciente() && $cita->paciente_id !== $user->id) abort(403);
+        if ($user->esMedico() && $cita->medico_id !== $user->id) abort(403);
+
+        return response()->json([
+            'html' => view('dashboard._acciones', compact('cita'))->render(),
+        ]);
+    }
+
+    public function estadosPoll(Request $request)
+    {
+        $ids = $request->query('ids', '');
+        $ids = array_filter(array_map('intval', explode(',', $ids)), fn($v) => $v > 0);
+        if (empty($ids)) return response()->json([]);
+
+        $citas = CitaMedica::whereIn('id', $ids)->get(['id', 'estado']);
+        $result = [];
+        foreach ($citas as $c) {
+            $result[(string)$c->id] = $c->estado;
+        }
+        return response()->json($result);
     }
 
     public function show($id)
@@ -320,6 +379,12 @@ class CitaController extends Controller
         ]);
 
         try {
+            broadcast(new CitaEstadoActualizado($cita->id, 'pendiente', $estadoAnterior))->toOthers();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
             $cita->medico->notify(new CitaEstadoNotificacion($cita, 'reprogramacion_confirmada'));
         } catch (\Throwable $e) {
             report($e);
@@ -356,6 +421,12 @@ class CitaController extends Controller
             'estado_nuevo'    => 'pendiente',
             'comentario'      => 'Paciente rechazó la reprogramación.',
         ]);
+
+        try {
+            broadcast(new CitaEstadoActualizado($cita->id, 'pendiente', $estadoAnterior))->toOthers();
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         try {
             $cita->medico->notify(new CitaEstadoNotificacion($cita, 'reprogramacion_rechazada'));
