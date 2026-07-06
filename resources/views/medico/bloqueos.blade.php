@@ -7,14 +7,14 @@
     @php $user = auth()->user(); @endphp
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold" style="color:var(--yellow)">Bloqueos de {{ $medico->name }}</h4>
-        <a href="{{ $user->esAdmin() ? route('admin.medicos') : route('dashboard') }}" class="neu-btn neu-btn-sm" style="color:var(--yellow)">&larr; Volver</a>
+        <h4 class="fw-bold" style="color:#1266f1">Bloqueos de {{ $medico->name }}</h4>
+        <a href="{{ $user->esAdmin() ? route('admin.medicos') : route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1">&larr; Volver</a>
     </div>
 
     <div class="row g-4">
         <div class="col-md-5">
-            <div class="neu-card p-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Nuevo bloqueo</h5>
+            <div class="card shadow-2 p-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Nuevo bloqueo</h5>
                 <form action="{{ $user->esAdmin() ? route('admin.medicos.bloqueos.store', $medico->id) : route('medico.bloqueos.store') }}" method="POST">
                     @csrf
                     @if ($user->esAdmin())
@@ -22,24 +22,24 @@
                     @endif
                     <div class="mb-3">
                         <label class="form-label">Fecha inicio</label>
-                        <input type="date" name="fecha_inicio" class="neu-input form-control" required>
+                        <input type="date" name="fecha_inicio" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Fecha fin</label>
-                        <input type="date" name="fecha_fin" class="neu-input form-control" required>
+                        <input type="date" name="fecha_fin" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Motivo</label>
-                        <textarea name="motivo" class="neu-input form-control" rows="2" maxlength="500"></textarea>
+                        <textarea name="motivo" class="form-control" rows="2" maxlength="500"></textarea>
                     </div>
-                    <button type="submit" class="neu-btn neu-btn-primary neu-btn-sm">Guardar</button>
+                    <button type="submit" class="btn btn-primary neu-btn-sm"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar</button>
                 </form>
             </div>
         </div>
 
         <div class="col-md-7">
-            <div class="neu-card p-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Bloqueos registrados</h5>
+            <div class="card shadow-2 p-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Bloqueos registrados</h5>
                 @if ($bloqueos->isEmpty())
                     <p class="text-muted mb-0">Sin bloqueos registrados.</p>
                 @else
@@ -62,7 +62,7 @@
                                         <td>
                                             <form action="{{ $user->esAdmin() ? route('admin.medicos.bloqueos.destroy', [$medico->id, $b->id]) : route('medico.bloqueos.destroy', $b->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este bloqueo?')">
                                                 @csrf @method('DELETE')
-                                                <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Eliminar</button>
+                                                <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                             </form>
                                         </td>
                                     </tr>

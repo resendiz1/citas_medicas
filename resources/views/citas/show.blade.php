@@ -6,11 +6,11 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold mb-0">Detalle de Cita</h4>
-        <a href="{{ route('dashboard') }}" class="neu-btn neu-btn-sm">Volver</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
     </div>
 
-    <div class="neu-card p-4 mb-4">
-        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Información de la Cita</h6>
+    <div class="card shadow-2 p-4 mb-4">
+        <h6 class="fw-bold mb-3" style="color:#1266f1">Información de la Cita</h6>
         <div class="row g-3">
             <div class="col-md-4">
                 <strong class="text-muted small">Fecha y hora</strong><br>
@@ -19,14 +19,14 @@
             <div class="col-md-4">
                 <strong class="text-muted small">Estado</strong><br>
                 @switch($cita->estado)
-                    @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                    @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                    @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                    @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                    @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                    @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                    @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                    @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                    @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
+                    @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
+                    @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
+                    @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                    @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
+                    @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
+                    @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
+                    @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
                 @endswitch
             </div>
             <div class="col-md-4">
@@ -56,15 +56,15 @@
 
     <div class="row g-4 mb-4">
         <div class="col-md-6">
-            <div class="neu-card p-4 h-100">
-                <h6 class="fw-bold mb-3" style="color:var(--yellow)">Paciente</h6>
+            <div class="card shadow-2 p-4 h-100">
+                <h6 class="fw-bold mb-3" style="color:#1266f1">Paciente</h6>
                 <div class="mb-2"><strong class="text-muted small">Nombre:</strong><br>{{ $cita->paciente->name }}</div>
                 <div class="mb-2"><strong class="text-muted small">Email:</strong><br>{{ $cita->paciente->email }}</div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="neu-card p-4 h-100">
-                <h6 class="fw-bold mb-3" style="color:var(--yellow)">Médico</h6>
+            <div class="card shadow-2 p-4 h-100">
+                <h6 class="fw-bold mb-3" style="color:#1266f1">Médico</h6>
                 <div class="mb-2"><strong class="text-muted small">Nombre:</strong><br>{{ $cita->medico->name }}</div>
                 <div class="mb-2"><strong class="text-muted small">Email:</strong><br>{{ $cita->medico->email }}</div>
                 @if ($cita->medico->medicoPerfil && $cita->medico->medicoPerfil->tipoMedico)
@@ -76,10 +76,10 @@
 
     @if ($cita->recetas->count())
     @foreach ($cita->recetas as $receta)
-    <div class="neu-card p-4 mb-4">
+    <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="fw-bold mb-0" style="color:var(--yellow)">Receta del {{ $receta->fecha_emision->format('d/m/Y') }}</h6>
-            <a href="{{ route('recetas.show', $receta->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem">Abrir receta</a>
+            <h6 class="fw-bold mb-0" style="color:#1266f1">Receta del {{ $receta->fecha_emision->format('d/m/Y') }}</h6>
+            <a href="{{ route('recetas.show', $receta->id) }}" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem"><i class="fa-solid fa-prescription me-1"></i>Abrir receta</a>
         </div>
         <div class="row g-3 mb-3">
             <div class="col-md-3"><strong class="text-muted small">Paciente:</strong><br>{{ $receta->cita->paciente->name }}</div>
@@ -146,7 +146,7 @@
                                 <img src="{{ route('recetas.documento.download', $doc->id) }}"
                                      alt="{{ $doc->nombre_original }}"
                                      class="rounded mb-1"
-                                     style="width:80px;height:80px;object-fit:cover;box-shadow:3px 3px 6px var(--neu-shadow-dark),-3px -3px 6px var(--neu-shadow-light)">
+                                     style="width:80px;height:80px;object-fit:cover;box-shadow:3px 3px 6px #ccc,-3px -3px 6px #f5f5f5">
                             </a>
                         @else
                             <a href="{{ route('recetas.documento.download', $doc->id) }}"
@@ -164,8 +164,8 @@
 
     @if ($cita->consultaMedica)
     @php $consulta = $cita->consultaMedica; @endphp
-    <div class="neu-card p-4 mb-4">
-        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Consulta Médica</h6>
+    <div class="card shadow-2 p-4 mb-4">
+        <h6 class="fw-bold mb-3" style="color:#1266f1">Consulta Médica</h6>
 
         @if ($consulta->motivo_consulta || $consulta->sintomas || $consulta->tiempo_evolucion)
         <div class="mb-3">
@@ -239,8 +239,8 @@
     @endif
 
     @if ($cita->historiales->count())
-    <div class="neu-card p-4 mb-4">
-        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Historial de cambios</h6>
+    <div class="card shadow-2 p-4 mb-4">
+        <h6 class="fw-bold mb-3" style="color:#1266f1">Historial de cambios</h6>
         <div class="table-responsive">
             <table class="table table-sm neu-table mb-0">
                 <thead>

@@ -5,25 +5,25 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold" style="color:var(--yellow)">Pacientes</h4>
-        <a href="{{ route('admin.pacientes.create') }}" class="neu-btn neu-btn-primary neu-btn-sm">+ Nuevo paciente</a>
+        <h4 class="fw-bold" style="color:#1266f1">Pacientes</h4>
+        <a href="{{ route('admin.pacientes.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa-solid fa-plus me-1"></i>+ Nuevo paciente</a>
     </div>
 
     <form method="GET" class="mb-3">
         <div class="row g-2 align-items-center">
             <div class="col-auto flex-grow-1">
-                <input type="text" name="search" class="neu-input form-control" placeholder="Buscar por nombre o email..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o email..." value="{{ request('search') }}">
             </div>
             <div class="col-auto">
-                <button type="submit" class="neu-btn neu-btn-sm">Buscar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-search me-1"></i>Buscar</button>
                 @if (request('search'))
-                    <a href="{{ route('admin.pacientes') }}" class="neu-btn neu-btn-sm" style="background:#ff4444;color:#fff">Limpiar</a>
+                    <a href="{{ route('admin.pacientes') }}" class="btn btn-outline-secondary btn-sm" style="background:#ff4444;color:#fff"><i class="fa-solid fa-rotate-left me-1"></i>Limpiar</a>
                 @endif
             </div>
         </div>
     </form>
 
-    <div class="neu-card p-4">
+    <div class="card shadow-2 p-4">
         <div class="table-responsive">
             <table class="table neu-table align-middle mb-0">
                 <thead>
@@ -41,10 +41,10 @@
                             <td class="text-muted">{{ $paciente->email }}</td>
                             <td class="text-muted">{{ $paciente->telefono ?? '—' }}</td>
                             <td>
-                                <a href="{{ route('admin.pacientes.edit', $paciente->id) }}" class="neu-btn neu-btn-sm neu-btn-warning">Editar</a>
+                                <a href="{{ route('admin.pacientes.edit', $paciente->id) }}" class="btn btn-outline-secondary btn-sm neu-btn-warning"><i class="fa-regular fa-pen-to-square me-1"></i>Editar</a>
                                 <form action="{{ route('admin.pacientes.destroy', $paciente->id) }}" method="POST" class="d-inline">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="neu-btn neu-btn-sm neu-btn-danger" onclick="return confirm('¿Eliminar paciente?')">Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm neu-btn-danger" onclick="return confirm('¿Eliminar paciente?')"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                 </form>
                             </td>
                         </tr>

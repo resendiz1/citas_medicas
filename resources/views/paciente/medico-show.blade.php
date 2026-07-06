@@ -9,16 +9,16 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">Perfil del Médico</h4>
                 <div>
-                    <a href="{{ route('citas.create', ['medico_id' => $medico->id]) }}" class="neu-btn neu-btn-primary neu-btn-sm me-2">Solicitar cita</a>
-                    <a href="{{ route('dashboard') }}" class="neu-btn neu-btn-sm">Volver</a>
+                    <a href="{{ route('citas.create', ['medico_id' => $medico->id]) }}" class="btn btn-primary neu-btn-sm me-2"><i class="fa-regular fa-calendar-check me-1"></i>Solicitar cita</a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
                 </div>
             </div>
 
             <div class="row g-4">
                 <div class="col-12">
-                    <div class="neu-card p-4 d-flex align-items-center gap-3" style="border-radius:16px;">
+                    <div class="card shadow-2 p-4 d-flex align-items-center gap-3" style="border-radius:16px;">
                         <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                             style="width:64px;height:64px;background:var(--yellow);color:#121212;font-size:1.5rem;font-weight:bold;overflow:hidden">
+                             style="width:64px;height:64px;background:#1266f1;color:#121212;font-size:1.5rem;font-weight:bold;overflow:hidden">
                             @if ($medico->foto_url)
                                 <img src="{{ Storage::url($medico->foto_url) }}" alt="Foto"
                                      style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -31,15 +31,15 @@
                             <h5 class="fw-bold mb-1" style="color:var(--text-emphasis)">{{ $medico->name }}</h5>
                             <p class="text-muted mb-0">{{ optional(optional($medico->medicoPerfil)->tipoMedico)->nombre_tipo_medico ?? 'General' }} · {{ $medico->email }}</p>
                             @if (isset($medico->medicoPerfil->activo) && $medico->medicoPerfil->activo)
-                                <span class="neu-badge mt-1" style="background:#00b894;color:#fff;font-size:0.65rem">Activo</span>
+                                <span class="badge mt-1" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
                             @endif
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <div class="neu-card p-4" style="border-radius:16px;">
-                        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Información Personal</h6>
+                    <div class="card shadow-2 p-4" style="border-radius:16px;">
+                        <h6 class="fw-bold mb-3" style="color:#1266f1">Información Personal</h6>
                         <div class="row g-3">
                             <div class="col-6 col-md-4">
                                 <label class="form-label text-muted small">Nombre</label>
@@ -77,9 +77,9 @@
                                 <label class="form-label text-muted small">Estado</label>
                                 <p class="fw-bold mb-0">
                                     @if (isset($medico->medicoPerfil->activo) && $medico->medicoPerfil->activo)
-                                        <span class="neu-badge" style="background:#00b894;color:#fff">Activo</span>
+                                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
                                     @else
-                                        <span class="neu-badge" style="background:#ff4444;color:#fff">Inactivo</span>
+                                        <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Inactivo</span>
                                     @endif
                                 </p>
                             </div>
@@ -94,8 +94,8 @@
                 @php $docs = optional(optional($medico->medicoPerfil)->documentos); @endphp
                 @if ($docs && $docs->isNotEmpty())
                 <div class="col-12">
-                    <div class="neu-card p-4" style="border-radius:16px;">
-                        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Documentos</h6>
+                    <div class="card shadow-2 p-4" style="border-radius:16px;">
+                        <h6 class="fw-bold mb-3" style="color:#1266f1">Documentos</h6>
                         <div class="table-responsive">
                             <table class="table neu-table table-sm mb-0">
                                 <thead>
@@ -110,7 +110,7 @@
                                         <td>{{ $doc->nombre ?? $doc->nombre_original }}</td>
                                         <td>
                                             <a href="{{ Storage::url($doc->ruta_archivo) }}" target="_blank"
-                                               class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">Ver</a>
+                                               class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">Ver</a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -124,8 +124,8 @@
 
                 <div class="col-12">
                     @if ($medico->horarios->where('activo', true)->count())
-                    <div class="neu-card p-4 mb-4" style="border-radius:16px;">
-                        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Horarios de atención</h6>
+                    <div class="card shadow-2 p-4 mb-4" style="border-radius:16px;">
+                        <h6 class="fw-bold mb-3" style="color:#1266f1">Horarios de atención</h6>
                         <div class="table-responsive">
                             <table class="table neu-table table-sm mb-0">
                                 <thead>
@@ -154,8 +154,8 @@
                     @endif
 
                     @if ($medico->bloqueos->count())
-                    <div class="neu-card p-4 mb-4" style="border-radius:16px;">
-                        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Bloqueos de disponibilidad</h6>
+                    <div class="card shadow-2 p-4 mb-4" style="border-radius:16px;">
+                        <h6 class="fw-bold mb-3" style="color:#1266f1">Bloqueos de disponibilidad</h6>
                         <div class="table-responsive">
                             <table class="table neu-table table-sm mb-0">
                                 <thead>
@@ -181,7 +181,7 @@
                     @endif
 
                     @if (!$medico->horarios->where('activo', true)->count() && !$medico->bloqueos->count())
-                    <div class="neu-card p-4 text-center" style="border-radius:16px;">
+                    <div class="card shadow-2 p-4 text-center" style="border-radius:16px;">
                         <p class="text-muted mb-0">El médico aún no ha configurado su disponibilidad.</p>
                     </div>
                     @endif

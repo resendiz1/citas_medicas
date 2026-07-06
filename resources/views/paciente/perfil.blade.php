@@ -6,10 +6,10 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <div class="neu-card p-4 d-flex justify-content-between align-items-center">
+            <div class="card shadow-2 p-4 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-3">
                     <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                         style="width:64px;height:64px;background:var(--yellow);color:#121212;font-size:1.5rem;font-weight:bold;overflow:hidden">
+                         style="width:64px;height:64px;background:#1266f1;color:#121212;font-size:1.5rem;font-weight:bold;overflow:hidden">
                         @if ($user->foto_url)
                             <img src="{{ Storage::url($user->foto_url) }}" alt="Foto"
                                  style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -23,13 +23,13 @@
                         <p class="mb-0 text-muted">Gestiona tu información personal</p>
                     </div>
                 </div>
-                <button type="button" id="btn-editar" class="neu-btn" style="background:var(--yellow);color:#121212" onclick="toggleEdit()">Editar</button>
+                <button type="button" id="btn-editar" class="btn btn-outline-secondary" style="background:#1266f1;color:#121212" onclick="toggleEdit()"><i class="fa-regular fa-pen-to-square me-1"></i>Editar</button>
             </div>
         </div>
     </div>
 
-    <div class="neu-card p-4 mb-4">
-        <h5 class="fw-bold mb-3" style="color:var(--yellow)">Información Personal</h5>
+    <div class="card shadow-2 p-4 mb-4">
+        <h5 class="fw-bold mb-3" style="color:#1266f1">Información Personal</h5>
         <div class="row g-3 view-mode">
             <div class="col-md-6">
                 <label class="form-label text-muted small">Nombre</label>
@@ -65,7 +65,7 @@
                         <div class="d-flex align-items-center gap-3">
                             <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                                  id="foto-preview-container"
-                                 style="width:56px;height:56px;background:var(--yellow);color:#121212;font-size:1.3rem;font-weight:bold;overflow:hidden">
+                                 style="width:56px;height:56px;background:#1266f1;color:#121212;font-size:1.3rem;font-weight:bold;overflow:hidden">
                                 @if ($user->foto_url)
                                     <img id="foto-preview" src="{{ Storage::url($user->foto_url) }}" alt="Foto"
                                          style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -75,7 +75,7 @@
                                 @endif
                             </div>
                             <input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp"
-                                   class="neu-input form-control @error('foto') is-invalid @enderror"
+                                   class="form-control @error('foto') is-invalid @enderror"
                                    onchange="previewFoto(this)">
                             @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             <small class="text-muted">JPG, PNG, GIF, WebP — Máx. 2MB</small>
@@ -84,53 +84,53 @@
                 <div class="col-md-6">
                     <label class="form-label text-muted small">Nombre</label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                           class="neu-input form-control @error('name') is-invalid @enderror">
+                           class="form-control @error('name') is-invalid @enderror">
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-muted small">Email</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                           class="neu-input form-control @error('email') is-invalid @enderror">
+                           class="form-control @error('email') is-invalid @enderror">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Fecha de Nacimiento</label>
                     <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', optional($user->fecha_nacimiento)->format('Y-m-d')) }}"
-                           class="neu-input form-control @error('fecha_nacimiento') is-invalid @enderror">
+                           class="form-control @error('fecha_nacimiento') is-invalid @enderror">
                     @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono', $user->telefono) }}"
-                           class="neu-input form-control @error('telefono') is-invalid @enderror">
+                           class="form-control @error('telefono') is-invalid @enderror">
                     @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Dirección</label>
                     <input type="text" name="direccion" value="{{ old('direccion', $user->direccion) }}"
-                           class="neu-input form-control @error('direccion') is-invalid @enderror">
+                           class="form-control @error('direccion') is-invalid @enderror">
                     @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-12">
                     <label class="form-label text-muted small">Observaciones</label>
                     <textarea name="observaciones" rows="2"
-                              class="neu-input form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones', $user->observaciones) }}</textarea>
+                              class="form-control @error('observaciones') is-invalid @enderror">{{ old('observaciones', $user->observaciones) }}</textarea>
                     @error('observaciones') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
             </div>
             <div class="mt-4 text-end d-flex gap-2 justify-content-end edit-mode">
-                <button type="button" class="neu-btn neu-btn-sm" onclick="toggleEdit()">Cancelar</button>
-                <button type="submit" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Guardar cambios</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar cambios</button>
             </div>
         </form>
     </div>
 
     {{-- Contactos de Emergencia --}}
-    <div class="neu-card p-4 mb-4">
+    <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0" style="color:var(--yellow)">Contactos de Emergencia</h5>
-            <button type="button" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212" data-mdb-toggle="modal" data-mdb-target="#contactoModal" onclick="resetContactoModal()">
-                + Agregar
+            <h5 class="fw-bold mb-0" style="color:#1266f1">Contactos de Emergencia</h5>
+            <button type="button" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212" data-mdb-toggle="modal" data-mdb-target="#contactoModal" onclick="resetContactoModal()">
+                <i class="fa-solid fa-plus me-1"></i>+ Agregar
             </button>
         </div>
         @if ($user->contactosEmergencia->isEmpty())
@@ -158,13 +158,13 @@
                         <td>{{ $contacto->direccion ?? '—' }}</td>
                         <td>
                             <div class="d-flex gap-1">
-                                <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:var(--yellow);color:#121212"
+                                <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1266f1;color:#121212"
                                         onclick="editarContacto({{ $contacto->id }}, '{{ addslashes($contacto->nombre_completo) }}', '{{ addslashes($contacto->telefono) }}', '{{ addslashes($contacto->parentesco ?? '') }}', '{{ addslashes($contacto->email ?? '') }}', '{{ addslashes($contacto->direccion ?? '') }}')">
-                                    Editar
+                                    <i class="fa-regular fa-pen-to-square me-1"></i>Editar
                                 </button>
                                 <form action="{{ route('paciente.contactos.destroy', $contacto) }}" method="POST" onsubmit="return confirm('¿Eliminar este contacto?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                 </form>
                             </div>
                         </td>
@@ -178,11 +178,11 @@
     </div>
 
     {{-- Alergias --}}
-    <div class="neu-card p-4 mb-4">
+    <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0" style="color:var(--yellow)">Alergias</h5>
-            <button type="button" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212" data-mdb-toggle="modal" data-mdb-target="#alergiaModal" onclick="resetAlergiaModal()">
-                + Agregar
+            <h5 class="fw-bold mb-0" style="color:#1266f1">Alergias</h5>
+            <button type="button" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212" data-mdb-toggle="modal" data-mdb-target="#alergiaModal" onclick="resetAlergiaModal()">
+                <i class="fa-solid fa-plus me-1"></i>+ Agregar
             </button>
         </div>
         @if ($user->alergias->isEmpty())
@@ -206,13 +206,13 @@
                         <td>{{ $alergia->pivot->observaciones ?? '—' }}</td>
                         <td>
                             <div class="d-flex gap-1">
-                                <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:var(--yellow);color:#121212"
+                                <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1266f1;color:#121212"
                                         onclick="editarAlergia({{ $alergia->id }}, {{ $alergia->pivot->gravedad ? "'" . addslashes($alergia->pivot->gravedad) . "'" : "''" }}, {{ $alergia->pivot->observaciones ? "'" . addslashes($alergia->pivot->observaciones) . "'" : "''" }})">
-                                    Editar
+                                    <i class="fa-regular fa-pen-to-square me-1"></i>Editar
                                 </button>
                                 <form action="{{ route('paciente.alergias.destroy', $alergia) }}" method="POST" onsubmit="return confirm('¿Eliminar esta alergia?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                 </form>
                             </div>
                         </td>
@@ -226,11 +226,11 @@
     </div>
 
     {{-- Enfermedades Importantes --}}
-    <div class="neu-card p-4 mb-4">
+    <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0" style="color:var(--yellow)">Enfermedades Importantes</h5>
-            <button type="button" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212" data-mdb-toggle="modal" data-mdb-target="#enfermedadModal" onclick="resetEnfermedadModal()">
-                + Agregar
+            <h5 class="fw-bold mb-0" style="color:#1266f1">Enfermedades Importantes</h5>
+            <button type="button" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212" data-mdb-toggle="modal" data-mdb-target="#enfermedadModal" onclick="resetEnfermedadModal()">
+                <i class="fa-solid fa-plus me-1"></i>+ Agregar
             </button>
         </div>
         @if ($user->enfermedadesImportantes->isEmpty())
@@ -256,13 +256,13 @@
                         <td>{{ $enfermedad->pivot->observaciones ?? '—' }}</td>
                         <td>
                             <div class="d-flex gap-1">
-                                <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:var(--yellow);color:#121212"
+                                <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1266f1;color:#121212"
                                         onclick="editarEnfermedad({{ $enfermedad->id }}, '{{ addslashes($enfermedad->pivot->fecha_diagnostico ?? '') }}', {{ $enfermedad->pivot->tratamiento_actual ? "'" . addslashes($enfermedad->pivot->tratamiento_actual) . "'" : "''" }}, {{ $enfermedad->pivot->observaciones ? "'" . addslashes($enfermedad->pivot->observaciones) . "'" : "''" }})">
-                                    Editar
+                                    <i class="fa-regular fa-pen-to-square me-1"></i>Editar
                                 </button>
                                 <form action="{{ route('paciente.enfermedades.destroy', $enfermedad) }}" method="POST" onsubmit="return confirm('¿Eliminar esta enfermedad?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                 </form>
                             </div>
                         </td>
@@ -284,34 +284,34 @@
                     <input type="hidden" name="_method" id="contactoMethod" value="POST">
                     <input type="hidden" id="contactoId">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="contactoModalTitle" style="color:var(--yellow)">Nuevo Contacto</h5>
+                        <h5 class="modal-title" id="contactoModalTitle" style="color:#1266f1">Nuevo Contacto</h5>
                         <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Nombre Completo</label>
-                            <input type="text" name="nombre_completo" id="contactoNombre" class="neu-input form-control" required>
+                            <input type="text" name="nombre_completo" id="contactoNombre" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" name="telefono" id="contactoTelefono" class="neu-input form-control" required>
+                            <input type="text" name="telefono" id="contactoTelefono" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Parentesco</label>
-                            <input type="text" name="parentesco" id="contactoParentesco" class="neu-input form-control">
+                            <input type="text" name="parentesco" id="contactoParentesco" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" id="contactoEmail" class="neu-input form-control">
+                            <input type="email" name="email" id="contactoEmail" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Dirección</label>
-                            <input type="text" name="direccion" id="contactoDireccion" class="neu-input form-control">
+                            <input type="text" name="direccion" id="contactoDireccion" class="form-control">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Guardar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar</button>
                     </div>
                 </form>
             </div>
@@ -327,13 +327,13 @@
                     <input type="hidden" name="_method" id="alergiaMethod" value="POST">
                     <input type="hidden" id="alergiaId">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="alergiaModalTitle" style="color:var(--yellow)">Nueva Alergia</h5>
+                        <h5 class="modal-title" id="alergiaModalTitle" style="color:#1266f1">Nueva Alergia</h5>
                         <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Alergia</label>
-                            <select name="alergia_id" id="alergiaSelect" class="neu-input form-control" required>
+                            <select name="alergia_id" id="alergiaSelect" class="form-control" required>
                                 <option value="">Seleccionar...</option>
                                 @foreach ($catalogoAlergias as $alergia)
                                     <option value="{{ $alergia->id }}">{{ $alergia->nombre }}</option>
@@ -342,7 +342,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Gravedad</label>
-                            <select name="gravedad" id="alergiaGravedad" class="neu-input form-control">
+                            <select name="gravedad" id="alergiaGravedad" class="form-control">
                                 <option value="">Seleccionar...</option>
                                 <option value="Leve">Leve</option>
                                 <option value="Moderada">Moderada</option>
@@ -351,12 +351,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Observaciones</label>
-                            <textarea name="observaciones" id="alergiaObservaciones" rows="2" class="neu-input form-control"></textarea>
+                            <textarea name="observaciones" id="alergiaObservaciones" rows="2" class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Guardar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar</button>
                     </div>
                 </form>
             </div>
@@ -372,13 +372,13 @@
                     <input type="hidden" name="_method" id="enfermedadMethod" value="POST">
                     <input type="hidden" id="enfermedadId">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="enfermedadModalTitle" style="color:var(--yellow)">Nueva Enfermedad</h5>
+                        <h5 class="modal-title" id="enfermedadModalTitle" style="color:#1266f1">Nueva Enfermedad</h5>
                         <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Enfermedad</label>
-                            <select name="enfermedad_importante_id" id="enfermedadSelect" class="neu-input form-control" required>
+                            <select name="enfermedad_importante_id" id="enfermedadSelect" class="form-control" required>
                                 <option value="">Seleccionar...</option>
                                 @foreach ($catalogoEnfermedades as $enfermedad)
                                     <option value="{{ $enfermedad->id }}">{{ $enfermedad->nombre }}</option>
@@ -387,20 +387,20 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha de Diagnóstico</label>
-                            <input type="date" name="fecha_diagnostico" id="enfermedadFecha" class="neu-input form-control">
+                            <input type="date" name="fecha_diagnostico" id="enfermedadFecha" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tratamiento Actual</label>
-                            <textarea name="tratamiento_actual" id="enfermedadTratamiento" rows="2" class="neu-input form-control"></textarea>
+                            <textarea name="tratamiento_actual" id="enfermedadTratamiento" rows="2" class="form-control"></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Observaciones</label>
-                            <textarea name="observaciones" id="enfermedadObservaciones" rows="2" class="neu-input form-control"></textarea>
+                            <textarea name="observaciones" id="enfermedadObservaciones" rows="2" class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Guardar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar</button>
                     </div>
                 </form>
             </div>
@@ -408,8 +408,8 @@
     </div>
 
     @if ($citas->count())
-    <div class="neu-card p-4 mb-4">
-        <h6 class="fw-bold mb-3" style="color:var(--yellow)">Mis Citas</h6>
+    <div class="card shadow-2 p-4 mb-4">
+        <h6 class="fw-bold mb-3" style="color:#1266f1">Mis Citas</h6>
         <div class="table-responsive">
             <table class="table neu-table align-middle mb-0">
                 <thead>
@@ -431,18 +431,18 @@
                         <td class="text-muted">{{ Str::limit($cita->motivo, 40) }}</td>
                         <td>
                             @switch($cita->estado)
-                                @case('pendiente') <span class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                                @case('confirmada') <span class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                                @case('en_espera') <span class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                                @case('en_consulta') <span class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                                @case('finalizada') <span class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                                @case('cancelada') <span class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                                @case('no_asistio') <span class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                                @case('reprogramada') <span class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                                @case('pendiente') <span class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
+                                @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
+                                @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
+                                @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                                @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
+                                @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
+                                @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
+                                @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
                             @endswitch
                         </td>
                         <td>
-                            <a href="{{ route('citas.show', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem">Ver detalles</a>
+                            <a href="{{ route('citas.show', $cita->id) }}" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem"><i class="fa-regular fa-eye me-1"></i>Ver detalles</a>
                         </td>
                     </tr>
                     @endforeach
@@ -468,7 +468,7 @@ function toggleEdit() {
         form.style.display = 'none';
         view.forEach(el => el.style.display = '');
         btn.textContent = 'Editar';
-        btn.style.background = 'var(--yellow)';
+        btn.style.background = '#1266f1';
     } else {
         form.style.display = '';
         view.forEach(el => el.style.display = 'none');

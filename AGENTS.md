@@ -80,12 +80,12 @@
 
 ### UI/UX
 - Notyf para notificaciones toast (success/error)
-- Diseño neumórfico con theme claro/oscuro
-- Placeholder amarillo en inputs en tema oscuro (con `!important` para vencer MDB)
+- Diseño neumórfico con theme claro (sin modo oscuro)
 - Flatpickr para selects de fecha/hora
 - Navbar siempre expandida (sin collapse), links visibles en todos los tamaños
 - Fotos de perfil: click → `window.open(url, '_blank')` (sin modal)
 - Assets cargados desde `public/build/manifest.json` dinámicamente con rutas `/build/...`
+- Variables CSS en `:root` con colores de tema claro
 
 ## Estructura de Archivos Clave
 
@@ -123,7 +123,7 @@ resources/
     citas/create.blade.php      - Crear cita con preselección de médico por query param
     citas/show.blade.php        - Detalle cita con recetas + consulta inline
     admin/citas/index.blade.php
-    admin/medicos/index.blade.php - Placeholder amarillo en búsqueda
+    admin/medicos/index.blade.php
     admin/pacientes/index.blade.php
     medico/perfil.blade.php
     medico/horarios.blade.php
@@ -134,7 +134,7 @@ resources/
     consulta-medica/form.blade.php, show.blade.php
     recepcionista/paciente-show.blade.php
 routes/web.php                  - + ruta notificaciones.poll
-resources/css/app.css           - Placeholder amarillo en tema oscuro con !important
+resources/css/app.css           - Variables CSS en :root con colores de tema claro
 resources/js/app.js             - Polling cada 10s + Notyf toast de notificaciones
 ```
 

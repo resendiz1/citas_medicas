@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme')||'dark');</script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -16,14 +15,13 @@
     $jsFile = $manifest['resources/js/app.js']['file'] ?? '';
     @endphp
     <link rel="stylesheet" href="/build/{{ $cssFile }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="/build/{{ $jsFile }}" defer></script>
     @stack('head')
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg sticky-top" style="position:sticky !important;top:0;z-index:1020">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-2">
         <div class="container">
-            <a class="navbar-brand fw-bold me-3 d-flex flex-column align-items-start" href="{{ route('dashboard') }}" style="line-height:1.2">Citas Médicas<small style="font-size:0.65rem;font-weight:400;opacity:0.8">&lt;JuanPancho's/&gt;</small></a>
+            <a class="navbar-brand fw-bold me-3 d-flex flex-column align-items-start text-primary" href="{{ route('dashboard') }}" style="line-height:1.2">Citas Médicas<small style="font-size:0.65rem;font-weight:400;opacity:0.8">&lt;JuanPancho's/&gt;</small></a>
             <div class="d-flex flex-grow-1 align-items-center justify-content-between flex-wrap" id="navbarNav">
                 <ul class="navbar-nav flex-row align-items-center gap-1 mb-0">
                     @auth
@@ -31,7 +29,7 @@
                         @if (auth()->user()->esAdmin())
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-mdb-toggle="dropdown">Gestión</a>
-                                <ul class="dropdown-menu neu-dropdown">
+                                <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{{ route('admin.citas') }}">Citas</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.medicos') }}">Médicos</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.pacientes') }}">Pacientes</a></li>
@@ -41,7 +39,7 @@
                         @if (auth()->user()->esMedico())
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-mdb-toggle="dropdown">Mi agenda</a>
-                                <ul class="dropdown-menu neu-dropdown">
+                                <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{{ route('medico.horarios') }}">Horarios</a></li>
                                     <li><a class="dropdown-item" href="{{ route('medico.bloqueos') }}">Bloqueos</a></li>
                                 </ul>
@@ -50,23 +48,18 @@
                     @endauth
                 </ul>
                 <ul class="navbar-nav flex-row align-items-center gap-1 mb-0">
-                    <li class="nav-item d-flex align-items-center me-2">
-                        <button id="theme-toggle" class="neu-btn neu-btn-sm" style="font-size:0.9rem;padding:0.25rem 0.6rem;line-height:1" aria-label="Cambiar tema">
-                            <span id="theme-icon">🌙</span>
-                        </button>
-                    </li>
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-mdb-toggle="dropdown">
                                 <span class="me-2">{{ auth()->user()->name }}</span>
                                 @switch(auth()->user()->role)
-                                    @case('admin') <span class="badge neu-badge" style="background:var(--yellow);color:#121212">Admin</span> @break
-                                    @case('medico') <span class="badge neu-badge" style="background:#00b894;color:#fff">Médico</span> @break
-                                    @case('paciente') <span class="badge neu-badge" style="background:var(--yellow);color:#121212">Paciente</span> @break
-                                    @case('recepcionista') <span class="badge neu-badge" style="background:#1e90ff;color:#fff">Recepcionista</span> @break
+                                    @case('admin') <span class="badge" style="border:2px solid #e4a11b;color:#e4a11b;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-shield-halved me-1"></i>Admin</span> @break
+                                    @case('medico') <span class="badge" style="border:2px solid #14a44d;color:#14a44d;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-user-doctor me-1"></i>Médico</span> @break
+                                    @case('paciente') <span class="badge" style="border:2px solid #3b71ca;color:#3b71ca;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-user me-1"></i>Paciente</span> @break
+                                    @case('recepcionista') <span class="badge" style="border:2px solid #54b4d3;color:#54b4d3;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-phone me-1"></i>Recepcionista</span> @break
                                 @endswitch
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end neu-dropdown">
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#"
                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar sesión</a></li>
                             </ul>

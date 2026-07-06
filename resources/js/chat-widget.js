@@ -108,7 +108,7 @@ function agregarMensajeWidget(m) {
     var esPropio = parseInt(m.user_id) === chatUserId;
     var div = document.createElement('div');
     div.innerHTML = '<div style="display:flex;justify-content:' + (esPropio ? 'flex-end' : 'flex-start') + ';margin-bottom:0.25rem">' +
-        '<div style="max-width:75%;padding:0.5rem 0.75rem;border-radius:12px;background:' + (esPropio ? 'var(--yellow)' : 'var(--neu-card)') + ';color:' + (esPropio ? '#121212' : 'var(--text-primary)') + ';box-shadow:2px 2px 6px var(--neu-shadow-dark),-2px -2px 6px var(--neu-shadow-light)">' +
+        '<div style="max-width:75%;padding:0.5rem 0.75rem;border-radius:12px;background:' + (esPropio ? '#ffc107' : '#f0f0f3') + ';color:' + (esPropio ? '#121212' : '#2c3e50') + ';box-shadow:2px 2px 6px #d1d1d1,-2px -2px 6px #ffffff">' +
         '<div style="font-size:0.65rem;opacity:0.7;margin-bottom:0.2rem">' + escapeHtml(m.nombre) + ' · ' + m.created_at + '</div>' +
         '<div style="font-size:0.85rem;line-height:1.4;word-break:break-word">' + escapeHtml(m.mensaje) + '</div></div></div>';
     el.appendChild(div.firstElementChild);

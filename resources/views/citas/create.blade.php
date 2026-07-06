@@ -21,25 +21,25 @@
     font-size: 0.85rem;
 }
 .fc .fc-col-header-cell-cushion {
-    color: var(--yellow);
+    color:#1266f1;
     font-size: 0.75rem;
     text-transform: uppercase;
     font-weight: 600;
 }
 .fc .fc-button-primary {
-    background: var(--neu-card) !important;
+    background: #fff !important;
     border: none !important;
-    box-shadow: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
+    box-shadow: 4px 4px 8px #ccc, -4px -4px 8px #f5f5f5;
     color: var(--text-primary) !important;
     font-size: 0.8rem !important;
     padding: 0.3rem 0.8rem !important;
     border-radius: 10px !important;
 }
 .fc .fc-button-primary:hover {
-    color: var(--yellow) !important;
+    color:#1266f1 !important;
 }
 .fc .fc-button-primary:not(:disabled).fc-button-active {
-    background: var(--yellow) !important;
+    background:#1266f1 !important;
     color: #121212 !important;
 }
 .fc .fc-toolbar-title {
@@ -52,7 +52,7 @@
 }
 .fc .fc-day-selected {
     background: rgba(240, 192, 0, 0.2) !important;
-    outline: 2px solid var(--yellow);
+    outline: 2px solid #1266f1;
     outline-offset: -2px;
     border-radius: 6px;
 }
@@ -96,7 +96,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
-            <div class="neu-card p-4">
+            <div class="card shadow-2 p-4">
                 <h4 class="mb-4 fw-bold">Solicitar Cita Médica</h4>
                 <form method="POST" action="{{ route('citas.store') }}" id="citaForm">
                     @csrf
@@ -104,7 +104,7 @@
                     <div class="mb-4">
                         <label for="medico_id" class="form-label">Médico</label>
                         <select id="medico_id" name="medico_id"
-                                class="neu-select form-control @error('medico_id') is-invalid @enderror" required>
+                                class="form-select @error('medico_id') is-invalid @enderror" required>
                             <option value="">Seleccionar médico...</option>
                             @foreach ($medicos as $medico)
                                 <option value="{{ $medico->id }}" {{ old('medico_id', $medicoSeleccionado) == $medico->id ? 'selected' : '' }}>
@@ -130,14 +130,14 @@
                     <div class="mb-4">
                         <label for="motivo" class="form-label">Motivo de la consulta</label>
                         <textarea id="motivo" name="motivo" rows="4"
-                                  class="neu-textarea form-control @error('motivo') is-invalid @enderror"
+                                  class="form-control @error('motivo') is-invalid @enderror"
                                   required>{{ old('motivo') }}</textarea>
                         @error('motivo') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('dashboard') }}" class="neu-btn">Cancelar</a>
-                        <button type="submit" class="neu-btn neu-btn-primary">Solicitar cita</button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="fa fa-xmark me-1"></i>Cancelar</a>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-calendar-check me-1"></i>Solicitar cita</button>
                     </div>
                 </form>
             </div>
@@ -257,9 +257,9 @@
                 btn.style.color = '#888';
                 btn.style.cursor = 'not-allowed';
             } else {
-                btn.style.background = 'var(--neu-card)';
+                btn.style.background = '#fff';
                 btn.style.color = 'var(--text-primary)';
-                btn.style.boxShadow = '4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light)';
+                btn.style.boxShadow = '4px 4px 8px #ccc, -4px -4px 8px #f5f5f5';
                 btn.addEventListener('click', function () {
                     document.querySelectorAll('.horario-chip.selected').forEach(function (el) { el.classList.remove('selected'); });
                     this.classList.add('selected');

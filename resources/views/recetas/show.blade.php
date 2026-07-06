@@ -7,14 +7,14 @@
     @php $user = auth()->user(); @endphp
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold" style="color:var(--yellow)">Receta Médica</h4>
-        <a href="{{ route('dashboard') }}" class="neu-btn neu-btn-sm" style="color:var(--yellow)">&larr; Volver al dashboard</a>
+        <h4 class="fw-bold" style="color:#1266f1">Receta Médica</h4>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1">&larr; Volver al dashboard</a>
     </div>
 
     <div class="row g-4">
         <div class="col-md-5">
-            <div class="neu-card p-4 h-100">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Información</h5>
+            <div class="card shadow-2 p-4 h-100">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Información</h5>
                 <table class="table neu-table align-middle mb-0">
                     <tbody>
                         <tr><th style="width:120px">Paciente</th><td style="color:var(--text-emphasis);font-weight:500">{{ $receta->cita->paciente->name }}</td></tr>
@@ -26,8 +26,8 @@
                 <br><br><br><br>
             </div>
 
-            <div class="neu-card p-4 mt-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Documentos adjuntos</h5>
+            <div class="card shadow-2 p-4 mt-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Documentos adjuntos</h5>
                 @if ($receta->documentos->isEmpty())
                     <p class="text-muted mb-0">Sin documentos adjuntos.</p>
                 @else
@@ -39,7 +39,7 @@
                                         <img src="{{ route('recetas.documento.download', $doc->id) }}"
                                              alt="{{ $doc->nombre_original }}"
                                              class="rounded mb-1"
-                                             style="width:100px;height:100px;object-fit:cover;box-shadow:3px 3px 6px var(--neu-shadow-dark),-3px -3px 6px var(--neu-shadow-light)">
+                                             style="width:100px;height:100px;object-fit:cover;box-shadow:3px 3px 6px #ccc,-3px -3px 6px #f5f5f5">
                                     </a>
                                 @else
                                     <a href="{{ route('recetas.documento.download', $doc->id) }}"
@@ -56,19 +56,19 @@
         </div>
 
         <div class="col-md-7">
-            <div class="neu-card p-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Diagnóstico</h5>
+            <div class="card shadow-2 p-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Diagnóstico</h5>
                 <p style="color:var(--text-emphasis);font-weight:400;line-height:1.7">{{ $receta->diagnostico }}</p>
             </div>
 
-            <div class="neu-card p-4 mt-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Indicaciones generales</h5>
+            <div class="card shadow-2 p-4 mt-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Indicaciones generales</h5>
                 <p style="color:var(--text-emphasis);font-weight:400;line-height:1.7">{{ $receta->indicaciones_generales }}</p>
             </div>
 
             @if ($receta->medicamentos->isNotEmpty())
-            <div class="neu-card p-4 mt-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Medicamentos</h5>
+            <div class="card shadow-2 p-4 mt-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Medicamentos</h5>
                 <div class="table-responsive">
                     <table class="table neu-table align-middle mb-0">
                         <thead>
@@ -98,15 +98,15 @@
             @endif
 
             @if ($receta->notas)
-            <div class="neu-card p-4 mt-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Notas adicionales</h5>
+            <div class="card shadow-2 p-4 mt-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Notas adicionales</h5>
                 <p style="color:var(--text-primary);line-height:1.7;white-space:pre-wrap">{{ $receta->notas }}</p>
             </div>
             @endif
 
             @if ($user->esMedico() || $user->esAdmin())
             <div class="mt-4 text-end">
-                <a href="{{ route('recetas.create', $receta->cita->id) }}" class="neu-btn neu-btn-primary neu-btn-sm">+ Nueva receta para esta cita</a>
+                <a href="{{ route('recetas.create', $receta->cita->id) }}" class="btn btn-primary neu-btn-sm"><i class="fa-solid fa-plus me-1"></i>Nueva receta para esta cita</a>
             </div>
             @endif
         </div>

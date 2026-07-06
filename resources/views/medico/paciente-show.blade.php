@@ -5,14 +5,14 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold" style="color:var(--yellow)">Perfil del Paciente</h4>
-        <a href="{{ route('dashboard') }}" class="neu-btn neu-btn-sm" style="color:var(--yellow)">&larr; Volver al dashboard</a>
+        <h4 class="fw-bold" style="color:#1266f1">Perfil del Paciente</h4>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1"><i class="fa-solid fa-arrow-left me-1"></i>Volver al dashboard</a>
     </div>
 
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="neu-card p-4 h-100">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Datos personales</h5>
+            <div class="card shadow-2 p-4 h-100">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Datos personales</h5>
                 <div class="table-responsive">
                     <table class="table neu-table align-middle mb-0">
                         <tbody>
@@ -30,8 +30,8 @@
         </div>
 
         <div class="col-md-6">
-            <div class="neu-card p-4 h-100">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Contactos de emergencia</h5>
+            <div class="card shadow-2 p-4 h-100">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Contactos de emergencia</h5>
                 @forelse ($paciente->contactosEmergencia as $contacto)
                     <div class="table-responsive mb-2">
                         <table class="table neu-table align-middle mb-0">
@@ -50,15 +50,15 @@
         </div>
 
         <div class="col-md-6">
-            <div class="neu-card p-4 h-100">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Alergias</h5>
+            <div class="card shadow-2 p-4 h-100">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Alergias</h5>
                 @php $alergias = $paciente->alergias; @endphp
                 @if ($alergias->isNotEmpty())
                     @foreach ($alergias as $alergia)
                         <div class="mb-2">
                             <p class="fw-bold mb-0" style="color:var(--text-emphasis);font-size:1.05rem">{{ $alergia->nombre }}</p>
                             @if ($alergia->pivot->gravedad)
-                                <small style="color:var(--yellow)">Gravedad: {{ $alergia->pivot->gravedad }}</small>
+                                <small style="color:#1266f1">Gravedad: {{ $alergia->pivot->gravedad }}</small>
                             @endif
                             <p style="color:var(--text-primary);margin-bottom:0">{{ $alergia->descripcion ?? '' }}</p>
                         </div>
@@ -70,8 +70,8 @@
         </div>
 
         <div class="col-md-6">
-            <div class="neu-card p-4 h-100">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Enfermedades importantes</h5>
+            <div class="card shadow-2 p-4 h-100">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Enfermedades importantes</h5>
                 @php $enfermedades = $paciente->enfermedadesImportantes; @endphp
                 @if ($enfermedades->isNotEmpty())
                     @foreach ($enfermedades as $enf)
@@ -90,8 +90,8 @@
         </div>
 
         <div class="col-12">
-            <div class="neu-card p-4">
-                <h5 class="mb-3 fw-bold" style="color:var(--yellow);border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Historial de citas</h5>
+            <div class="card shadow-2 p-4">
+                <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Historial de citas</h5>
                 @if ($citas->isEmpty())
                     <p class="text-muted mb-0">Sin citas previas.</p>
                 @else
@@ -111,14 +111,14 @@
                                         <td style="color:var(--text-primary)">{{ $cita->motivo }}</td>
                                         <td>
                                             @switch($cita->estado)
-                                                @case('pendiente') <span class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                                                @case('confirmada') <span class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                                                @case('en_espera') <span class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                                                @case('en_consulta') <span class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                                                @case('finalizada') <span class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                                                @case('cancelada') <span class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                                                @case('no_asistio') <span class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                                                @case('reprogramada') <span class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                                                @case('pendiente') <span class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
+                                                @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
+                                                @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
+                                                @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                                                @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
+                                                @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
+                                                @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
+                                                @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
                                             @endswitch
                                         </td>
                                     </tr>

@@ -6,10 +6,10 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <div class="neu-card p-4 d-flex justify-content-between align-items-center">
+            <div class="card shadow-2 p-4 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-3">
                     <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                         style="width:64px;height:64px;background:var(--yellow);color:#121212;font-size:1.5rem;font-weight:bold;overflow:hidden">
+                         style="width:64px;height:64px;background:#1266f1;color:#121212;font-size:1.5rem;font-weight:bold;overflow:hidden">
                         @if ($user->foto_url)
                             <img src="{{ Storage::url($user->foto_url) }}" alt="Foto"
                                  style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -29,20 +29,20 @@
                         <div class="form-check form-switch mb-0 d-flex align-items-center gap-2" style="cursor:pointer" onclick="document.getElementById('toggle-activo-form').submit();">
                             <input class="form-check-input" type="checkbox" role="switch"
                                    {{ optional($perfil)->activo ?? true ? 'checked' : '' }}
-                                   style="width:2.5rem;height:1.3rem;cursor:pointer;background:var(--neu-shadow-dark);pointer-events:none">
-                            <span class="small fw-bold" style="color:{{ optional($perfil)->activo ?? true ? 'var(--yellow)' : '#ff4444' }}">
+                                   style="width:2.5rem;height:1.3rem;cursor:pointer;background:#ccc;pointer-events:none">
+                            <span class="small fw-bold" style="color:{{ optional($perfil)->activo ?? true ? '#1266f1' : '#ff4444' }}">
                                 {{ optional($perfil)->activo ?? true ? 'Activo' : 'Inactivo' }}
                             </span>
                         </div>
                     </form>
-                    <button type="button" id="btn-editar" class="neu-btn" style="background:var(--yellow);color:#121212" onclick="toggleEdit()">Editar</button>
+                    <button type="button" id="btn-editar" class="btn btn-outline-secondary" style="background:#1266f1;color:#121212" onclick="toggleEdit()"><i class="fa-regular fa-pen-to-square me-1"></i>Editar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="neu-card p-4 mb-4">
-        <h5 class="fw-bold mb-3" style="color:var(--yellow)">Información Personal</h5>
+    <div class="card shadow-2 p-4 mb-4">
+        <h5 class="fw-bold mb-3" style="color:#1266f1">Información Personal</h5>
         <div class="row g-3 view-mode">
             <div class="col-md-6">
                 <label class="form-label text-muted small">Nombre</label>
@@ -74,7 +74,7 @@
                         <div class="d-flex align-items-center gap-3">
                             <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                                  id="foto-preview-container"
-                                 style="width:56px;height:56px;background:var(--yellow);color:#121212;font-size:1.3rem;font-weight:bold;overflow:hidden">
+                                 style="width:56px;height:56px;background:#1266f1;color:#121212;font-size:1.3rem;font-weight:bold;overflow:hidden">
                                 @if ($user->foto_url)
                                     <img id="foto-preview" src="{{ Storage::url($user->foto_url) }}" alt="Foto"
                                          style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -84,7 +84,7 @@
                                 @endif
                             </div>
                             <input type="file" name="foto" accept="image/jpeg,image/png,image/gif,image/webp"
-                                   class="neu-input form-control @error('foto') is-invalid @enderror"
+                                   class="form-control @error('foto') is-invalid @enderror"
                                    onchange="previewFoto(this)">
                             @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             <small class="text-muted">JPG, PNG, GIF, WebP — Máx. 2MB</small>
@@ -93,41 +93,41 @@
                 <div class="col-md-6">
                     <label class="form-label text-muted small">Nombre</label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                           class="neu-input form-control @error('name') is-invalid @enderror">
+                           class="form-control @error('name') is-invalid @enderror">
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-muted small">Email</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                           class="neu-input form-control @error('email') is-invalid @enderror">
+                           class="form-control @error('email') is-invalid @enderror">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Fecha de Nacimiento</label>
                     <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', optional($user->fecha_nacimiento)->format('Y-m-d')) }}"
-                           class="neu-input form-control @error('fecha_nacimiento') is-invalid @enderror">
+                           class="form-control @error('fecha_nacimiento') is-invalid @enderror">
                     @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono', $user->telefono) }}"
-                           class="neu-input form-control @error('telefono') is-invalid @enderror">
+                           class="form-control @error('telefono') is-invalid @enderror">
                     @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Dirección</label>
                     <input type="text" name="direccion" value="{{ old('direccion', $user->direccion) }}"
-                           class="neu-input form-control @error('direccion') is-invalid @enderror">
+                           class="form-control @error('direccion') is-invalid @enderror">
                     @error('direccion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
             </div>
 
-            <h5 class="fw-bold mb-3 mt-4" style="color:var(--yellow)">Información Profesional</h5>
+            <h5 class="fw-bold mb-3 mt-4" style="color:#1266f1">Información Profesional</h5>
             <div class="row g-3 edit-mode">
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Especialidad</label>
                     <select name="tipo_medico_id"
-                            class="neu-input form-control @error('tipo_medico_id') is-invalid @enderror">
+                            class="form-control @error('tipo_medico_id') is-invalid @enderror">
                         <option value="">Seleccionar...</option>
                         @foreach ($tiposMedico as $tipo)
                             <option value="{{ $tipo->id }}" {{ old('tipo_medico_id', optional($perfil)->tipo_medico_id) == $tipo->id ? 'selected' : '' }}>
@@ -140,38 +140,38 @@
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Cédula Profesional</label>
                     <input type="text" name="cedula_profesional" value="{{ old('cedula_profesional', optional($perfil)->cedula_profesional) }}"
-                           class="neu-input form-control @error('cedula_profesional') is-invalid @enderror">
+                           class="form-control @error('cedula_profesional') is-invalid @enderror">
                     @error('cedula_profesional') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Universidad</label>
                     <input type="text" name="universidad" value="{{ old('universidad', optional($perfil)->universidad) }}"
-                           class="neu-input form-control @error('universidad') is-invalid @enderror">
+                           class="form-control @error('universidad') is-invalid @enderror">
                     @error('universidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Años de Experiencia</label>
                     <input type="number" name="experiencia_anios" value="{{ old('experiencia_anios', optional($perfil)->experiencia_anios) }}"
-                           class="neu-input form-control @error('experiencia_anios') is-invalid @enderror" min="0" max="100">
+                           class="form-control @error('experiencia_anios') is-invalid @enderror" min="0" max="100">
                     @error('experiencia_anios') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-muted small">Observaciones</label>
                     <input type="text" name="observaciones" value="{{ old('observaciones', $user->observaciones) }}"
-                           class="neu-input form-control @error('observaciones') is-invalid @enderror">
+                           class="form-control @error('observaciones') is-invalid @enderror">
                     @error('observaciones') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-12">
                     <label class="form-label text-muted small">Descripción</label>
                     <textarea name="descripcion" rows="3"
-                              class="neu-input form-control @error('descripcion') is-invalid @enderror">{{ old('descripcion', optional($perfil)->descripcion) }}</textarea>
+                              class="form-control @error('descripcion') is-invalid @enderror">{{ old('descripcion', optional($perfil)->descripcion) }}</textarea>
                     @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
             </div>
 
             <div class="mt-4 text-end d-flex gap-2 justify-content-end edit-mode">
-                <button type="button" class="neu-btn neu-btn-sm" onclick="toggleEdit()">Cancelar</button>
-                <button type="submit" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Guardar cambios</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar cambios</button>
             </div>
         </form>
 
@@ -204,19 +204,19 @@
                 <label class="form-label text-muted small">Estado</label>
                 <p class="fw-bold mb-0">
                     @if (optional($perfil)->activo ?? true)
-                        <span class="neu-badge" style="background:#00b894;color:#fff">Activo</span>
+                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
                     @else
-                        <span class="neu-badge" style="background:#ff4444;color:#fff">Inactivo</span>
+                        <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Inactivo</span>
                     @endif
                 </p>
             </div>
         </div>
     </div>
 
-    <div class="neu-card p-4 mb-4">
+    <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0" style="color:var(--yellow)">Mis Documentos</h5>
-            <button type="button" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212" data-mdb-toggle="modal" data-mdb-target="#documentosModal">+ Subir</button>
+            <h5 class="fw-bold mb-0" style="color:#1266f1">Mis Documentos</h5>
+            <button type="button" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212" data-mdb-toggle="modal" data-mdb-target="#documentosModal"><i class="fa-solid fa-upload me-1"></i>+ Subir</button>
         </div>
 
         @error('documento')
@@ -264,13 +264,13 @@
                                 <td>
                                     <div class="d-flex gap-1">
                                         <a href="{{ Storage::url($doc->ruta_archivo) }}" target="_blank"
-                                           class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">Ver</a>
+                                           class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">Ver</a>
                                         <a href="{{ route('medico.documentos.download', $doc->id) }}"
-                                           class="neu-btn neu-btn-sm" style="font-size:0.65rem">Descargar</a>
+                                           class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem">Descargar</a>
                                         <form action="{{ route('medico.documentos.destroy', $doc->id) }}" method="POST"
                                               class="d-inline" onsubmit="return confirm('¿Eliminar este documento?')">
                                             @csrf @method('DELETE')
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Eliminar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                         </form>
                                     </div>
                                 </td>
@@ -297,21 +297,21 @@
                     <div class="mb-3">
                         <label class="form-label text-muted small">Nombre del documento</label>
                         <input type="text" name="nombre" placeholder="Ej. Cédula profesional"
-                               class="neu-input form-control @error('nombre') is-invalid @enderror">
+                               class="form-control @error('nombre') is-invalid @enderror">
                         @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-muted small">Archivo</label>
                         <input type="file" name="documento"
-                               class="neu-input form-control @error('documento') is-invalid @enderror"
+                               class="form-control @error('documento') is-invalid @enderror"
                                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" required>
                         @error('documento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         <small class="text-muted">JPG, PNG, GIF, WebP, PDF — Máx. 20MB</small>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Subir</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-solid fa-upload me-1"></i>Subir</button>
                 </div>
             </form>
         </div>
@@ -331,12 +331,12 @@ function toggleEdit() {
     if (isEditing) {
         form.style.display = 'none';
         view.forEach(el => el.style.display = '');
-        btn.textContent = 'Editar';
-        btn.style.background = 'var(--yellow)';
+        btn.innerHTML = '<i class=\"fa-regular fa-pen-to-square me-1\"></i>Editar';
+        btn.style.background = '#1266f1';
     } else {
         form.style.display = '';
         view.forEach(el => el.style.display = 'none');
-        btn.textContent = 'Cancelar';
+        btn.innerHTML = '<i class=\"fa-regular fa-xmark me-1\"></i>Cancelar';
         btn.style.background = '#ff4444';
         btn.style.color = '#fff';
     }

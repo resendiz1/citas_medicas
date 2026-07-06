@@ -9,7 +9,7 @@
     <form method="GET" class="mb-3">
         <div class="row g-2 align-items-center">
             <div class="col-auto flex-grow-1">
-                <input type="text" name="search" class="neu-input form-control" placeholder="Buscar por paciente o médico..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por paciente o médico..." value="{{ request('search') }}">
             </div>
             <div class="col-auto">
                 <select name="estado" class="neu-select form-select" onchange="this.form.submit()">
@@ -25,15 +25,15 @@
                 </select>
             </div>
             <div class="col-auto">
-                <button type="submit" class="neu-btn neu-btn-sm">Buscar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-search me-1"></i>Buscar</button>
                 @if (request('search') || request('estado'))
-                    <a href="{{ route('admin.citas') }}" class="neu-btn neu-btn-sm" style="background:#ff4444;color:#fff">Limpiar</a>
+                    <a href="{{ route('admin.citas') }}" class="btn btn-outline-secondary btn-sm" style="background:#ff4444;color:#fff"><i class="fa-solid fa-rotate-left me-1"></i>Limpiar</a>
                 @endif
             </div>
         </div>
     </form>
 
-    <div class="neu-card p-4">
+    <div class="card shadow-2 p-4">
         <div class="table-responsive">
             <table class="table neu-table align-middle mb-0">
                 <thead>
@@ -57,14 +57,14 @@
                             <td class="text-muted">{{ Str::limit($cita->motivo, 40) }}</td>
                             <td>
                                 @switch($cita->estado)
-                                    @case('pendiente') <span class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                                    @case('confirmada') <span class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                                    @case('en_espera') <span class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                                    @case('en_consulta') <span class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                                    @case('finalizada') <span class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                                    @case('cancelada') <span class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                                    @case('no_asistio') <span class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                                    @case('reprogramada') <span class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                                    @case('pendiente') <span class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
+                                    @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
+                                    @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
+                                    @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                                    @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
+                                    @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
+                                    @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
+                                    @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
                                 @endswitch
                             </td>
                             <td>
@@ -73,74 +73,74 @@
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="confirmada">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff">Confirmar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff"><i class="fa-regular fa-check-circle me-1"></i>Confirmar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="cancelada">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Cancelar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff">No asistió</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff"><i class="fa-regular fa-user-slash me-1"></i>No asistió</button>
                                         </form>
-                                        <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
-                                            Reprogramar
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
+                                            <i class="fa-regular fa-calendar me-1"></i>Reprogramar
                                         </button>
                                     @elseif ($cita->estado === 'confirmada')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="en_espera">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ffa500;color:#121212">En espera</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ffa500;color:#121212"><i class="fa-regular fa-clock me-1"></i>En espera</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="cancelada">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Cancelar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff">No asistió</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff"><i class="fa-regular fa-user-slash me-1"></i>No asistió</button>
                                         </form>
-                                        <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
-                                            Reprogramar
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
+                                            <i class="fa-regular fa-calendar me-1"></i>Reprogramar
                                         </button>
                                     @elseif ($cita->estado === 'en_espera')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="en_consulta">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">En consulta</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="cancelada">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Cancelar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff">No asistió</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff"><i class="fa-regular fa-user-slash me-1"></i>No asistió</button>
                                         </form>
                                     @elseif ($cita->estado === 'en_consulta')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="finalizada">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#555;color:#fff">Finalizar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#555;color:#fff"><i class="fa-regular fa-check-double me-1"></i>Finalizar</button>
                                         </form>
                                     @elseif ($cita->estado === 'reprogramada')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="confirmada">
-                                            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff">Confirmar</button>
+                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff"><i class="fa-regular fa-check-circle me-1"></i>Confirmar</button>
                                         </form>
                                     @else
                                         <span class="text-muted" style="font-size:0.75rem">—</span>
                                     @endif
                                     <form action="{{ route('admin.citas.destroy', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar permanentemente esta cita? También se eliminarán recetas, consultas e historial asociados.')">
                                         @csrf @method('DELETE')
-                                        <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Eliminar</button>
+                                        <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
                                     </form>
                                 </div>
                             </td>
@@ -159,12 +159,12 @@
                                                     <input type="hidden" name="estado" value="reprogramada">
                                                     <div class="mb-3">
                                                         <label class="form-label text-muted small">Selecciona la nueva fecha y hora</label>
-                                                        <input type="datetime-local" name="fecha_reprogramada" class="neu-input form-control js-flatpickr-simple" required>
+                                                        <input type="datetime-local" name="fecha_reprogramada" class="form-control js-flatpickr-simple" required>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer border-0">
-                                                    <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" class="neu-btn neu-btn-sm" style="background:#9370db;color:#fff">Guardar reprogramación</button>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                                                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#9370db;color:#fff"><i class="fa-regular fa-calendar-check me-1"></i>Guardar reprogramación</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -176,12 +176,12 @@
                                                     <input type="hidden" name="estado" value="reprogramada">
                                                     <div class="mb-3">
                                                         <label class="form-label text-muted small">Selecciona la nueva fecha y hora</label>
-                                                        <input type="datetime-local" name="fecha_reprogramada" class="neu-input form-control js-flatpickr-simple" required>
+                                                        <input type="datetime-local" name="fecha_reprogramada" class="form-control js-flatpickr-simple" required>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer border-0">
-                                                    <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" class="neu-btn neu-btn-sm" style="background:#9370db;color:#fff">Guardar reprogramación</button>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                                                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#9370db;color:#fff"><i class="fa-regular fa-calendar-check me-1"></i>Guardar reprogramación</button>
                                                 </div>
                                             </form>
                                         </div>

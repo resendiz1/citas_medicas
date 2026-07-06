@@ -8,9 +8,9 @@
 
     <div class="row mb-4">
         <div class="col-12">
-            <div class="neu-card p-4 d-flex align-items-center gap-3">
+            <div class="card shadow-2 p-4 d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                     style="width:48px;height:48px;background:var(--yellow);color:#121212;font-size:1.2rem;font-weight:bold;overflow:hidden">
+                     style="width:48px;height:48px;background:#1266f1;color:#121212;font-size:1.2rem;font-weight:bold;overflow:hidden">
                     @if ($user->foto_url)
                         <img src="{{ Storage::url($user->foto_url) }}" alt="Foto"
                              style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -39,8 +39,8 @@
             @if ($user->esAdmin())
             <div class="col-md-6 col-lg-3">
                 <a href="{{ route('admin.pacientes') }}" class="text-decoration-none">
-                    <div class="neu-stat p-4 text-center">
-                        <div class="stat-icon mx-auto mb-3" style="color:var(--yellow)"><i class="fa-solid fa-users fa-xl"></i></div>
+                    <div class="card border-0 shadow-2 p-4 text-center">
+                        <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa-solid fa-users fa-xl"></i></div>
                         <h5>Pacientes</h5>
                         <p class="display-6 mb-0 fw-bold">{{ $totalPacientes }}</p>
                     </div>
@@ -48,8 +48,8 @@
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ route('admin.medicos') }}" class="text-decoration-none">
-                    <div class="neu-stat p-4 text-center">
-                        <div class="stat-icon mx-auto mb-3" style="color:var(--yellow)"><i class="fa-solid fa-user-doctor fa-xl"></i></div>
+                    <div class="card border-0 shadow-2 p-4 text-center">
+                        <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa-solid fa-user-doctor fa-xl"></i></div>
                         <h5>Médicos</h5>
                         <p class="display-6 mb-0 fw-bold">{{ $totalMedicos }}</p>
                     </div>
@@ -58,8 +58,8 @@
             @endif
             <div class="col-md-6 col-lg-3">
                 <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas') }}" class="text-decoration-none">
-                    <div class="neu-stat p-4 text-center">
-                        <div class="stat-icon mx-auto mb-3" style="color:var(--yellow)"><i class="fa-solid fa-calendar-check fa-xl"></i></div>
+                    <div class="card border-0 shadow-2 p-4 text-center">
+                        <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa-solid fa-calendar-check fa-xl"></i></div>
                         <h5>Citas</h5>
                         <p class="display-6 mb-0 fw-bold">{{ $totalCitas }}</p>
                     </div>
@@ -67,8 +67,8 @@
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas', ['estado' => 'pendiente']) }}" class="text-decoration-none">
-                    <div class="neu-stat p-4 text-center">
-                        <div class="stat-icon mx-auto mb-3" style="color:var(--yellow)"><i class="fa-solid fa-clock fa-xl"></i></div>
+                    <div class="card border-0 shadow-2 p-4 text-center">
+                        <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa-solid fa-clock fa-xl"></i></div>
                         <h5>Pendientes</h5>
                         <p class="display-6 mb-0 fw-bold">{{ $citasPendientes }}</p>
                     </div>
@@ -76,8 +76,8 @@
             </div>
             @if ($user->esRecepcionista())
             <div class="col-md-6 col-lg-3">
-                <div class="neu-stat p-4 text-center">
-                    <div class="stat-icon mx-auto mb-3" style="color:var(--yellow)"><i class="fa-solid fa-calendar-day fa-xl"></i></div>
+                <div class="card border-0 shadow-2 p-4 text-center">
+                    <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa-solid fa-calendar-day fa-xl"></i></div>
                     <h5>Hoy</h5>
                     <p class="display-6 mb-0 fw-bold">{{ $citasHoy }}</p>
                 </div>
@@ -85,8 +85,8 @@
             @endif
         </div>
         @if ($user->esRecepcionista())
-        <div class="neu-card p-4 mt-4" id="citas-section">
-            <h5 class="mb-3 fw-bold" style="color:var(--yellow)">Todas las Citas</h5>
+        <div class="card shadow-2 p-4 mt-4" id="citas-section">
+            <h5 class="mb-3 fw-bold" style="color:#1266f1">Todas las Citas</h5>
             <div class="table-responsive">
                 <table class="table neu-table align-middle mb-0">
                     <thead>
@@ -108,14 +108,14 @@
                                 <td class="text-muted">{{ $cita->medico->medicoPerfil->tipoMedico->nombre_tipo_medico ?? '—' }}</td>
                                 <td data-cita-id="{{ $cita->id }}">
                                     @switch($cita->estado)
-                                        @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                                        @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                                        @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                                        @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                                        @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                                        @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                                        @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                                        @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                                        @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
+                                        @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
+                                        @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
+                                        @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                                        @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
+                                        @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
+                                        @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
+                                        @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
                                     @endswitch
                                 </td>
                                 <td data-cita-acciones="{{ $cita->id }}">
@@ -144,9 +144,9 @@
                 @forelse ($medicos as $medico)
                 <div class="col-md-4 col-lg-3">
                     <a href="{{ route('paciente.medicos.show', $medico->id) }}" class="text-decoration-none">
-                        <div class="neu-card p-3 text-center h-100" style="border-radius:12px;cursor:pointer;">
+                        <div class="card shadow-2 p-3 text-center h-100" style="border-radius:12px;cursor:pointer;">
                             <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
-                                 style="width:56px;height:56px;background:var(--yellow);color:#121212;font-size:1.4rem;font-weight:bold;overflow:hidden">
+                                 style="width:56px;height:56px;background:#1266f1;color:#121212;font-size:1.4rem;font-weight:bold;overflow:hidden">
                                 @if ($medico->foto_url)
                                     <img src="{{ Storage::url($medico->foto_url) }}" alt="Foto"
                                          style="width:100%;height:100%;object-fit:cover;cursor:pointer"
@@ -171,15 +171,15 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 fw-bold" style="color:var(--text-primary)">Mis Citas</h5>
             <div class="d-flex gap-2">
-                <a href="{{ route('medico.perfil') }}" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Mi Perfil</a>
+                <a href="{{ route('medico.perfil') }}" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-user me-1"></i>Mi Perfil</a>
             </div>
         </div>
         @elseif ($user->esPaciente())
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 fw-bold" style="color:var(--text-primary)">Mis Citas</h5>
             <div class="d-flex gap-2">
-                <a href="{{ route('paciente.perfil') }}" class="neu-btn neu-btn-sm" style="background:var(--yellow);color:#121212">Mi Perfil</a>
-                <a href="{{ route('citas.create') }}" class="neu-btn neu-btn-primary neu-btn-sm">+ Nueva cita</a>
+                <a href="{{ route('paciente.perfil') }}" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-user me-1"></i>Mi Perfil</a>
+                <a href="{{ route('citas.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa-regular fa-calendar-plus me-1"></i>+ Nueva cita</a>
             </div>
         </div>
         @else
@@ -187,7 +187,7 @@
             <h5 class="mb-0 fw-bold" style="color:var(--text-primary)">Mis Citas</h5>
         </div>
         @endif
-        <div class="neu-card p-4">
+        <div class="card shadow-2 p-4">
             @if ($citas->isEmpty())
                 <p class="text-muted mb-0">No tienes citas registradas.</p>
             @else
@@ -212,14 +212,14 @@
                                     <td class="text-muted">{{ Str::limit($cita->motivo, 40) }}</td>
                                     <td data-cita-id="{{ $cita->id }}">
                                         @switch($cita->estado)
-                                            @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:var(--yellow);color:#121212">Pendiente</span> @break
-                                            @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#00b894;color:#fff">Confirmada</span> @break
-                                            @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ffa500;color:#121212">En espera</span> @break
-                                            @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#1e90ff;color:#fff">En consulta</span> @break
-                                            @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#555;color:#fff">Finalizada</span> @break
-                                            @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#ff4444;color:#fff">Cancelada</span> @break
-                                            @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#dc143c;color:#fff">No asistió</span> @break
-                                            @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="neu-badge" style="background:#9370db;color:#fff">Reprogramada</span> @break
+                                            @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
+                                            @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
+                                            @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
+                                            @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                                            @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
+                                            @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
+                                            @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
+                                            @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
                                         @endswitch
                                     </td>
                                     <td data-cita-acciones="{{ $cita->id }}">
@@ -240,12 +240,12 @@
                                                             <input type="hidden" name="estado" value="reprogramada">
                                                             <div class="mb-3">
                                                                 <label class="form-label text-muted small">Selecciona la nueva fecha y hora</label>
-                                                                <input type="datetime-local" name="fecha_reprogramada" class="neu-input form-control js-flatpickr-simple" required>
+                                                                <input type="datetime-local" name="fecha_reprogramada" class="form-control js-flatpickr-simple" required>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer border-0">
-                                                            <button type="button" class="neu-btn neu-btn-sm" data-mdb-dismiss="modal">Cancelar</button>
-                                                            <button type="submit" class="neu-btn neu-btn-sm" style="background:#9370db;color:#fff">Guardar reprogramación</button>
+                                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
+                                                            <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#9370db;color:#fff"><i class="fa-regular fa-calendar-check me-1"></i>Guardar reprogramación</button>
                                                         </div>
                                                     </form>
                                                 </div>

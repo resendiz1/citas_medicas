@@ -10,15 +10,15 @@
     <div class="container">
         <div class="row justify-content-center align-items-center min-vh-100">
             <div class="col-md-6 text-center">
-                <div class="neu-card p-5">
-                    <h1 class="display-4 mb-3 fw-bold" style="color:var(--yellow)">Citas Médicas</h1>
+                <div class="card shadow-2 p-5">
+                    <h1 class="display-4 mb-3 fw-bold" style="color:#1266f1">Citas Médicas</h1>
                     <p class="lead mb-4 text-muted">Sistema de gestión de citas médicas</p>
                     <div class="d-flex justify-content-center gap-3">
                         @auth
-                            <a href="{{ route('dashboard') }}" class="neu-btn neu-btn-primary">Ir al Dashboard</a>
+                            <a href="{{ route('dashboard') }}" class="btn btn-primary"><i class="fa-solid fa-gauge-high me-1"></i>Ir al Dashboard</a>
                         @else
-                            <a href="{{ route('login') }}" class="neu-btn neu-btn-primary">Iniciar sesión</a>
-                            <a href="{{ route('register') }}" class="neu-btn">Registrarse</a>
+                            <a href="{{ route('login') }}" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket me-1"></i>Iniciar sesión</a>
+                            <a href="{{ route('register') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-user-plus me-1"></i>Registrarse</a>
                         @endauth
                     </div>
                 </div>

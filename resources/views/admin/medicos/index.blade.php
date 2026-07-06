@@ -5,25 +5,25 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold" style="color:var(--yellow)">Médicos</h4>
-        <a href="{{ route('admin.medicos.create') }}" class="neu-btn neu-btn-primary neu-btn-sm">+ Nuevo médico</a>
+        <h4 class="fw-bold" style="color:#1266f1">Médicos</h4>
+        <a href="{{ route('admin.medicos.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa-solid fa-plus me-1"></i>+ Nuevo médico</a>
     </div>
 
     <form method="GET" class="mb-3">
         <div class="row g-2 align-items-center">
             <div class="col-auto flex-grow-1">
-                <input type="text" name="search" class="neu-input form-control" placeholder="Buscar por nombre o email..." value="{{ request('search') }}" style="color:var(--text-primary)">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o email..." value="{{ request('search') }}" style="color:var(--text-primary)">
             </div>
             <div class="col-auto">
-                <button type="submit" class="neu-btn neu-btn-sm">Buscar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-search me-1"></i>Buscar</button>
                 @if (request('search'))
-                    <a href="{{ route('admin.medicos') }}" class="neu-btn neu-btn-sm" style="background:#ff4444;color:#fff">Limpiar</a>
+                    <a href="{{ route('admin.medicos') }}" class="btn btn-outline-secondary btn-sm" style="background:#ff4444;color:#fff"><i class="fa-solid fa-rotate-left me-1"></i>Limpiar</a>
                 @endif
             </div>
         </div>
     </form>
 
-    <div class="neu-card p-4">
+    <div class="card shadow-2 p-4">
         <div class="table-responsive">
             <table class="table neu-table align-middle mb-0">
                 <thead>
@@ -45,7 +45,7 @@
                                          style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer"
                                          onclick="window.open('{{ Storage::url($medico->foto_url) }}','_blank')">
                                 @else
-                                    <span style="display:inline-flex;width:36px;height:36px;border-radius:50%;background:var(--yellow);color:#121212;align-items:center;justify-content:center;font-size:0.8rem;font-weight:bold">
+                                    <span style="display:inline-flex;width:36px;height:36px;border-radius:50%;background:#1266f1;color:#121212;align-items:center;justify-content:center;font-size:0.8rem;font-weight:bold">
                                         {{ strtoupper(substr($medico->name, 0, 1)) }}
                                     </span>
                                 @endif
@@ -55,14 +55,14 @@
                             <td class="text-muted">{{ $medico->medicoPerfil->cedula_profesional ?? '—' }}</td>
                             <td>
                                 @if ($medico->medicoPerfil->activo ?? true)
-                                    <span class="neu-badge" style="background:#00b894;color:#fff;font-size:0.65rem">Activo</span>
+                                    <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
                                 @else
-                                    <span class="neu-badge" style="background:#ff4444;color:#fff;font-size:0.65rem">Inactivo</span>
+                                    <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa-regular fa-circle-xmark me-1"></i>Inactivo</span>
                                 @endif
                             </td>
                             <td>
                                 <div class="dropdown">
-                                    <button class="neu-btn neu-btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown" style="background:var(--yellow);color:#121212">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown" style="background:#1266f1;color:#121212">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end neu-dropdown" style="min-width:170px">

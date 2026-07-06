@@ -8,39 +8,6 @@ import { initChatWidget } from './chat-widget.js';
 
 window.Pusher = Pusher;
 
-
-
-    // window.Echo = new Echo({
-    //     broadcaster: 'reverb',
-    //     key: import.meta.env.VITE_REVERB_APP_KEY,
-    //     wsHost: import.meta.env.VITE_REVERB_HOST,
-    //     wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
-    //     wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
-    //     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
-    //     enabledTransports: ['ws', 'wss'],
-    // });
-    // window.Echo.connector.pusher.connection.bind('error', function () {});
-
-
-console.log('BOOTSTRAP JS CARGADO');
-console.log('REVERB KEY:', import.meta.env.VITE_REVERB_APP_KEY);
-console.log('REVERB HOST:', import.meta.env.VITE_REVERB_HOST);
-console.log('REVERB PORT:', import.meta.env.VITE_REVERB_PORT);
-console.log('REVERB SCHEME:', import.meta.env.VITE_REVERB_SCHEME);
-
-window.Pusher = Pusher;
-
-
-// window.Echo = new Echo({
-//     broadcaster: 'reverb',
-//     key: import.meta.env.VITE_REVERB_APP_KEY,
-//     wsHost: import.meta.env.VITE_REVERB_HOST,
-//     wsPort: Number(import.meta.env.VITE_REVERB_PORT ?? 80),
-//     wssPort: Number(import.meta.env.VITE_REVERB_PORT ?? 443),
-//     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
-//     enabledTransports: ['ws', 'wss'],
-// });
-
 try {
     window.Echo = new Echo({
         broadcaster: 'reverb',
@@ -58,20 +25,6 @@ try {
 
 
 console.log('ECHO CREADO:', window.Echo);
-
-
-
-
-
-
-function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    const icon = document.getElementById('theme-icon');
-    if (icon) {
-        icon.textContent = theme === 'dark' ? '🌙' : '☀️';
-    }
-}
 
 window.openModal = function openModal(id) {
     const modal = document.getElementById(id);
@@ -100,19 +53,18 @@ window.actualizarEstadoCita = function (citaId, nuevoEstado) {
     const badge = document.getElementById('estado-badge-' + citaId);
     if (badge) {
         const config = {
-            pendiente:     { text: 'Pendiente',     bg: 'var(--yellow)',  color: '#121212' },
-            confirmada:    { text: 'Confirmada',    bg: '#00b894',        color: '#fff' },
-            en_espera:     { text: 'En espera',     bg: '#ffa500',        color: '#121212' },
-            en_consulta:   { text: 'En consulta',   bg: '#1e90ff',        color: '#fff' },
-            finalizada:    { text: 'Finalizada',    bg: '#555',           color: '#fff' },
-            cancelada:     { text: 'Cancelada',     bg: '#ff4444',        color: '#fff' },
-            no_asistio:    { text: 'No asistió',    bg: '#dc143c',        color: '#fff' },
-            reprogramada:  { text: 'Reprogramada',  bg: '#9370db',        color: '#fff' },
+            pendiente:     { text: 'Pendiente',     cls: 'badge bg-warning text-dark' },
+            confirmada:    { text: 'Confirmada',    cls: 'badge bg-success' },
+            en_espera:     { text: 'En espera',     cls: 'badge bg-warning text-dark' },
+            en_consulta:   { text: 'En consulta',   cls: 'badge bg-primary' },
+            finalizada:    { text: 'Finalizada',    cls: 'badge bg-secondary' },
+            cancelada:     { text: 'Cancelada',     cls: 'badge bg-danger' },
+            no_asistio:    { text: 'No asistió',    cls: 'badge bg-danger' },
+            reprogramada:  { text: 'Reprogramada',  cls: 'badge bg-info' },
         };
-        const cfg = config[nuevoEstado] || { text: nuevoEstado, bg: '#888', color: '#fff' };
+        const cfg = config[nuevoEstado] || { text: nuevoEstado, cls: 'badge bg-secondary' };
         badge.textContent = cfg.text;
-        badge.style.background = cfg.bg;
-        badge.style.color = cfg.color;
+        badge.className = cfg.cls;
     }
     const accionesTd = document.querySelector('td[data-cita-acciones="' + citaId + '"]');
     if (accionesTd) {
@@ -143,8 +95,8 @@ window.closeModal = function closeModal(id) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const saved = localStorage.getItem('theme') || 'dark';
-    applyTheme(saved);
+    localStorage.removeItem('theme');
+    document.documentElement.removeAttribute('data-theme');
 
     const chatWidget = document.getElementById('chat-widget');
     if (chatWidget) {
@@ -155,14 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.initMdbTooltips();
-
-    const btn = document.getElementById('theme-toggle');
-    if (btn) {
-        btn.addEventListener('click', function () {
-            const current = document.documentElement.getAttribute('data-theme');
-            applyTheme(current === 'dark' ? 'light' : 'dark');
-        });
-    }
 
     document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
         toggle.addEventListener('click', function (e) {
