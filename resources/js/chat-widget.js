@@ -1,3 +1,5 @@
+import gsap from 'gsap';
+
 var chatCitasList = [];
 var chatCitaActual = null;
 var chatWidgetAbierto = false;
@@ -24,10 +26,22 @@ document.addEventListener('visibilitychange', function () {
 
 function toggleChatWidget() {
     chatWidgetAbierto = !chatWidgetAbierto;
-    document.getElementById('chat-panel').classList.toggle('d-none', !chatWidgetAbierto);
+    var panel = document.getElementById('chat-panel');
     if (chatWidgetAbierto) {
+        panel.classList.remove('d-none');
+        gsap.fromTo(panel,
+            { opacity: 0, y: 20, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'back.out(1.4)' }
+        );
         abrirChat();
     } else {
+        gsap.to(panel, {
+            opacity: 0, y: 20, scale: 0.95, duration: 0.2, ease: 'power2.in',
+            onComplete: function () {
+                panel.classList.add('d-none');
+                gsap.set(panel, { opacity: 1, y: 0, scale: 1 });
+            }
+        });
         chatCitaActual = null;
         detenerPoll();
     }
@@ -84,6 +98,7 @@ function renderMensajesCache(citaId) {
         agregarMensajeWidget(m);
     });
     el.scrollTop = el.scrollHeight;
+    gsap.from(el.children, { opacity: 0, y: 8, stagger: 0.03, duration: 0.2, ease: 'power2.out' });
 }
 
 function cargarMensajesWidget(citaId) {
@@ -111,7 +126,9 @@ function agregarMensajeWidget(m) {
         '<div style="max-width:75%;padding:0.5rem 0.75rem;border-radius:12px;background:' + (esPropio ? '#ffc107' : '#f0f0f3') + ';color:' + (esPropio ? '#121212' : '#2c3e50') + ';box-shadow:2px 2px 6px #d1d1d1,-2px -2px 6px #ffffff">' +
         '<div style="font-size:0.65rem;opacity:0.7;margin-bottom:0.2rem">' + escapeHtml(m.nombre) + ' · ' + m.created_at + '</div>' +
         '<div style="font-size:0.85rem;line-height:1.4;word-break:break-word">' + escapeHtml(m.mensaje) + '</div></div></div>';
-    el.appendChild(div.firstElementChild);
+    var msgEl = div.firstElementChild;
+    el.appendChild(msgEl);
+    gsap.from(msgEl, { opacity: 0, y: 10, duration: 0.25, ease: 'power2.out' });
     el.scrollTop = el.scrollHeight;
 }
 

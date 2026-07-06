@@ -15,7 +15,7 @@
             </div>
             <button class="btn btn-sm p-0 text-white" onclick="toggleChatWidget()" style="font-size:1.2rem">&times;</button>
         </div>
-        <div id="chat-mensajes" class="chat-mensajes" style="max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;padding:0.5rem;background:rgba(0,0,0,0.15);border-radius:10px;flex:1"></div>
+        <div id="chat-mensajes" class="chat-mensajes" style="max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;padding:0.5rem;background:rgba(0,0,0,0.15);border-radius:0;flex:1"></div>
         <div class="chat-widget-input">
             <input type="text" id="chat-input" class="form-control form-control-sm" placeholder="Escribe un mensaje..." maxlength="2000">
             <button id="chat-send" class="btn btn-primary" style="white-space:nowrap;font-size:0.75rem;padding:0.25rem 0.6rem"><i class="fa-solid fa-paper-plane me-1"></i>Enviar</button>

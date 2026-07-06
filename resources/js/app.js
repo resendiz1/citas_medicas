@@ -5,6 +5,7 @@ import { Notyf } from 'notyf';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { initChatWidget } from './chat-widget.js';
+import gsap from 'gsap';
 
 window.Pusher = Pusher;
 
@@ -302,5 +303,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } catch {}
         }, 10000);
+    }
+
+    // Dashboard animations
+    var cont = document.querySelector('.container');
+    if (cont && cont.querySelector('.stat-icon')) {
+        var cards = cont.querySelectorAll('.row.g-4 > div > .card, .row.g-4 > div a > .card');
+        if (cards.length) {
+            gsap.from(cards, { opacity: 0, y: 30, stagger: 0.1, duration: 0.5, ease: 'power2.out' });
+        }
+    }
+
+    if (cont && cont.querySelector('.neu-table')) {
+        var tipoUser = document.querySelector('meta[name="user-id"]');
+        // solo animar en dashboard (no en admin CRUDs)
+        var rows = cont.querySelectorAll('.neu-table tbody tr');
+        if (rows.length && cont.querySelector('h5.fw-bold')) {
+            gsap.from(rows, { opacity: 0, x: -20, stagger: 0.04, duration: 0.3, ease: 'power2.out', delay: 0.3 });
+        }
     }
 });

@@ -62,7 +62,7 @@
                             </td>
                             <td>
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown" style="background:#1266f1;color:#121212">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end neu-dropdown" style="min-width:170px">
