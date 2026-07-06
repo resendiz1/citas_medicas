@@ -94,7 +94,6 @@ body {
 
 .neu-btn {
     border: none !important;
-    border-radius: 12px !important;
     background: var(--neu-card) !important;
     box-shadow: 4px 4px 8px var(--neu-shadow-dark), -4px -4px 8px var(--neu-shadow-light);
     color: var(--text-primary) !important;
@@ -145,7 +144,6 @@ body {
 
 .neu-input {
     border: none !important;
-    border-radius: 12px !important;
     background: var(--neu-card) !important;
     box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
     padding: 0.6rem 1rem;
@@ -160,7 +158,6 @@ body {
 
 .neu-select {
     border: none !important;
-    border-radius: 12px !important;
     background: var(--neu-card) !important;
     box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
     padding: 0.6rem 1rem;
@@ -169,7 +166,6 @@ body {
 
 .neu-textarea {
     border: none !important;
-    border-radius: 12px !important;
     background: var(--neu-card) !important;
     box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -3px -3px 6px var(--neu-shadow-light);
     padding: 0.6rem 1rem;
@@ -263,7 +259,6 @@ body {
 
 .neu-dropdown {
     border: none !important;
-    border-radius: 12px !important;
     background: var(--neu-card) !important;
     box-shadow: 6px 6px 12px var(--neu-shadow-dark), -6px -6px 12px var(--neu-shadow-light);
     margin-top: 8px !important;
