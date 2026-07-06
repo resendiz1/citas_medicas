@@ -1,5 +1,12 @@
 @php $user = auth()->user(); @endphp
 @if ($user->esMedico())
+@php
+    $esHoy = $cita->fecha_hora->isToday();
+    $disabledAttr = 'style="font-size:0.65rem;opacity:0.4;pointer-events:none;background:#888;color:#fff;border:none;cursor:not-allowed;display:inline-block;padding:0.25rem 0.5rem;border-radius:6px"';
+    $ds = function($label, $tooltip) use ($disabledAttr) {
+        return '<span data-mdb-toggle="tooltip" title="'.$tooltip.'"><span class="neu-btn neu-btn-sm" '.$disabledAttr.'>'.$label.'</span></span>';
+    };
+@endphp
 <div class="d-flex flex-wrap gap-1 mb-1">
     @if ($cita->estado === 'pendiente')
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
@@ -7,41 +14,37 @@
             <input type="hidden" name="estado" value="confirmada">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff">Confirmar</button>
         </form>
+        {!! $ds('En espera', 'Confirma la cita primero') !!}
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
             @csrf @method('PUT')
             <input type="hidden" name="estado" value="cancelada">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Cancelar</button>
         </form>
-        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
-            @csrf @method('PUT')
-            <input type="hidden" name="estado" value="no_asistio">
-            <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff">No asistió</button>
-        </form>
-        <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
-            Reprogramar
-        </button>
-        @if ($cita->reprogramacion_rechazada)
-            <span class="neu-badge" style="background:#ff6b6b;color:#fff;font-size:0.6rem">Reprogramación rechazada</span>
-        @endif
+        {!! $ds('No asistió', 'Confirma la cita primero') !!}
     @elseif ($cita->estado === 'confirmada')
+        @if ($esHoy)
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
             @csrf @method('PUT')
             <input type="hidden" name="estado" value="en_espera">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ffa500;color:#121212">En espera</button>
         </form>
+        @else
+            {!! $ds('En espera', 'Solo disponible el día de la cita') !!}
+        @endif
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
             @csrf @method('PUT')
             <input type="hidden" name="estado" value="cancelada">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Cancelar</button>
         </form>
+        @if ($esHoy)
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
             @csrf @method('PUT')
             <input type="hidden" name="estado" value="no_asistio">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff">No asistió</button>
         </form>
-        <button type="button" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
-            Reprogramar
-        </button>
+        @else
+            {!! $ds('No asistió', 'Solo disponible el día de la cita') !!}
+        @endif
     @elseif ($cita->estado === 'en_espera')
         <a href="{{ route('consulta-medica.create', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">En consulta</a>
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
@@ -49,11 +52,15 @@
             <input type="hidden" name="estado" value="cancelada">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff">Cancelar</button>
         </form>
+        @if ($esHoy)
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
             @csrf @method('PUT')
             <input type="hidden" name="estado" value="no_asistio">
             <button class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff">No asistió</button>
         </form>
+        @else
+            {!! $ds('No asistió', 'Solo disponible el día de la cita') !!}
+        @endif
     @elseif ($cita->estado === 'en_consulta')
         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
             @csrf @method('PUT')
@@ -74,20 +81,20 @@
     @if (!in_array($cita->estado, ['cancelada', 'no_asistio']))
     @if ($cita->consultaMedica)
         <a href="{{ route('consulta-medica.show', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff">Consulta</a>
-    @else
+    @elseif ($cita->estado === 'confirmada')
         <a href="{{ route('consulta-medica.create', $cita->id) }}" class="neu-btn neu-btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff">+ Consulta</a>
+    @else
+        {!! $ds('+ Consulta', 'Primero confirma la cita') !!}
     @endif
     @if ($cita->ultimaReceta)
         <a href="{{ route('recetas.show', $cita->ultimaReceta->id) }}" class="neu-btn neu-btn-sm neu-btn-warning" style="font-size:0.65rem">Receta</a>
     @else
         @php $esHoy = $cita->fecha_hora->isToday(); @endphp
-        <a href="{{ $esHoy ? route('recetas.create', $cita->id) : '#' }}"
-           class="neu-btn neu-btn-sm {{ $esHoy ? 'neu-btn-primary' : '' }}"
-           style="font-size:0.65rem{{ !$esHoy ? ';opacity:0.5;pointer-events:none' : '' }}"
-           @if (!$esHoy)
-               onclick="event.preventDefault(); alert('No es el día de la consulta. Solo puedes generar la receta el día de la cita.');"
-           @endif
-        >+ Receta</a>
+        @if ($esHoy)
+        <a href="{{ route('recetas.create', $cita->id) }}" class="neu-btn neu-btn-sm neu-btn-primary" style="font-size:0.65rem">+ Receta</a>
+        @else
+        <span data-mdb-toggle="tooltip" title="Solo disponible el día de la cita"><span style="font-size:0.65rem;opacity:0.4;pointer-events:none;background:#888;color:#fff;border:none;cursor:not-allowed;display:inline-block;padding:0.25rem 0.5rem;border-radius:6px">+ Receta</span></span>
+        @endif
     @endif
     @endif
 </div>

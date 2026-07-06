@@ -4,6 +4,7 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
 import { Notyf } from 'notyf';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import { initChatWidget } from './chat-widget.js';
 
 window.Pusher = Pusher;
 
@@ -89,6 +90,12 @@ window.openModal = function openModal(id) {
     }
 }
 
+window.initMdbTooltips = function (container) {
+    (container || document).querySelectorAll('[data-mdb-toggle="tooltip"]').forEach(function (el) {
+        try { new mdb.Tooltip(el); } catch (e) {}
+    });
+};
+
 window.actualizarEstadoCita = function (citaId, nuevoEstado) {
     const badge = document.getElementById('estado-badge-' + citaId);
     if (badge) {
@@ -114,6 +121,7 @@ window.actualizarEstadoCita = function (citaId, nuevoEstado) {
             .then(function (data) {
                 if (data && data.html) {
                     accionesTd.innerHTML = data.html;
+                    window.initMdbTooltips(accionesTd);
                 }
             })
             .catch(function () {});
@@ -137,6 +145,16 @@ window.closeModal = function closeModal(id) {
 document.addEventListener('DOMContentLoaded', function () {
     const saved = localStorage.getItem('theme') || 'dark';
     applyTheme(saved);
+
+    const chatWidget = document.getElementById('chat-widget');
+    if (chatWidget) {
+        initChatWidget(
+            chatWidget.dataset.chatCitasUrl,
+            parseInt(chatWidget.dataset.userId)
+        );
+    }
+
+    window.initMdbTooltips();
 
     const btn = document.getElementById('theme-toggle');
     if (btn) {

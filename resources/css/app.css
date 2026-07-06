@@ -3,12 +3,20 @@
 @import 'flatpickr/dist/themes/dark.css';
 @import 'notyf/notyf.min.css';
 
+* {
+    border-radius: 0 !important;
+}
+[style*="border-radius: 50"], [style*="border-radius:50"],
+.chat-fab, .chat-badge, .chat-fab *, .chat-badge * {
+    border-radius: 50% !important;
+}
+
 :root {
     --neu-bg: #121212;
     --neu-card: #1a1a1a;
     --neu-shadow-light: #2a2a2a;
     --neu-shadow-dark: #080808;
-    --neu-radius: 18px;
+    --neu-radius: 0px;
     --yellow: #f0c000;
     --yellow-hover: #ffd700;
     --text-primary: #e8e8e8;
@@ -340,5 +348,14 @@ textarea::placeholder {
     opacity: 0.8 !important;
 }
 
+.chat-widget { position:fixed;bottom:20px;right:20px;z-index:9999;font-family:system-ui,sans-serif }
+.chat-fab { width:52px;height:52px;border-radius:50%;background:var(--yellow);color:#121212;border:none;font-size:1.3rem;box-shadow:3px 3px 8px var(--neu-shadow-dark),-3px -3px 8px var(--neu-shadow-light);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative }
+.chat-badge { position:absolute;top:-6px;right:-6px;background:#ff4444;color:#fff;font-size:1rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 0 8px rgba(255,68,68,0.5) }
+.chat-panel { position:absolute;bottom:65px;right:0;width:300px;height:380px;background:var(--neu-card);border-radius:12px;box-shadow:5px 5px 15px var(--neu-shadow-dark),-5px -5px 15px var(--neu-shadow-light);display:flex;flex-direction:column;overflow:hidden }
+.chat-mensajes::-webkit-scrollbar { width:4px }
+.chat-mensajes::-webkit-scrollbar-thumb { background:var(--neu-shadow-dark);border-radius:4px }
+.chat-panel-header { background:var(--yellow);color:#121212;padding:0.5rem 0.75rem;font-weight:700;font-size:0.9rem;display:flex;justify-content:space-between;align-items:center }
+.chat-widget-input { display:flex;gap:0.3rem;padding:0.4rem;border-top:1px solid rgba(255,255,255,0.08) }
+.chat-widget-input input { font-size:0.8rem;min-width:0 }
 
 

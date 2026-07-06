@@ -1,0 +1,285 @@
+var chatCitasList = [];
+var chatCitaActual = null;
+var chatWidgetAbierto = false;
+var chatPollInterval = null;
+var chatBgInterval = null;
+var chatMensajesCache = {};
+var chatMensajesIds = {};
+var chatNoLeidos = {};
+var chatUltimosMsgs = {};
+var chatBgReady = false;
+var chatAbort = null;
+var chatCitasUrl = '';
+var chatUserId = 0;
+
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+        detenerPoll();
+        detenerBgPoll();
+    } else {
+        if (chatCitaActual) iniciarPoll(chatCitaActual);
+        if (!chatBgInterval) iniciarBgPoll();
+    }
+});
+
+function toggleChatWidget() {
+    chatWidgetAbierto = !chatWidgetAbierto;
+    document.getElementById('chat-panel').classList.toggle('d-none', !chatWidgetAbierto);
+    if (chatWidgetAbierto) {
+        abrirChat();
+    } else {
+        chatCitaActual = null;
+        detenerPoll();
+    }
+}
+
+function abrirChat() {
+    detenerPoll();
+    chatCitaActual = null;
+    var sel = document.getElementById('chat-cita-select');
+    sel.innerHTML = '<option value="">Cargando...</option>';
+
+    fetch(chatCitasUrl)
+        .then(function (r) { return r.json(); })
+        .then(function (citas) {
+            chatCitasList = citas;
+            if (!citas.length) {
+                sel.innerHTML = '<option value="">Sin citas</option>';
+                document.getElementById('chat-mensajes').innerHTML = '<div class="text-center text-muted small p-3">Sin citas</div>';
+                return;
+            }
+            sel.innerHTML = citas.map(function (c) {
+                return '<option value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
+            }).join('');
+            sel.value = citas[0].id;
+            chatNoLeidos = {};
+            actualizarBadge();
+            cambiarChatCita(citas[0].id);
+        })
+        .catch(function () {
+            sel.innerHTML = '<option value="">Error</option>';
+            document.getElementById('chat-mensajes').innerHTML = '<div class="text-center text-muted small p-3">Error al cargar</div>';
+        });
+}
+
+function cambiarChatCita(citaId) {
+    detenerPoll();
+    chatCitaActual = citaId;
+    delete chatNoLeidos[citaId];
+    actualizarBadge();
+    if (chatMensajesCache[citaId]) {
+        renderMensajesCache(citaId);
+    } else {
+        cargarMensajesWidget(citaId);
+    }
+    iniciarPoll(citaId);
+}
+
+function renderMensajesCache(citaId) {
+    var el = document.getElementById('chat-mensajes');
+    el.innerHTML = '';
+    chatMensajesIds[citaId] = new Set();
+    chatMensajesCache[citaId].forEach(function (m) {
+        chatMensajesIds[citaId].add(m.id);
+        agregarMensajeWidget(m);
+    });
+    el.scrollTop = el.scrollHeight;
+}
+
+function cargarMensajesWidget(citaId) {
+    if (chatAbort) chatAbort.abort();
+    chatAbort = new AbortController();
+    var el = document.getElementById('chat-mensajes');
+    el.innerHTML = '<div class="text-center text-muted small p-3">Cargando...</div>';
+    fetch('/citas/' + citaId + '/chat', { signal: chatAbort.signal })
+        .then(function (r) { return r.json(); })
+        .then(function (msgs) {
+            chatMensajesCache[citaId] = msgs;
+            renderMensajesCache(citaId);
+        })
+        .catch(function (err) {
+            if (err.name !== 'AbortError') el.innerHTML = '<div class="text-center text-muted small p-3">Error</div>';
+        });
+}
+
+function agregarMensajeWidget(m) {
+    var el = document.getElementById('chat-mensajes');
+    if (!el) return;
+    var esPropio = parseInt(m.user_id) === chatUserId;
+    var div = document.createElement('div');
+    div.innerHTML = '<div style="display:flex;justify-content:' + (esPropio ? 'flex-end' : 'flex-start') + ';margin-bottom:0.25rem">' +
+        '<div style="max-width:75%;padding:0.5rem 0.75rem;border-radius:12px;background:' + (esPropio ? 'var(--yellow)' : 'var(--neu-card)') + ';color:' + (esPropio ? '#121212' : 'var(--text-primary)') + ';box-shadow:2px 2px 6px var(--neu-shadow-dark),-2px -2px 6px var(--neu-shadow-light)">' +
+        '<div style="font-size:0.65rem;opacity:0.7;margin-bottom:0.2rem">' + escapeHtml(m.nombre) + ' · ' + m.created_at + '</div>' +
+        '<div style="font-size:0.85rem;line-height:1.4;word-break:break-word">' + escapeHtml(m.mensaje) + '</div></div></div>';
+    el.appendChild(div.firstElementChild);
+    el.scrollTop = el.scrollHeight;
+}
+
+function escapeHtml(text) {
+    var d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+}
+
+function actualizarBadge() {
+    var dot = document.getElementById('chat-unread-dot');
+    var badge = document.getElementById('chat-badge');
+    var total = Object.values(chatNoLeidos).reduce(function (a, b) { return a + b; }, 0);
+
+    if (total > 0) {
+        if (dot) dot.classList.remove('d-none');
+        badge.textContent = total;
+        badge.classList.remove('d-none');
+    } else {
+        if (dot) dot.classList.add('d-none');
+        badge.classList.add('d-none');
+    }
+
+    var sel = document.getElementById('chat-cita-select');
+    if (sel && chatCitasList.length) {
+        sel.innerHTML = chatCitasList.map(function (c) {
+            return '<option value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
+        }).join('');
+        sel.value = chatCitaActual;
+    }
+}
+
+function iniciarPoll(citaId) {
+    detenerPoll();
+    if (document.hidden) return;
+    chatPollInterval = setInterval(function () {
+        if (chatCitaActual !== citaId || document.hidden) return detenerPoll();
+        var ids = chatMensajesIds[citaId];
+        var ultimoId = ids && ids.size > 0 ? Math.max.apply(null, Array.from(ids)) : 0;
+        fetch('/citas/' + citaId + '/chat?since_id=' + ultimoId)
+            .then(function (r) { return r.json(); })
+            .then(function (msgs) {
+                if (!msgs.length) return;
+                if (!chatMensajesCache[citaId]) chatMensajesCache[citaId] = [];
+                if (!chatMensajesIds[citaId]) chatMensajesIds[citaId] = new Set();
+                msgs.forEach(function (m) {
+                    if (!chatMensajesIds[citaId].has(m.id)) {
+                        chatMensajesIds[citaId].add(m.id);
+                        chatMensajesCache[citaId].push(m);
+                        if (citaId === chatCitaActual) agregarMensajeWidget(m);
+                    }
+                });
+            })
+            .catch(function () {});
+    }, 2000);
+}
+
+function detenerPoll() {
+    if (chatPollInterval) {
+        clearInterval(chatPollInterval);
+        chatPollInterval = null;
+    }
+}
+
+function iniciarBgPoll() {
+    detenerBgPoll();
+    if (document.hidden) return;
+    chatBgInterval = setInterval(function () {
+        if (document.hidden) return;
+        fetch(chatCitasUrl)
+            .then(function (r) { return r.json(); })
+            .then(function (citas) {
+                citas.forEach(function (c) {
+                    var actualId = c.ultimo_id;
+                    if (!chatBgReady) {
+                        chatUltimosMsgs[c.id] = actualId;
+                        return;
+                    }
+                    var anteriorId = chatUltimosMsgs[c.id];
+                    if (actualId && actualId !== anteriorId) {
+                        chatUltimosMsgs[c.id] = actualId;
+                        if (c.id !== chatCitaActual) {
+                            chatNoLeidos[c.id] = (chatNoLeidos[c.id] || 0) + 1;
+                        }
+                    }
+                });
+                chatBgReady = true;
+                if (Object.keys(chatNoLeidos).length > 0) actualizarBadge();
+            })
+            .catch(function () {});
+    }, 6000);
+}
+
+function detenerBgPoll() {
+    if (chatBgInterval) {
+        clearInterval(chatBgInterval);
+        chatBgInterval = null;
+    }
+}
+
+function chatInitBg() {
+    if (chatBgReady) return;
+    fetch(chatCitasUrl)
+        .then(function (r) { return r.json(); })
+        .then(function (citas) {
+            citas.forEach(function (c) {
+                chatUltimosMsgs[c.id] = c.ultimo_id;
+            });
+            chatBgReady = true;
+            iniciarBgPoll();
+        })
+        .catch(function () {
+            setTimeout(chatInitBg, 3000);
+        });
+}
+
+window.toggleChatWidget = toggleChatWidget;
+
+export function initChatWidget(citasUrl, userId) {
+    chatCitasUrl = citasUrl;
+    chatUserId = userId;
+
+    function setupChat() {
+        chatInitBg();
+
+        var sendBtn = document.getElementById('chat-send');
+        var input = document.getElementById('chat-input');
+        var sel = document.getElementById('chat-cita-select');
+        if (!sendBtn || !input || !sel) return;
+
+        sel.addEventListener('change', function () {
+            var id = parseInt(this.value);
+            if (id) cambiarChatCita(id);
+        });
+
+        sendBtn.addEventListener('click', function () {
+            var msg = input.value.trim();
+            if (!msg || !chatCitaActual) return;
+            input.value = '';
+            input.disabled = true;
+            fetch('/citas/' + chatCitaActual + '/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''
+                },
+                body: JSON.stringify({ mensaje: msg })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!chatMensajesIds[chatCitaActual]) chatMensajesIds[chatCitaActual] = new Set();
+                chatMensajesIds[chatCitaActual].add(data.id);
+                if (!chatMensajesCache[chatCitaActual]) chatMensajesCache[chatCitaActual] = [];
+                chatMensajesCache[chatCitaActual].push(data);
+                agregarMensajeWidget(data);
+            })
+            .catch(function () {})
+            .finally(function () { input.disabled = false; input.focus(); });
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') sendBtn.click();
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupChat);
+    } else {
+        setupChat();
+    }
+}
