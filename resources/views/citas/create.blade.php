@@ -118,6 +118,10 @@
                     <div class="mb-4" id="calendar-wrapper" style="display:none">
                         <label class="form-label">Selecciona un día disponible</label>
                         <div id="calendar"></div>
+                        <div id="sin-horarios-msg" class="flex-column align-items-center py-4" style="display:none">
+                            <i class="fa fa-clock fa-2x text-muted opacity-50 mb-2"></i>
+                            <p class="fw-bold text-muted mb-0" style="font-size:1.1rem">Este médico aún no ha configurado sus horarios.</p>
+                        </div>
                         <div id="horarios-container" class="mt-3" style="display:none">
                             <label class="form-label">Horarios disponibles</label>
                             <div id="horarios-list" class="d-flex flex-wrap"></div>
@@ -156,6 +160,11 @@
     let calendar = null;
     let fechaSeleccionada = null;
     let horaSeleccionada = null;
+
+    function hoyLocal() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
 
     function getDiasActivos(medicoId) {
         const horarios = horariosPorMedico[medicoId] ?? [];
@@ -196,9 +205,9 @@
 
         calendar.setOption('dayCellClassNames', function (arg) {
             const d = arg.date;
-            const dateStr = d.toISOString().slice(0, 10);
+            const dateStr = arg.dateStr;
             const diaSem = d.getDay();
-            const esHoy = dateStr === new Date().toISOString().slice(0, 10);
+            const esHoy = dateStr === hoyLocal();
             if (d < new Date() && !esHoy) return ['fc-day-disabled'];
 
             for (const r of ranges) {
@@ -226,7 +235,7 @@
 
         container.innerHTML = '';
         const ahora = new Date();
-        const esHoy = dateStr === ahora.toISOString().slice(0, 10);
+        const esHoy = dateStr === hoyLocal();
 
         const intervalo = intervalosPorMedico[medicoId] ?? 30;
         let todosSlots = [];
@@ -272,6 +281,7 @@
         });
 
         wrapper.style.display = todosSlots.length > 0 ? 'block' : 'none';
+        
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -290,14 +300,14 @@
                 right: ''
             },
             dayCellDidMount: function (info) {
-                const dateStr = info.date.toISOString().slice(0, 10);
+                const dateStr = info.dateStr;
                 const medicoId = medicoSelect.value;
                 if (!medicoId) return;
 
                 const diasActivos = getDiasActivos(medicoId);
                 const diaSem = info.date.getDay();
                 const ranges = bloqueosPorMedico[medicoId] ?? [];
-                const esHoy = dateStr === new Date().toISOString().slice(0, 10);
+                const esHoy = dateStr === hoyLocal();
                 if (info.date < new Date() && !esHoy) return;
 
                 let bloqueado = false;
@@ -323,7 +333,7 @@
                 const diaSem = date.getDay();
                 const diasActivos = getDiasActivos(medicoId);
                 const ranges = bloqueosPorMedico[medicoId] ?? [];
-                const esHoy = dateStr === new Date().toISOString().slice(0, 10);
+                const esHoy = dateStr === hoyLocal();
                 if (date < new Date() && !esHoy) return;
 
                 let bloqueado = false;
@@ -344,6 +354,19 @@
         calendar.render();
 
         function initCalendar(medicoId) {
+            const sinHorarios = document.getElementById('sin-horarios-msg');
+            const horarios = horariosPorMedico[medicoId] ?? [];
+            if (horarios.length === 0) {
+                calendarWrapper.style.display = 'block';
+                calendarEl.style.display = 'none';
+                sinHorarios.classList.add('d-flex');
+                sinHorarios.style.display = 'flex';
+                document.getElementById('horarios-container').style.display = 'none';
+                return;
+            }
+            calendarEl.style.display = 'block';
+            sinHorarios.classList.remove('d-flex');
+            sinHorarios.style.display = 'none';
             calendarWrapper.style.display = 'block';
             marcarDia(medicoId);
             calendar.refetchEvents();
@@ -352,6 +375,10 @@
         function clearCalendar() {
             calendarWrapper.style.display = 'none';
             document.getElementById('horarios-container').style.display = 'none';
+            const sinHorarios = document.getElementById('sin-horarios-msg');
+            sinHorarios.classList.remove('d-flex');
+            sinHorarios.style.display = 'none';
+            calendarEl.style.display = 'block';
             document.getElementById('fecha_hora').value = '';
             fechaSeleccionada = null;
             horaSeleccionada = null;

@@ -23,7 +23,7 @@
                         <p class="mb-0 text-muted">Gestiona tu información profesional y documentos</p>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3 mt-3">
                     <form action="{{ route('medico.toggle-activo') }}" method="POST" id="toggle-activo-form">
                         @csrf
                         <div class="form-check form-switch mb-0 d-flex align-items-center gap-2" style="cursor:pointer" onclick="document.getElementById('toggle-activo-form').submit();">
@@ -35,7 +35,7 @@
                             </span>
                         </div>
                     </form>
-                    <button type="button" id="btn-editar" class="btn btn-outline-secondary" style="background:#1266f1;color:#121212" onclick="toggleEdit()"><i class="fa-regular fa-pen-to-square me-1"></i>Editar</button>
+                    <button type="button" id="btn-editar" class="btn btn-primary" onclick="toggleEdit()"><i class="fa fa-pen-to-square me-1"></i>Editar</button>
                 </div>
             </div>
         </div>
@@ -170,8 +170,8 @@
             </div>
 
             <div class="mt-4 text-end d-flex gap-2 justify-content-end edit-mode">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
-                <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar cambios</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa fa-xmark me-1"></i>Cancelar</button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar cambios</button>
             </div>
         </form>
 
@@ -204,9 +204,9 @@
                 <label class="form-label text-muted small">Estado</label>
                 <p class="fw-bold mb-0">
                     @if (optional($perfil)->activo ?? true)
-                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
+                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Activo</span>
                     @else
-                        <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Inactivo</span>
+                        <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Inactivo</span>
                     @endif
                 </p>
             </div>
@@ -216,7 +216,7 @@
     <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0" style="color:#1266f1">Mis Documentos</h5>
-            <button type="button" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212" data-mdb-toggle="modal" data-mdb-target="#documentosModal"><i class="fa-solid fa-upload me-1"></i>+ Subir</button>
+            <button type="button" class="btn btn-primary btn-sm" data-mdb-toggle="modal" data-mdb-target="#documentosModal"><i class="fa fa-upload me-1"></i>+ Subir</button>
         </div>
 
         @error('documento')
@@ -227,7 +227,7 @@
         @enderror
 
         @if ($documentos->isEmpty())
-            <p class="text-muted mb-0">No has subido ningún documento aún.</p>
+            <div class="d-flex flex-column align-items-center py-3"><i class="fa fa-file fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No has subido ningún documento aún.</p></div>
         @else
             <div class="table-responsive">
                 <table class="table neu-table align-middle mb-0">
@@ -270,7 +270,7 @@
                                         <form action="{{ route('medico.documentos.destroy', $doc->id) }}" method="POST"
                                               class="d-inline" onsubmit="return confirm('¿Eliminar este documento?')">
                                             @csrf @method('DELETE')
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
                                         </form>
                                     </div>
                                 </td>
@@ -280,7 +280,7 @@
                 </table>
             </div>
         @endif
-        <br><br><br><br>
+        <br><br>
     </div>
 </div>
 
@@ -310,8 +310,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa-regular fa-xmark me-1"></i>Cancelar</button>
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#1266f1;color:#121212"><i class="fa-solid fa-upload me-1"></i>Subir</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-upload me-1"></i>Subir</button>
                 </div>
             </form>
         </div>
@@ -331,12 +331,12 @@ function toggleEdit() {
     if (isEditing) {
         form.style.display = 'none';
         view.forEach(el => el.style.display = '');
-        btn.innerHTML = '<i class=\"fa-regular fa-pen-to-square me-1\"></i>Editar';
+        btn.innerHTML = '<i class=\"fa fa-pen-to-square me-1\"></i>Editar';
         btn.style.background = '#1266f1';
     } else {
         form.style.display = '';
         view.forEach(el => el.style.display = 'none');
-        btn.innerHTML = '<i class=\"fa-regular fa-xmark me-1\"></i>Cancelar';
+        btn.innerHTML = '<i class=\"fa fa-xmark me-1\"></i>Cancelar';
         btn.style.background = '#ff4444';
         btn.style.color = '#fff';
     }

@@ -15,10 +15,10 @@
                     <p class="lead mb-4 text-muted">Sistema de gestión de citas médicas</p>
                     <div class="d-flex justify-content-center gap-3">
                         @auth
-                            <a href="{{ route('dashboard') }}" class="btn btn-primary"><i class="fa-solid fa-gauge-high me-1"></i>Ir al Dashboard</a>
+                            <a href="{{ route('dashboard') }}" class="btn btn-primary"><i class="fa fa-gauge-high me-1"></i>Ir al Dashboard</a>
                         @else
-                            <a href="{{ route('login') }}" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket me-1"></i>Iniciar sesión</a>
-                            <a href="{{ route('register') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-user-plus me-1"></i>Registrarse</a>
+                            <a href="{{ route('login') }}" class="btn btn-primary"><i class="fa fa-right-to-bracket me-1"></i>Iniciar sesión</a>
+                            <a href="{{ route('register') }}" class="btn btn-outline-secondary"><i class="fa fa-user-plus me-1"></i>Registrarse</a>
                         @endauth
                     </div>
                 </div>

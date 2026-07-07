@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Perfil del Paciente</h4>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1"><i class="fa-solid fa-arrow-left me-1"></i>Volver al dashboard</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i>Volver al dashboard</a>
     </div>
 
     <div class="row g-4">
@@ -25,7 +25,7 @@
                         </tbody>
                     </table>
                 </div>
-                <br><br><br><br>
+                <br><br>
             </div>
         </div>
 
@@ -43,9 +43,9 @@
                         </table>
                     </div>
                 @empty
-                    <p class="text-muted mb-0">No registrado.</p>
+                    <div class="d-flex flex-column align-items-center py-3"><i class="fa fa-circle-info fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No registrado.</p></div>
                 @endforelse
-                <br><br><br><br>
+                <br><br>
             </div>
         </div>
 
@@ -93,7 +93,7 @@
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Historial de citas</h5>
                 @if ($citas->isEmpty())
-                    <p class="text-muted mb-0">Sin citas previas.</p>
+                    <div class="d-flex flex-column align-items-center py-4"><i class="fa fa-calendar-xmark fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">Sin citas previas.</p></div>
                 @else
                     <div class="table-responsive">
                         <table class="table neu-table align-middle mb-0">
@@ -111,14 +111,14 @@
                                         <td style="color:var(--text-primary)">{{ $cita->motivo }}</td>
                                         <td>
                                             @switch($cita->estado)
-                                                @case('pendiente') <span class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
-                                                @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
-                                                @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
-                                                @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
-                                                @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
-                                                @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
-                                                @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
-                                                @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
+                                                @case('pendiente') <span class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-clock me-1"></i>Pendiente</span> @break
+                                                @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
+                                                @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
+                                                @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
+                                                @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
+                                                @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
+                                                @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
+                                                @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
                                             @endswitch
                                         </td>
                                     </tr>
@@ -127,7 +127,7 @@
                         </table>
                     </div>
                 @endif
-                <br><br><br><br>
+                <br><br>
             </div>
         </div>
     </div>

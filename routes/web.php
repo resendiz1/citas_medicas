@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:paciente')->group(function () {
         Route::get('/paciente/perfil', [PacienteController::class, 'perfilShow'])->name('paciente.perfil');
+        Route::get('/paciente/historial', [PacienteController::class, 'historial'])->name('paciente.historial');
         Route::put('/paciente/perfil', [PacienteController::class, 'perfilUpdate'])->name('paciente.perfil.update');
         Route::post('/paciente/contactos', [PacienteController::class, 'contactoStore'])->name('paciente.contactos.store');
         Route::put('/paciente/contactos/{contacto}', [PacienteController::class, 'contactoUpdate'])->name('paciente.contactos.update');

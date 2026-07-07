@@ -83,10 +83,10 @@ function cambiarChatCita(citaId) {
     actualizarBadge();
     if (chatMensajesCache[citaId]) {
         renderMensajesCache(citaId);
+        iniciarPoll(citaId);
     } else {
         cargarMensajesWidget(citaId);
     }
-    iniciarPoll(citaId);
 }
 
 function renderMensajesCache(citaId) {
@@ -95,10 +95,9 @@ function renderMensajesCache(citaId) {
     chatMensajesIds[citaId] = new Set();
     chatMensajesCache[citaId].forEach(function (m) {
         chatMensajesIds[citaId].add(m.id);
-        agregarMensajeWidget(m);
+        agregarMensajeWidget(m, true);
     });
     el.scrollTop = el.scrollHeight;
-    gsap.from(el.children, { opacity: 0, y: 8, stagger: 0.03, duration: 0.2, ease: 'power2.out' });
 }
 
 function cargarMensajesWidget(citaId) {
@@ -111,13 +110,14 @@ function cargarMensajesWidget(citaId) {
         .then(function (msgs) {
             chatMensajesCache[citaId] = msgs;
             renderMensajesCache(citaId);
+            iniciarPoll(citaId);
         })
         .catch(function (err) {
             if (err.name !== 'AbortError') el.innerHTML = '<div class="text-center text-muted small p-3">Error</div>';
         });
 }
 
-function agregarMensajeWidget(m) {
+function agregarMensajeWidget(m, skipAnimation) {
     var el = document.getElementById('chat-mensajes');
     if (!el) return;
     var esPropio = parseInt(m.user_id) === chatUserId;
@@ -128,7 +128,7 @@ function agregarMensajeWidget(m) {
         '<div style="font-size:0.85rem;line-height:1.4;word-break:break-word">' + escapeHtml(m.mensaje) + '</div></div></div>';
     var msgEl = div.firstElementChild;
     el.appendChild(msgEl);
-    gsap.from(msgEl, { opacity: 0, y: 10, duration: 0.25, ease: 'power2.out' });
+    if (!skipAnimation) gsap.from(msgEl, { opacity: 0, y: 10, duration: 0.25, ease: 'power2.out' });
     el.scrollTop = el.scrollHeight;
 }
 

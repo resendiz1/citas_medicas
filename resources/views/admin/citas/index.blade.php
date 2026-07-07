@@ -25,9 +25,9 @@
                 </select>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-search me-1"></i>Buscar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-search me-1"></i>Buscar</button>
                 @if (request('search') || request('estado'))
-                    <a href="{{ route('admin.citas') }}" class="btn btn-outline-secondary btn-sm" style="background:#ff4444;color:#fff"><i class="fa-solid fa-rotate-left me-1"></i>Limpiar</a>
+                    <a href="{{ route('admin.citas') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-rotate-left me-1"></i>Limpiar</a>
                 @endif
             </div>
         </div>
@@ -60,7 +60,7 @@
                                     @case('pendiente') <span class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-clock me-1"></i>Pendiente</span> @break
                                     @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
                                     @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
-                                    @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
+                                    @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
                                     @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
                                     @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
                                     @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
@@ -73,74 +73,74 @@
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="confirmada">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff"><i class="fa fa-check-circle me-1"></i>Confirmar</button>
+                                            <button class="btn btn-success btn-sm"><i class="fa fa-check-circle me-1"></i>Confirmar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="cancelada">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff"><i class="fa fa-user-slash me-1"></i>No asistió</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-user-slash me-1"></i>No asistió</button>
                                         </form>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
                                             <i class="fa fa-calendar me-1"></i>Reprogramar
                                         </button>
                                     @elseif ($cita->estado === 'confirmada')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="en_espera">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ffa500;color:#121212"><i class="fa fa-clock me-1"></i>En espera</button>
+                                            <button class="btn btn-warning btn-sm"><i class="fa fa-clock me-1"></i>En espera</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="cancelada">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff"><i class="fa fa-user-slash me-1"></i>No asistió</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-user-slash me-1"></i>No asistió</button>
                                         </form>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#9370db;color:#fff" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
                                             <i class="fa fa-calendar me-1"></i>Reprogramar
                                         </button>
                                     @elseif ($cita->estado === 'en_espera')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="en_consulta">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#1e90ff;color:#fff"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</button>
+                                            <button class="btn btn-primary btn-sm"><i class="fa fa-stethoscope me-1"></i>En consulta</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="cancelada">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
                                         </form>
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#dc143c;color:#fff"><i class="fa fa-user-slash me-1"></i>No asistió</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-user-slash me-1"></i>No asistió</button>
                                         </form>
                                     @elseif ($cita->estado === 'en_consulta')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="finalizada">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#555;color:#fff"><i class="fa fa-check-double me-1"></i>Finalizar</button>
+                                            <button class="btn btn-secondary btn-sm"><i class="fa fa-check-double me-1"></i>Finalizar</button>
                                         </form>
                                     @elseif ($cita->estado === 'reprogramada')
                                         <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
                                             @csrf @method('PUT')
                                             <input type="hidden" name="estado" value="confirmada">
-                                            <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#00b894;color:#fff"><i class="fa fa-check-circle me-1"></i>Confirmar</button>
+                                            <button class="btn btn-success btn-sm"><i class="fa fa-check-circle me-1"></i>Confirmar</button>
                                         </form>
                                     @else
                                         <span class="text-muted" style="font-size:0.75rem">—</span>
                                     @endif
                                     <form action="{{ route('admin.citas.destroy', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar permanentemente esta cita? También se eliminarán recetas, consultas e historial asociados.')">
                                         @csrf @method('DELETE')
-                                        <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
+                                        <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
                                     </form>
                                 </div>
                             </td>
@@ -164,7 +164,7 @@
                                         </div>
                                         <div class="modal-footer border-0">
                                             <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm" style="background:#9370db;color:#fff"><i class="fa fa-calendar-check me-1"></i>Guardar reprogramación</button>
+                                            <button type="submit" class="btn btn-secondary btn-sm"><i class="fa fa-calendar-check me-1"></i>Guardar reprogramación</button>
                                         </div>
                                     </form>
                                 </div>
@@ -172,7 +172,7 @@
                         </div>
                         @endif
                     @empty
-                        <tr><td colspan="7" class="text-center text-muted">No hay citas registradas.</td></tr>
+                        <tr><td colspan="7" class="text-center py-5"><div class="d-flex flex-column align-items-center gap-2"><i class="fa fa-calendar-xmark fa-2x text-muted opacity-50"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No hay citas registradas.</p></div></td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -182,7 +182,7 @@
                 {{ $citas->appends(request()->query())->links() }}
             </div>
         @endif
-        <br><br><br><br>
+        <br><br>
     </div>
 </div>
 @endsection

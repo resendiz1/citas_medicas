@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold mb-0">Detalle de Cita</h4>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i>Volver</a>
     </div>
 
     <div class="card shadow-2 p-4 mb-4">
@@ -19,14 +19,14 @@
             <div class="col-md-4">
                 <strong class="text-muted small">Estado</strong><br>
                 @switch($cita->estado)
-                    @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-clock me-1"></i>Pendiente</span> @break
-                    @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Confirmada</span> @break
-                    @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-hourglass-half me-1"></i>En espera</span> @break
-                    @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-stethoscope me-1"></i>En consulta</span> @break
-                    @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Finalizada</span> @break
-                    @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Cancelada</span> @break
-                    @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-user-slash me-1"></i>No asistió</span> @break
-                    @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-calendar me-1"></i>Reprogramada</span> @break
+                    @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-clock me-1"></i>Pendiente</span> @break
+                    @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
+                    @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
+                    @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
+                    @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
+                    @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
+                    @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
+                    @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
                 @endswitch
             </div>
             <div class="col-md-4">
@@ -79,7 +79,7 @@
     <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-bold mb-0" style="color:#1266f1">Receta del {{ $receta->fecha_emision->format('d/m/Y') }}</h6>
-            <a href="{{ route('recetas.show', $receta->id) }}" class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem"><i class="fa-solid fa-prescription me-1"></i>Abrir receta</a>
+            <a href="{{ route('recetas.show', $receta->id) }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-prescription me-1"></i>Abrir receta</a>
         </div>
         <div class="row g-3 mb-3">
             <div class="col-md-3"><strong class="text-muted small">Paciente:</strong><br>{{ $receta->cita->paciente->name }}</div>
@@ -129,7 +129,7 @@
         </div>
         @endif
         @if ($receta->notas)
-        <br><br><br><br>
+        <br><br>
         <div class="mb-3">
             <strong class="text-muted small">Notas adicionales</strong>
             <p class="mb-0" style="color:var(--text-primary);line-height:1.6;white-space:pre-wrap">{{ $receta->notas }}</p>
@@ -203,7 +203,7 @@
             </div>
         </div>
         @endif
-        <br><br><br><br>
+        <br><br>
 
         @if ($consulta->presion_arterial || $consulta->temperatura || $consulta->frecuencia_cardiaca || $consulta->frecuencia_respiratoria || $consulta->saturacion_oxigeno || $consulta->peso || $consulta->estatura || $consulta->imc)
         <div class="mb-3">
@@ -265,7 +265,7 @@
                 </tbody>
             </table>
         </div>
-        <br><br><br><br>
+        <br><br>
     </div>
     @endif
 

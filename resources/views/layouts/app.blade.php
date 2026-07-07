@@ -21,7 +21,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-2">
         <div class="container">
-            <a class="navbar-brand fw-bold me-3 d-flex flex-column align-items-start text-primary" href="{{ route('dashboard') }}" style="line-height:1.2">Citas Médicas<small style="font-size:0.65rem;font-weight:400;opacity:0.8">&lt;JuanPancho's/&gt;</small></a>
+            <a class="navbar-brand fw-bold me-3 d-flex flex-column align-items-start text-primary" href="{{ route('dashboard') }}">Citas Médicas<small style="font-size:0.65rem;font-weight:400;opacity:0.8">&lt;JuanPancho's/&gt;</small></a>
             <div class="d-flex flex-grow-1 align-items-center justify-content-between flex-wrap" id="navbarNav">
                 <ul class="navbar-nav flex-row align-items-center gap-1 mb-0">
                     @auth
@@ -53,10 +53,10 @@
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-mdb-toggle="dropdown">
                                 <span class="me-2">{{ auth()->user()->name }}</span>
                                 @switch(auth()->user()->role)
-                                    @case('admin') <span class="badge" style="border:2px solid #e4a11b;color:#e4a11b;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-shield-halved me-1"></i>Admin</span> @break
-                                    @case('medico') <span class="badge" style="border:2px solid #14a44d;color:#14a44d;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-user-doctor me-1"></i>Médico</span> @break
-                                    @case('paciente') <span class="badge" style="border:2px solid #3b71ca;color:#3b71ca;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-user me-1"></i>Paciente</span> @break
-                                    @case('recepcionista') <span class="badge" style="border:2px solid #54b4d3;color:#54b4d3;background:transparent;padding:0.5rem 0.75rem"><i class="fa-solid fa-phone me-1"></i>Recepcionista</span> @break
+                                    @case('admin') <span class="badge" style="border:2px solid #e4a11b;color:#e4a11b;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-shield-halved me-1"></i>Admin</span> @break
+                                    @case('medico') <span class="badge" style="border:2px solid #14a44d;color:#14a44d;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-doctor me-1"></i>Médico</span> @break
+                                    @case('paciente') <span class="badge" style="border:2px solid #3b71ca;color:#3b71ca;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user me-1"></i>Paciente</span> @break
+                                    @case('recepcionista') <span class="badge" style="border:2px solid #54b4d3;color:#54b4d3;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-phone me-1"></i>Recepcionista</span> @break
                                 @endswitch
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">

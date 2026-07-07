@@ -8,7 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Horarios de {{ $medico->name }}</h4>
-        <a href="{{ $user->esAdmin() ? route('admin.medicos') : route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1">&larr; Volver</a>
+        <a href="{{ $user->esAdmin() ? route('admin.medicos') : route('dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Volver</a>
     </div>
 
     <div class="card shadow-2 p-4 mb-4">
@@ -27,7 +27,7 @@
                 </select>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
             </div>
         </form>
     </div>
@@ -63,7 +63,7 @@
                         <input type="checkbox" name="activo" class="form-check-input" id="activo" value="1" checked>
                         <label class="form-check-label" for="activo">Activo</label>
                     </div>
-                    <button type="submit" class="btn btn-primary neu-btn-sm"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar</button>
+                    <button type="submit" class="btn btn-primary neu-btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
                 </form>
             </div>
         </div>
@@ -72,7 +72,7 @@
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Horarios registrados</h5>
                 @if ($horarios->isEmpty())
-                    <p class="text-muted mb-0">Sin horarios registrados.</p>
+                    <div class="d-flex flex-column align-items-center py-4"><i class="fa fa-clock fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">Sin horarios registrados.</p></div>
                 @else
                     <div class="table-responsive">
                         <table class="table neu-table align-middle mb-0">
@@ -93,15 +93,15 @@
                                         <td>{{ substr($h->hora_fin, 0, 5) }}</td>
                                         <td>
                                             @if ($h->activo)
-                                                <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Sí</span>
+                                                <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Sí</span>
                                             @else
-                                                <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>No</span>
+                                                <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>No</span>
                                             @endif
                                         </td>
                                         <td>
                                             <form action="{{ $user->esAdmin() ? route('admin.medicos.horarios.destroy', [$medico->id, $h->id]) : route('medico.horarios.destroy', $h->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este horario?')">
                                                 @csrf @method('DELETE')
-                                                <button class="btn btn-outline-secondary btn-sm" style="font-size:0.65rem;background:#ff4444;color:#fff"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
+                                                <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -110,7 +110,7 @@
                         </table>
                     </div>
                 @endif
-                <br><br><br><br>
+                <br><br>
             </div>
         </div>
     </div>

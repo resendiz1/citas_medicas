@@ -9,8 +9,8 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">Perfil del Médico</h4>
                 <div>
-                    <a href="{{ route('citas.create', ['medico_id' => $medico->id]) }}" class="btn btn-primary neu-btn-sm me-2"><i class="fa-regular fa-calendar-check me-1"></i>Solicitar cita</a>
-                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
+                    <a href="{{ route('citas.create', ['medico_id' => $medico->id]) }}" class="btn btn-primary neu-btn-sm me-2"><i class="fa fa-calendar-check me-1"></i>Solicitar cita</a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i>Volver</a>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
                             <h5 class="fw-bold mb-1" style="color:var(--text-emphasis)">{{ $medico->name }}</h5>
                             <p class="text-muted mb-0">{{ optional(optional($medico->medicoPerfil)->tipoMedico)->nombre_tipo_medico ?? 'General' }} · {{ $medico->email }}</p>
                             @if (isset($medico->medicoPerfil->activo) && $medico->medicoPerfil->activo)
-                                <span class="badge mt-1" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
+                                <span class="badge mt-1" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Activo</span>
                             @endif
                         </div>
                     </div>
@@ -77,9 +77,9 @@
                                 <label class="form-label text-muted small">Estado</label>
                                 <p class="fw-bold mb-0">
                                     @if (isset($medico->medicoPerfil->activo) && $medico->medicoPerfil->activo)
-                                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
+                                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Activo</span>
                                     @else
-                                        <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa-regular fa-circle-xmark me-1"></i>Inactivo</span>
+                                        <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Inactivo</span>
                                     @endif
                                 </p>
                             </div>
@@ -117,7 +117,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <br><br><br><br>
+                        <br><br>
                     </div>
                 </div>
                 @endif
@@ -149,7 +149,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <br><br><br><br>
+                        <br><br>
                     </div>
                     @endif
 
@@ -176,7 +176,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <br><br><br><br>
+                        <br><br>
                     </div>
                     @endif
 

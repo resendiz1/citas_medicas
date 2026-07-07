@@ -9,7 +9,7 @@
         <h4 class="fw-bold mb-2" style="color:var(--text-primary)">Página no encontrada</h4>
         <p class="text-muted mb-4" style="max-width:400px;margin:0 auto">La página que buscas no existe o ha sido movida.</p>
         <a href="{{ url('/') }}" class="btn btn-primary">
-            <i class="fa-solid fa-arrow-left me-1"></i>Volver al inicio
+            <i class="fa fa-arrow-left me-1"></i>Volver al inicio
         </a>
     </div>
 </div>

@@ -8,7 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Receta Médica</h4>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1">&larr; Volver al dashboard</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Volver al dashboard</a>
     </div>
 
     <div class="row g-4">
@@ -23,13 +23,13 @@
                         <tr><th>Emisión</th><td style="color:var(--text-emphasis);font-weight:500">{{ $receta->fecha_emision->format('d/m/Y') }}</td></tr>
                     </tbody>
                 </table>
-                <br><br><br><br>
+                <br><br>
             </div>
 
             <div class="card shadow-2 p-4 mt-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Documentos adjuntos</h5>
                 @if ($receta->documentos->isEmpty())
-                    <p class="text-muted mb-0">Sin documentos adjuntos.</p>
+                    <div class="d-flex flex-column align-items-center py-3"><i class="fa fa-file fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">Sin documentos adjuntos.</p></div>
                 @else
                     <div class="d-flex flex-wrap gap-3">
                         @foreach ($receta->documentos as $doc)
@@ -93,7 +93,7 @@
                         </tbody>
                     </table>
                 </div>
-                <br><br><br><br>
+                <br><br>
             </div>
             @endif
 
@@ -106,7 +106,7 @@
 
             @if ($user->esMedico() || $user->esAdmin())
             <div class="mt-4 text-end">
-                <a href="{{ route('recetas.create', $receta->cita->id) }}" class="btn btn-primary neu-btn-sm"><i class="fa-solid fa-plus me-1"></i>Nueva receta para esta cita</a>
+                <a href="{{ route('recetas.create', $receta->cita->id) }}" class="btn btn-primary neu-btn-sm"><i class="fa fa-plus me-1"></i>Nueva receta para esta cita</a>
             </div>
             @endif
         </div>

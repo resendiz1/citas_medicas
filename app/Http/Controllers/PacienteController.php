@@ -27,6 +27,22 @@ class PacienteController extends Controller
         return view('paciente.perfil', compact('user', 'citas', 'catalogoAlergias', 'catalogoEnfermedades'));
     }
 
+    public function historial()
+    {
+        $user = Auth::user();
+        $citas = $user->citasComoPaciente()
+            ->with([
+                'medico.medicoPerfil.tipoMedico',
+                'consultaMedica.dolores',
+                'recetas.medicamentos',
+                'recetas.documentos',
+            ])
+            ->orderBy('fecha_hora', 'desc')
+            ->get();
+
+        return view('paciente.historial', compact('citas'));
+    }
+
     public function perfilUpdate(Request $request)
     {
         $user = Auth::user();

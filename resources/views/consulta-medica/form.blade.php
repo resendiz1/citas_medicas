@@ -47,7 +47,7 @@
         <div class="card shadow-2 p-4 mb-4">
             <h6 class="fw-bold mb-3" style="color:#1266f1">
                 Dolores
-                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="btnAgregarDolor"><i class="fa-solid fa-plus me-1"></i>+ Agregar</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="btnAgregarDolor"><i class="fa fa-plus me-1"></i>+ Agregar</button>
             </h6>
             <div id="doloresContainer">
                 @php
@@ -69,7 +69,7 @@
                         <input type="text" name="dolores[{{ $i }}][duracion]" class="form-control" value="{{ $dolor['duracion'] ?? '' }}">
                     </div>
                     <div class="col-md-2">
-<button type="button" class="btn btn-outline-secondary btn-sm btn-remove-dolor" style="background:#e74c3c;color:#fff;border:none;"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
+<button type="button" class="btn btn-danger btn-sm btn-remove-dolor"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
                     </div>
                 </div>
                 @endforeach
@@ -156,7 +156,7 @@
         <div class="card shadow-2 p-4 mb-4">
             <h6 class="fw-bold mb-3" style="color:#1266f1">
                 Recetas
-                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="btnAgregarReceta"><i class="fa-solid fa-plus me-1"></i>+ Agregar receta</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="btnAgregarReceta"><i class="fa fa-plus me-1"></i>+ Agregar receta</button>
             </h6>
             <div id="recetasContainer">
                 @php
@@ -184,7 +184,7 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-muted small">Medicamentos</label>
-                        <button type="button" class="btn btn-outline-secondary btn-sm btn-agregar-med-receta ms-2" data-receta="{{ $ri }}"><i class="fa-solid fa-plus me-1"></i>+</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm btn-agregar-med-receta ms-2" data-receta="{{ $ri }}"><i class="fa fa-plus me-1"></i>+</button>
                     </div>
                     <div class="medicamentos-container">
                         @foreach ($receta['medicamentos'] ?? [] as $mi => $med)
@@ -206,13 +206,13 @@
                                 <input type="text" name="recetas[{{ $ri }}][medicamentos][{{ $mi }}][indicaciones]" class="form-control" placeholder="Indicaciones" value="{{ $med['indicaciones'] ?? '' }}">
                             </div>
                             <div class="col-md-1">
-<button type="button" class="btn btn-outline-secondary btn-sm btn-remove-med-receta" style="background:#e74c3c;color:#fff;border:none;"><i class="fa-solid fa-xmark me-1"></i>×</button>
+<button type="button" class="btn btn-danger btn-sm btn-remove-med-receta"><i class="fa fa-xmark me-1"></i>×</button>
                             </div>
                         </div>
                         @endforeach
                     </div>
                     <div class="mt-2">
-<button type="button" class="btn btn-outline-secondary btn-sm btn-remove-receta" style="background:#e74c3c;color:#fff;border:none;"><i class="fa-regular fa-trash-can me-1"></i>Eliminar receta</button>
+<button type="button" class="btn btn-danger btn-sm btn-remove-receta"><i class="fa fa-trash-can me-1"></i>Eliminar receta</button>
                     </div>
                 </div>
                 @endforeach
@@ -220,8 +220,8 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary"><i class="fa-regular fa-floppy-disk me-1"></i>Guardar consulta</button>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-regular fa-xmark me-1"></i>Cancelar</a>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-disk me-1"></i>Guardar consulta</button>
+            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-xmark me-1"></i>Cancelar</a>
         </div>
     </form>
 </div>
@@ -252,7 +252,7 @@
                     <input type="text" name="dolores[${dolorIndex}][duracion]" class="form-control">
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-remove-dolor" style="background:#e74c3c;color:#fff;border:none;"><i class="fa-regular fa-trash-can me-1"></i>Eliminar</button>
+<button type="button" class="btn btn-danger btn-sm btn-remove-dolor"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
                 </div>
             `;
             doloresContainer.appendChild(row);
@@ -289,11 +289,11 @@
                 </div>
                 <div class="mb-2">
                     <label class="form-label text-muted small">Medicamentos</label>
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-agregar-med-receta ms-2" data-receta="${ri}"><i class="fa-solid fa-plus me-1"></i>+</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm btn-agregar-med-receta ms-2" data-receta="${ri}"><i class="fa fa-plus me-1"></i>+</button>
                 </div>
                 <div class="medicamentos-container"></div>
                 <div class="mt-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-remove-receta" style="background:#e74c3c;color:#fff;border:none;"><i class="fa-regular fa-trash-can me-1"></i>Eliminar receta</button>
+                    <button type="button" class="btn btn-danger btn-sm btn-remove-receta"><i class="fa fa-trash-can me-1"></i>Eliminar receta</button>
                 </div>
             `;
             return card;
@@ -337,7 +337,7 @@
                         <input type="text" name="recetas[${ri}][medicamentos][${mi}][indicaciones]" class="form-control" placeholder="Indicaciones">
                     </div>
                     <div class="col-md-1">
-                        <button type="button" class="btn btn-outline-secondary btn-sm btn-remove-med-receta" style="background:#e74c3c;color:#fff;border:none;"><i class="fa-solid fa-xmark me-1"></i>×</button>
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-med-receta"><i class="fa fa-xmark me-1"></i>×</button>
                     </div>
                 `;
                 medContainer.appendChild(row);

@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Perfil del Paciente</h4>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm" style="color:#1266f1"><i class="fa-solid fa-arrow-left me-1"></i>Volver al dashboard</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i>Volver al dashboard</a>
     </div>
 
     <div class="row g-4">
@@ -25,7 +25,7 @@
                         </tbody>
                     </table>
                 </div>
-                <br><br><br><br>
+                <br><br>
             </div>
         </div>
 
@@ -43,9 +43,9 @@
                         </table>
                     </div>
                 @empty
-                    <p class="text-muted mb-0">No registrado.</p>
+                    <div class="d-flex flex-column align-items-center py-3"><i class="fa fa-circle-info fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No registrado.</p></div>
                 @endforelse
-                <br><br><br><br>
+                <br><br>
             </div>
         </div>
 

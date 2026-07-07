@@ -54,8 +54,8 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.pacientes') }}" class="btn btn-outline-secondary"><i class="fa-regular fa-xmark me-1"></i>Cancelar</a>
-                            <button type="submit" class="btn btn-primary"><i class="fa-regular fa-floppy-disk me-1"></i>Actualizar</button>
+                            <a href="{{ route('admin.pacientes') }}" class="btn btn-outline-secondary"><i class="fa fa-xmark me-1"></i>Cancelar</a>
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-disk me-1"></i>Actualizar</button>
                         </div>
                     </form>
             </div>

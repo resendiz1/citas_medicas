@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Médicos</h4>
-        <a href="{{ route('admin.medicos.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa-solid fa-plus me-1"></i>+ Nuevo médico</a>
+        <a href="{{ route('admin.medicos.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa fa-plus me-1"></i>+ Nuevo médico</a>
     </div>
 
     <form method="GET" class="mb-3">
@@ -15,9 +15,9 @@
                 <input type="text" name="search" class="form-control" placeholder="Buscar por nombre o email..." value="{{ request('search') }}" style="color:var(--text-primary)">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-search me-1"></i>Buscar</button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-search me-1"></i>Buscar</button>
                 @if (request('search'))
-                    <a href="{{ route('admin.medicos') }}" class="btn btn-outline-secondary btn-sm" style="background:#ff4444;color:#fff"><i class="fa-solid fa-rotate-left me-1"></i>Limpiar</a>
+                    <a href="{{ route('admin.medicos') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-rotate-left me-1"></i>Limpiar</a>
                 @endif
             </div>
         </div>
@@ -55,27 +55,27 @@
                             <td class="text-muted">{{ $medico->medicoPerfil->cedula_profesional ?? '—' }}</td>
                             <td>
                                 @if ($medico->medicoPerfil->activo ?? true)
-                                    <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa-regular fa-circle-check me-1"></i>Activo</span>
+                                    <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa fa-circle-check me-1"></i>Activo</span>
                                 @else
-                                    <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa-regular fa-circle-xmark me-1"></i>Inactivo</span>
+                                    <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa fa-circle-xmark me-1"></i>Inactivo</span>
                                 @endif
                             </td>
                             <td>
                                 <div class="dropdown">
                                     <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <i class="fa fa-ellipsis-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end neu-dropdown" style="min-width:170px">
-                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.show', $medico->id) }}"><i class="fa-regular fa-eye fa-fw me-1"></i> Perfil</a></li>
-                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.edit', $medico->id) }}"><i class="fa-regular fa-pen-to-square fa-fw me-1"></i> Editar</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.show', $medico->id) }}"><i class="fa fa-eye fa-fw me-1"></i> Perfil</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.edit', $medico->id) }}"><i class="fa fa-pen-to-square fa-fw me-1"></i> Editar</a></li>
                                         <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08)"></li>
-                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.horarios', $medico->id) }}"><i class="fa-regular fa-clock fa-fw me-1"></i> Horarios</a></li>
-                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.bloqueos', $medico->id) }}"><i class="fa-regular fa-calendar-xmark fa-fw me-1"></i> Bloqueos</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.horarios', $medico->id) }}"><i class="fa fa-clock fa-fw me-1"></i> Horarios</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('admin.medicos.bloqueos', $medico->id) }}"><i class="fa fa-calendar-xmark fa-fw me-1"></i> Bloqueos</a></li>
                                         <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08)"></li>
                                         <li>
                                             <form action="{{ route('admin.medicos.destroy', $medico->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Eliminar médico?')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="dropdown-item" style="background:none;border:none;width:100%;text-align:left;color:var(--text-primary)"><i class="fa-regular fa-trash-can fa-fw me-1" style="color:#ff4444"></i> Eliminar</button>
+                                                <button type="submit" class="dropdown-item"><i class="fa fa-trash-can fa-fw me-1" style="color:#ff4444"></i> Eliminar</button>
                                             </form>
                                         </li>
                                     </ul>
@@ -83,12 +83,12 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="text-center text-muted">No hay médicos registrados.</td></tr>
+                        <tr><td colspan="7" class="text-center py-5"><div class="d-flex flex-column align-items-center gap-2"><i class="fa fa-user-doctor fa-2x text-muted opacity-50"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No hay médicos registrados.</p></div></td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <br><br><br><br>
+        <br><br>
         @if ($medicos instanceof \Illuminate\Pagination\LengthAwarePaginator)
             <div class="mt-3 d-flex justify-content-center">
                 {{ $medicos->appends(request()->query())->links() }}

@@ -35,7 +35,7 @@
                             <label class="form-check-label" for="remember">Recordarme</label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fa-solid fa-right-to-bracket me-1"></i>Entrar</button>
+                        <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fa fa-right-to-bracket me-1"></i>Entrar</button>
 
                         <p class="text-center mb-0">
                             ¿No tienes cuenta?

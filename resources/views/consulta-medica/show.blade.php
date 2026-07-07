@@ -8,7 +8,7 @@
         <h4 class="fw-bold mb-0">Detalle de Consulta Médica</h4>
         <div>
             <span class="text-muted small me-3">Paciente: {{ $cita->paciente->name }}</span>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i>Volver</a>
+            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i>Volver</a>
         </div>
     </div>
 
@@ -50,7 +50,7 @@
                 </tbody>
             </table>
         </div>
-        <br><br><br><br>
+        <br><br>
     </div>
     @endif
 
