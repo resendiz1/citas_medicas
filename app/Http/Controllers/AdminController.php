@@ -8,6 +8,7 @@ use App\Models\MedicoPerfil;
 use App\Models\RecetaDocumento;
 use App\Models\TipoMedico;
 use App\Models\User;
+use App\Notifications\MedicoRegistroNotificacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -38,6 +39,30 @@ class AdminController extends Controller
         $documentos = optional($perfil)->documentos ?? collect();
 
         return view('admin.medicos.show', compact('user', 'perfil', 'documentos'));
+    }
+
+    public function medicosAprobar($id)
+    {
+        $medico = User::where('role', 'medico')->findOrFail($id);
+
+        if (!$medico->medicoPerfil) {
+            MedicoPerfil::create([
+                'user_id'        => $medico->id,
+                'tipo_medico_id' => 1,
+                'activo'         => true,
+                'aprobado'       => true,
+            ]);
+        } else {
+            $medico->medicoPerfil->update(['aprobado' => true]);
+        }
+
+        try {
+            $medico->notify(new MedicoRegistroNotificacion($medico, 'aprobado'));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->back()->with('success', 'Médico aprobado correctamente. Se le ha notificado por correo.');
     }
 
     public function medicosCreate()
@@ -76,6 +101,7 @@ class AdminController extends Controller
             'experiencia_anios'  => $data['experiencia_anios'] ?? null,
             'descripcion'        => $data['descripcion'] ?? null,
             'activo'             => $request->boolean('activo', true),
+            'aprobado'           => true,
         ]);
 
         return redirect()->route('admin.medicos')->with('success', 'Médico creado correctamente.');

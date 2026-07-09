@@ -34,7 +34,7 @@
     </form>
 
     <div class="card shadow-2 p-4">
-        <div class="table-responsive">
+        <div class="table-responsive" style="overflow:visible">
             <table class="table neu-table align-middle mb-0">
                 <thead>
                     <tr>
@@ -67,81 +67,117 @@
                                     @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
                                 @endswitch
                             </td>
-                            <td>
-                                <div class="d-flex flex-wrap gap-1">
-                                    @if ($cita->estado === 'pendiente')
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="confirmada">
-                                            <button class="btn btn-success btn-sm"><i class="fa fa-check-circle me-1"></i>Confirmar</button>
-                                        </form>
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="cancelada">
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
-                                        </form>
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-user-slash me-1"></i>No asistió</button>
-                                        </form>
-                                        <button type="button" class="btn btn-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
-                                            <i class="fa fa-calendar me-1"></i>Reprogramar
-                                        </button>
-                                    @elseif ($cita->estado === 'confirmada')
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="en_espera">
-                                            <button class="btn btn-warning btn-sm"><i class="fa fa-clock me-1"></i>En espera</button>
-                                        </form>
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="cancelada">
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
-                                        </form>
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-user-slash me-1"></i>No asistió</button>
-                                        </form>
-                                        <button type="button" class="btn btn-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
-                                            <i class="fa fa-calendar me-1"></i>Reprogramar
-                                        </button>
-                                    @elseif ($cita->estado === 'en_espera')
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="en_consulta">
-                                            <button class="btn btn-primary btn-sm"><i class="fa fa-stethoscope me-1"></i>En consulta</button>
-                                        </form>
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Cancelar esta cita?')">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="cancelada">
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-circle-xmark me-1"></i>Cancelar</button>
-                                        </form>
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Marcar como no asistió?')">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="no_asistio">
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-user-slash me-1"></i>No asistió</button>
-                                        </form>
-                                    @elseif ($cita->estado === 'en_consulta')
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="finalizada">
-                                            <button class="btn btn-secondary btn-sm"><i class="fa fa-check-double me-1"></i>Finalizar</button>
-                                        </form>
-                                    @elseif ($cita->estado === 'reprogramada')
-                                        <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline">
-                                            @csrf @method('PUT')
-                                            <input type="hidden" name="estado" value="confirmada">
-                                            <button class="btn btn-success btn-sm"><i class="fa fa-check-circle me-1"></i>Confirmar</button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted" style="font-size:0.75rem">—</span>
-                                    @endif
-                                    <form action="{{ route('admin.citas.destroy', $cita->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar permanentemente esta cita? También se eliminarán recetas, consultas e historial asociados.')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
-                                    </form>
+                            <td style="overflow:visible;position:relative">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown" style="border:none;background:transparent;box-shadow:none">
+                                        <i class="fa fa-ellipsis-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end neu-dropdown" style="min-width:190px;z-index:9999">
+                                        @if ($cita->estado === 'pendiente')
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="confirmada">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-check-circle fa-fw me-1" style="color:#00b894"></i> Confirmar</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Cancelar esta cita?')">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="cancelada">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-circle-xmark fa-fw me-1" style="color:#ff4444"></i> Cancelar</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Marcar como no asistió?')">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="no_asistio">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-user-slash fa-fw me-1" style="color:#dc143c"></i> No asistió</button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08)"></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
+                                                    <i class="fa fa-calendar fa-fw me-1" style="color:#9370db"></i> Reprogramar
+                                                </button>
+                                            </li>
+                                        @elseif ($cita->estado === 'confirmada')
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="en_espera">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-clock fa-fw me-1" style="color:#ffa500"></i> En espera</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Cancelar esta cita?')">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="cancelada">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-circle-xmark fa-fw me-1" style="color:#ff4444"></i> Cancelar</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Marcar como no asistió?')">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="no_asistio">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-user-slash fa-fw me-1" style="color:#dc143c"></i> No asistió</button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08)"></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item" data-mdb-toggle="modal" data-mdb-target="#reprogramarModal-{{ $cita->id }}">
+                                                    <i class="fa fa-calendar fa-fw me-1" style="color:#9370db"></i> Reprogramar
+                                                </button>
+                                            </li>
+                                        @elseif ($cita->estado === 'en_espera')
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="en_consulta">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-stethoscope fa-fw me-1" style="color:#1e90ff"></i> En consulta</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Cancelar esta cita?')">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="cancelada">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-circle-xmark fa-fw me-1" style="color:#ff4444"></i> Cancelar</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Marcar como no asistió?')">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="no_asistio">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-user-slash fa-fw me-1" style="color:#dc143c"></i> No asistió</button>
+                                                </form>
+                                            </li>
+                                        @elseif ($cita->estado === 'en_consulta')
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="finalizada">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-check-double fa-fw me-1" style="color:#555"></i> Finalizar</button>
+                                                </form>
+                                            </li>
+                                        @elseif ($cita->estado === 'reprogramada')
+                                            <li>
+                                                <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100">
+                                                    @csrf @method('PUT')
+                                                    <input type="hidden" name="estado" value="confirmada">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-check-circle fa-fw me-1" style="color:#00b894"></i> Confirmar reprogramación</button>
+                                                </form>
+                                            </li>
+                                        @else
+                                            <li><span class="dropdown-item-text text-muted" style="font-size:0.75rem">Sin acciones</span></li>
+                                        @endif
+                                        <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08)"></li>
+                                        <li>
+                                            <form action="{{ route('admin.citas.destroy', $cita->id) }}" method="POST" class="d-inline w-100" onsubmit="return confirm('¿Eliminar permanentemente esta cita? También se eliminarán recetas, consultas e historial asociados.')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="dropdown-item"><i class="fa fa-trash-can fa-fw me-1" style="color:#ff4444"></i> Eliminar</button>
+                                            </form>
+                                        </li>
+                                    </ul>
                                 </div>
                             </td>
                         </tr>
@@ -186,3 +222,16 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+document.querySelectorAll('.table-responsive .dropdown').forEach(function (el) {
+    el.addEventListener('show.bs.dropdown', function () {
+        const menu = this.querySelector('.dropdown-menu');
+        if (!menu) return;
+        gsap.fromTo(menu, { opacity: 0, y: -6, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: 'power2.out', clearProps: 'scale' });
+    });
+});
+</script>
+@endpush

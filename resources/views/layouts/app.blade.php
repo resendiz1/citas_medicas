@@ -8,6 +8,10 @@
     @auth
         <meta name="notificaciones-poll" content="{{ route('notificaciones.poll') }}">
         <meta name="user-id" content="{{ auth()->id() }}">
+        <meta name="reverb-key" content="{{ config('broadcasting.connections.reverb.key') }}">
+        <meta name="reverb-host" content="{{ config('broadcasting.connections.reverb.options.host', 'localhost') }}">
+        <meta name="reverb-port" content="{{ config('broadcasting.connections.reverb.options.port', 8080) }}">
+        <meta name="reverb-scheme" content="{{ config('broadcasting.connections.reverb.options.scheme', 'http') }}">
     @endauth
     @php
     $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
@@ -26,6 +30,7 @@
                 <ul class="navbar-nav flex-row align-items-center gap-1 mb-0">
                     @auth
                             <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Inicio</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('estadisticas.index') }}"><i class="fa fa-chart-simple me-1"></i>Estadísticas</a></li>
                         @if (auth()->user()->esAdmin())
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-mdb-toggle="dropdown">Gestión</a>

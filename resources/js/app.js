@@ -9,23 +9,35 @@ import gsap from 'gsap';
 
 window.Pusher = Pusher;
 
-try {
-    window.Echo = new Echo({
-        broadcaster: 'reverb',
-        key: '9f3c8c0a7f1b2e4d9a6c2b8e1f0d3a55',
-        wsHost: 'successful-heart-production-501a.up.railway.app',
-        wsPort: 443,
-        wssPort: 443,
-        forceTLS: true,
-        enabledTransports: ['ws', 'wss'],
-    });
-} catch (e) {
-    console.warn('Echo init failed:', e);
-    window.Echo = null;
-}
+(function () {
+    try {
+        var key = document.querySelector('meta[name="reverb-key"]')?.getAttribute('content');
+        var host = document.querySelector('meta[name="reverb-host"]')?.getAttribute('content');
+        var port = document.querySelector('meta[name="reverb-port"]')?.getAttribute('content');
+        var scheme = document.querySelector('meta[name="reverb-scheme"]')?.getAttribute('content');
 
+        if (!key || !host) {
+            console.warn('Reverb meta tags not found, Echo disabled');
+            window.Echo = null;
+            return;
+        }
 
-console.log('ECHO CREADO:', window.Echo);
+        var isTls = scheme === 'https';
+
+        window.Echo = new Echo({
+            broadcaster: 'reverb',
+            key: key,
+            wsHost: host,
+            wsPort: isTls ? 443 : (parseInt(port) || 8080),
+            wssPort: 443,
+            forceTLS: isTls,
+            enabledTransports: isTls ? ['ws', 'wss'] : ['ws', 'wss'],
+        });
+    } catch (e) {
+        console.warn('Echo init failed:', e);
+        window.Echo = null;
+    }
+})();
 
 window.openModal = function openModal(id) {
     const modal = document.getElementById(id);

@@ -41,9 +41,24 @@ class DashboardController extends Controller
             $totalMedicos   = User::where('role', 'medico')->count();
             $totalCitas     = CitaMedica::count();
             $citasPendientes = CitaMedica::where('estado', 'pendiente')->count();
+            $medicosPendientes = User::where('role', 'medico')
+                ->where(function ($q) {
+                    $q->whereDoesntHave('medicoPerfil')
+                      ->orWhereHas('medicoPerfil', fn($q) => $q->where('aprobado', false));
+                })
+                ->count();
+
+            $medicosPendientesList = User::where('role', 'medico')
+                ->where(function ($q) {
+                    $q->whereDoesntHave('medicoPerfil')
+                      ->orWhereHas('medicoPerfil', fn($q) => $q->where('aprobado', false));
+                })
+                ->with('medicoPerfil.tipoMedico')
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return view('dashboard.index', compact(
-                'totalPacientes', 'totalMedicos', 'totalCitas', 'citasPendientes'
+                'totalPacientes', 'totalMedicos', 'totalCitas', 'citasPendientes', 'medicosPendientes', 'medicosPendientesList'
             ));
         }
 
@@ -73,7 +88,7 @@ class DashboardController extends Controller
             ->get();
 
         $medicos = User::where('role', 'medico')
-            ->whereHas('medicoPerfil', fn($q) => $q->where('activo', true))
+            ->whereHas('medicoPerfil', fn($q) => $q->where('activo', true)->where('aprobado', true))
             ->with('medicoPerfil.tipoMedico')
             ->get();
 

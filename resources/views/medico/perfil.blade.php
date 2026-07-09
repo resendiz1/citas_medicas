@@ -4,6 +4,15 @@
 
 @section('content')
 <div class="container">
+    @if (!$perfil || !$perfil->aprobado)
+    <div class="alert alert-warning d-flex align-items-center gap-3 mb-4" role="alert" style="border:2px solid #ffc107;background:rgba(255,193,7,0.08);border-radius:16px;padding:18px 20px">
+        <i class="fa fa-clock fa-lg" style="color:#ffc107"></i>
+        <div>
+            <strong style="color:#856404">Registro pendiente de aprobación</strong><br>
+            <span style="color:#856404;font-size:0.88rem">Tu cuenta está siendo revisada por un administrador. Recibirás un correo cuando sea aprobada y los pacientes podrán ver tu perfil.</span>
+        </div>
+    </div>
+    @endif
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-2 p-4 d-flex justify-content-between align-items-center">
@@ -212,6 +221,8 @@
             </div>
         </div>
     </div>
+
+    @include('estadisticas._charts', ['statsUrl' => route('estadisticas.medico')])
 
     <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">

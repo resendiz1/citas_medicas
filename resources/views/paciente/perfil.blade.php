@@ -410,6 +410,8 @@
         </div>
     </div>
 
+    @include('estadisticas._charts', ['statsUrl' => route('estadisticas.paciente')])
+
     @if ($citas->count())
     <div class="card shadow-2 p-4 mb-4">
         <h6 class="fw-bold mb-3" style="color:#1266f1">Mis Citas</h6>

@@ -55,6 +55,17 @@
                     </div>
                 </a>
             </div>
+            @if ($medicosPendientes > 0)
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ route('admin.medicos') }}" class="text-decoration-none">
+                    <div class="card border-0 shadow-2 p-4 text-center" style="border:2px solid #ffc107 !important">
+                        <div class="stat-icon mx-auto mb-3" style="color:#ffc107"><i class="fa fa-clock fa-xl"></i></div>
+                        <h5>Por aprobar</h5>
+                        <p class="display-6 mb-0 fw-bold" style="color:#ffc107">{{ $medicosPendientes }}</p>
+                    </div>
+                </a>
+            </div>
+            @endif
             @endif
             <div class="col-md-6 col-lg-3">
                 <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas') }}" class="text-decoration-none">
@@ -84,6 +95,48 @@
             </div>
             @endif
         </div>
+        @if ($user->esAdmin() && $medicosPendientes > 0)
+        <div class="mt-4">
+            <div class="card shadow-2 p-4">
+                <h5 class="fw-bold mb-3" style="color:#ffc107"><i class="fa fa-clock me-2"></i>Médicos pendientes de aprobación</h5>
+                <div class="table-responsive">
+                    <table class="table neu-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Registro</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($medicosPendientesList as $medico)
+                                <tr>
+                                    <td class="fw-bold">{{ $medico->name }}</td>
+                                    <td class="text-muted">{{ $medico->email }}</td>
+                                    <td class="text-muted" style="font-size:0.82rem">{{ $medico->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <form action="{{ route('admin.medicos.aprobar', $medico->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('¿Aprobar a {{ $medico->name }}?')">
+                                                <i class="fa fa-check me-1"></i>Aprobar
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.medicos.destroy', $medico->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Rechazar y eliminar a {{ $medico->name }}?\n\nSe eliminará permanentemente.')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm" style="color:#ff4444;border-color:#ff4444">
+                                                <i class="fa fa-xmark me-1"></i>Rechazar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
         @if ($user->esRecepcionista())
         <div class="card shadow-2 p-4 mt-4" id="citas-section">
             <h5 class="mb-3 fw-bold" style="color:#1266f1">Todas las Citas</h5>
@@ -168,6 +221,16 @@
         @endif
 
         @if ($user->esMedico())
+        @php $medPerfil = $user->medicoPerfil; @endphp
+        @if (!$medPerfil || !$medPerfil->aprobado)
+        <div class="alert alert-warning d-flex align-items-center gap-3 mb-4" role="alert" style="border:2px solid #ffc107;background:rgba(255,193,7,0.08);border-radius:16px;padding:18px 20px">
+            <i class="fa fa-clock fa-lg" style="color:#ffc107"></i>
+            <div>
+                <strong style="color:#856404">Registro pendiente de aprobación</strong><br>
+                <span style="color:#856404;font-size:0.88rem">Tu cuenta está siendo revisada por un administrador. Recibirás un correo cuando sea aprobada y los pacientes podrán ver tu perfil.</span>
+            </div>
+        </div>
+        @endif
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 fw-bold" style="color:var(--text-primary)">Mis Citas</h5>
             <div class="d-flex gap-2">

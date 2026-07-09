@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "concurrently -n reverb,vite -c cyan,magenta \"php artisan reverb:start\" \"vite\"",
+        "reverb": "php artisan reverb:start"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

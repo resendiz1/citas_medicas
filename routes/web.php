@@ -12,6 +12,7 @@ use App\Http\Controllers\MedicoHorarioController;
 use App\Http\Controllers\ConsultaMedicaController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\RecetaController;
+use App\Http\Controllers\EstadisticaController;
 use App\Http\Controllers\GoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/citas/{cita}/reprogramacion/cancelar', [CitaController::class, 'cancelarReprogramacion'])->name('citas.reprogramacion.cancelar');
         Route::get('/medicos/{medico}', function ($medicoId) {
             $medico = App\Models\User::where('role', 'medico')
+                ->whereHas('medicoPerfil', fn($q) => $q->where('aprobado', true))
                 ->with('medicoPerfil.tipoMedico', 'medicoPerfil.documentos', 'horarios', 'bloqueos')
                 ->findOrFail($medicoId);
 
@@ -112,6 +114,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/citas/{id}', [AdminController::class, 'citasDestroy'])->name('citas.destroy');
         Route::get('/medicos', [AdminController::class, 'medicos'])->name('medicos');
         Route::get('/medicos/{id}', [AdminController::class, 'medicosShow'])->name('medicos.show');
+        Route::post('/medicos/{id}/aprobar', [AdminController::class, 'medicosAprobar'])->name('medicos.aprobar');
         Route::get('/medicos/crear', [AdminController::class, 'medicosCreate'])->name('medicos.create');
         Route::post('/medicos', [AdminController::class, 'medicosStore'])->name('medicos.store');
         Route::get('/medicos/{id}/editar', [AdminController::class, 'medicosEdit'])->name('medicos.edit');
@@ -131,6 +134,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/pacientes/{id}', [AdminController::class, 'pacientesUpdate'])->name('pacientes.update');
         Route::delete('/pacientes/{id}', [AdminController::class, 'pacientesDestroy'])->name('pacientes.destroy');
     });
+
+    Route::get('/estadisticas', [EstadisticaController::class, 'index'])->name('estadisticas.index');
+    Route::get('/estadisticas/medico', [EstadisticaController::class, 'medico'])->name('estadisticas.medico');
+    Route::get('/estadisticas/paciente', [EstadisticaController::class, 'paciente'])->name('estadisticas.paciente');
+    Route::get('/estadisticas/admin/general', [EstadisticaController::class, 'adminGeneral'])->name('estadisticas.admin.general');
+    Route::get('/estadisticas/admin/{medico}', [EstadisticaController::class, 'admin'])->name('estadisticas.admin');
 
     Route::middleware('role:recepcionista')->group(function () {
         Route::get('/recepcionista/pacientes', [AdminController::class, 'pacientes'])->name('recepcionista.pacientes');

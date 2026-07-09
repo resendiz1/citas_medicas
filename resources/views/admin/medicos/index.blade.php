@@ -33,6 +33,7 @@
                         <th>Especialidad</th>
                         <th>Cédula</th>
                         <th>Estado</th>
+                        <th>Aprobado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -58,6 +59,13 @@
                                     <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa fa-circle-check me-1"></i>Activo</span>
                                 @else
                                     <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa fa-circle-xmark me-1"></i>Inactivo</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if (optional($medico->medicoPerfil)->aprobado)
+                                    <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa fa-check me-1"></i>Aprobado</span>
+                                @else
+                                    <span class="badge" style="border:2px solid #ffc107;color:#ffc107;background:transparent;padding:0.5rem 0.75rem;font-size:0.65rem"><i class="fa fa-clock me-1"></i>Pendiente</span>
                                 @endif
                             </td>
                             <td>

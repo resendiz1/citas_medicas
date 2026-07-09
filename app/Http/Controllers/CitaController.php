@@ -18,7 +18,7 @@ class CitaController extends Controller
 {
     public function create(Request $request)
     {
-        $medicos = User::where('role', 'medico')->whereHas('medicoPerfil', fn($q) => $q->where('activo', true))->with('medicoPerfil.tipoMedico')->get();
+        $medicos = User::where('role', 'medico')->whereHas('medicoPerfil', fn($q) => $q->where('activo', true)->where('aprobado', true))->with('medicoPerfil.tipoMedico')->get();
         $bloqueos = MedicoBloqueo::all();
         $medicoSeleccionado = $request->query('medico_id');
 
@@ -65,7 +65,7 @@ class CitaController extends Controller
         ]);
 
         $medico = User::where('role', 'medico')->find($data['medico_id']);
-        if (!$medico || !$medico->medicoPerfil || !$medico->medicoPerfil->activo) {
+        if (!$medico || !$medico->medicoPerfil || !$medico->medicoPerfil->activo || !$medico->medicoPerfil->aprobado) {
             return redirect()->back()->with('error', 'El médico seleccionado no está disponible.')->withInput();
         }
 

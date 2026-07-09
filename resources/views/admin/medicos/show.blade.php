@@ -82,7 +82,7 @@
                 <label class="form-label text-muted small">Descripción</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->descripcion ?? '—' }}</p>
             </div>
-            <div class="col-12">
+            <div class="col-6">
                 <label class="form-label text-muted small">Estado</label>
                 <p class="fw-bold mb-0">
                     @if (optional($perfil)->activo ?? true)
@@ -92,8 +92,28 @@
                     @endif
                 </p>
             </div>
+            <div class="col-6">
+                <label class="form-label text-muted small">Aprobación</label>
+                <p class="fw-bold mb-0">
+                    @if (optional($perfil)->aprobado)
+                        <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-check me-1"></i>Aprobado</span>
+                    @else
+                        <span class="badge" style="border:2px solid #ffc107;color:#ffc107;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-clock me-1"></i>Pendiente de aprobación</span>
+                    @endif
+                </p>
+                @if (!optional($perfil)->aprobado)
+                    <form action="{{ route('admin.medicos.aprobar', $user->id) }}" method="POST" class="mt-2">
+                        @csrf
+                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('¿Aprobar este médico? Se le notificará por correo.')">
+                            <i class="fa fa-check me-1"></i>Aprobar médico
+                        </button>
+                    </form>
+                @endif
+            </div>
         </div>
     </div>
+
+    @include('estadisticas._charts', ['statsUrl' => route('estadisticas.admin', $user->id)])
 
     <div class="card shadow-2 p-4 mb-4">
         <h5 class="fw-bold mb-3" style="color:#1266f1">Documentos</h5>

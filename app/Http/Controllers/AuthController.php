@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MedicoPerfil;
 use App\Models\User;
+use App\Notifications\MedicoRegistroNotificacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -46,14 +49,39 @@ class AuthController extends Controller
             'role'     => 'required|in:medico,paciente',
         ]);
 
-        $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role'     => $data['role'],
-        ]);
+        $user = DB::transaction(function () use ($data) {
+            $user = User::create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role'     => $data['role'],
+            ]);
+
+            if ($data['role'] === 'medico') {
+                MedicoPerfil::create([
+                    'user_id'    => $user->id,
+                    'activo'     => true,
+                    'aprobado'   => false,
+                ]);
+            }
+
+            return $user;
+        });
 
         Auth::login($user);
+
+        if ($data['role'] === 'medico') {
+            try {
+                $user->notify(new MedicoRegistroNotificacion($user, 'pendiente'));
+
+                $admins = User::where('role', 'admin')->get();
+                foreach ($admins as $admin) {
+                    $admin->notify(new MedicoRegistroNotificacion($user, 'nuevo_registro'));
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return redirect()->route('dashboard');
     }

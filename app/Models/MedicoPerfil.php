@@ -11,7 +11,7 @@ class MedicoPerfil extends Model
     protected $fillable = [
         'user_id', 'tipo_medico_id', 'cedula_profesional',
         'universidad', 'experiencia_anios', 'descripcion', 'activo',
-        'intervalo_minutos',
+        'intervalo_minutos', 'aprobado',
     ];
 
     public function user()
