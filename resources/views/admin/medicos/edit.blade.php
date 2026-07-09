@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-12 col-md-8 col-lg-6">
             <div class="card shadow-2 p-4">
                 <h4 class="mb-4 fw-bold">Editar Médico</h4>
                     <form method="POST" action="{{ route('admin.medicos.update', $medico->id) }}">

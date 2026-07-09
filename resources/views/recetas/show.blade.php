@@ -12,7 +12,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
             <div class="card shadow-2 p-4 h-100">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Información</h5>
                 <table class="table neu-table align-middle mb-0">
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-12 col-md-7">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Diagnóstico</h5>
                 <p style="color:var(--text-emphasis);font-weight:400;line-height:1.7">{{ $receta->diagnostico }}</p>

@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="row justify-content-center align-items-center min-vh-100">
-            <div class="col-md-6 text-center">
+            <div class="col-12 col-md-6 text-center">
                 <div class="card shadow-2 p-5">
                     <h1 class="display-4 mb-3 fw-bold" style="color:#1266f1">Citas Médicas</h1>
                     <p class="lead mb-4 text-muted">Sistema de gestión de citas médicas</p>

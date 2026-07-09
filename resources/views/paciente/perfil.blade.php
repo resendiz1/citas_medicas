@@ -34,23 +34,23 @@
     <div class="card shadow-2 p-4 mb-4">
         <h5 class="fw-bold mb-3" style="color:#1266f1">Información Personal</h5>
         <div class="row g-3 view-mode">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label text-muted small">Nombre</label>
                 <p class="fw-bold mb-0">{{ $user->name }}</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label text-muted small">Email</label>
                 <p class="fw-bold mb-0">{{ $user->email }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Fecha de Nacimiento</label>
                 <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Teléfono</label>
                 <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Dirección</label>
                 <p class="fw-bold mb-0">{{ $user->direccion ?? '—' }}</p>
             </div>
@@ -84,31 +84,31 @@
                             <small class="text-muted">JPG, PNG, GIF, WebP — Máx. 2MB</small>
                         </div>
                     </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <label class="form-label text-muted small">Nombre</label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
                            class="form-control @error('name') is-invalid @enderror">
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <label class="form-label text-muted small">Email</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
                            class="form-control @error('email') is-invalid @enderror">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Fecha de Nacimiento</label>
                     <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', optional($user->fecha_nacimiento)->format('Y-m-d')) }}"
                            class="form-control @error('fecha_nacimiento') is-invalid @enderror">
                     @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono', $user->telefono) }}"
                            class="form-control @error('telefono') is-invalid @enderror">
                     @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Dirección</label>
                     <input type="text" name="direccion" value="{{ old('direccion', $user->direccion) }}"
                            class="form-control @error('direccion') is-invalid @enderror">

@@ -5,21 +5,21 @@
     <div id="stats-error" class="alert alert-danger py-2 mb-3 d-none" style="font-size:0.85rem;border-radius:8px"></div>
 
     <div class="row g-4" id="stats-cards">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-2 p-3 text-center" style="border-radius:12px">
                 <div class="stat-icon mx-auto mb-2" style="color:#1266f1;font-size:1.5rem"><i class="fa fa-calendar-check"></i></div>
                 <h6>Total Citas</h6>
                 <p class="display-6 mb-0 fw-bold" id="stats-total-citas">—</p>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-2 p-3 text-center" style="border-radius:12px">
                 <div class="stat-icon mx-auto mb-2" style="color:#00b894;font-size:1.5rem"><i class="fa fa-circle-check"></i></div>
                 <h6>Finalizadas</h6>
                 <p class="display-6 mb-0 fw-bold" id="stats-finalizadas">—</p>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-2 p-3 text-center" style="border-radius:12px">
                 <div class="stat-icon mx-auto mb-2" style="color:#ff4444;font-size:1.5rem"><i class="fa fa-circle-xmark"></i></div>
                 <h6>Canceladas</h6>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="row g-4 mt-2">
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card border-0 shadow-2 p-3" style="border-radius:12px">
                 <h6 class="fw-bold mb-3 text-center" style="color:#555">Citas por Estado</h6>
                 <div class="chart-wrapper" style="position:relative;height:220px">
@@ -37,7 +37,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card border-0 shadow-2 p-3" style="border-radius:12px">
                 <h6 class="fw-bold mb-3 text-center" style="color:#555">Citas por Mes</h6>
                 <div class="chart-wrapper" style="position:relative;height:220px">
@@ -48,7 +48,7 @@
     </div>
 
     <div class="row g-4 mt-2">
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card border-0 shadow-2 p-3" style="border-radius:12px">
                 <h6 class="fw-bold mb-3 text-center" style="color:#555" id="chart-med-title">Medicamentos más Recetados</h6>
                 <div id="chart-med-container" class="chart-wrapper" style="position:relative;height:220px">
@@ -56,7 +56,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card border-0 shadow-2 p-3" style="border-radius:12px">
                 <h6 class="fw-bold mb-3 text-center" style="color:#555" id="chart-diag-title">Diagnósticos más Frecuentes</h6>
                 <div id="chart-diag-container" class="chart-wrapper" style="position:relative;height:220px">
@@ -67,7 +67,7 @@
     </div>
 
     <div class="row g-4 mt-2 d-none" id="stats-medicos-row">
-        <div class="col-md-12">
+        <div class="col-12 col-md-12">
             <div class="card border-0 shadow-2 p-3" style="border-radius:12px">
                 <h6 class="fw-bold mb-3 text-center" style="color:#555">Médicos más Visitados</h6>
                 <div class="chart-wrapper" style="position:relative;height:200px">

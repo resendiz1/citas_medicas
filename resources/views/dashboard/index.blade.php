@@ -37,7 +37,7 @@
     @if ($user->esAdmin() || $user->esRecepcionista())
         <div class="row g-4">
             @if ($user->esAdmin())
-            <div class="col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="{{ route('admin.pacientes') }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center">
                         <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-users fa-xl"></i></div>
@@ -46,7 +46,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="{{ route('admin.medicos') }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center">
                         <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-user-doctor fa-xl"></i></div>
@@ -56,7 +56,7 @@
                 </a>
             </div>
             @if ($medicosPendientes > 0)
-            <div class="col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="{{ route('admin.medicos') }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center" style="border:2px solid #ffc107 !important">
                         <div class="stat-icon mx-auto mb-3" style="color:#ffc107"><i class="fa fa-clock fa-xl"></i></div>
@@ -67,7 +67,7 @@
             </div>
             @endif
             @endif
-            <div class="col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas') }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center">
                         <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-calendar-check fa-xl"></i></div>
@@ -76,7 +76,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-3">
                 <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas', ['estado' => 'pendiente']) }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center">
                         <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-clock fa-xl"></i></div>
@@ -86,7 +86,7 @@
                 </a>
             </div>
             @if ($user->esRecepcionista())
-            <div class="col-md-6 col-lg-3">
+            <div class="col-12 col-md-6 col-lg-3">
                 <div class="card border-0 shadow-2 p-4 text-center">
                     <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-calendar-day fa-xl"></i></div>
                     <h5>Hoy</h5>
@@ -195,7 +195,7 @@
             <h5 class="fw-bold mb-3" style="color:var(--text-primary)">Médicos Disponibles</h5>
             <div class="row g-3">
                 @forelse ($medicos as $medico)
-                <div class="col-md-4 col-lg-3">
+                <div class="col-12 col-md-4 col-lg-3">
                     <a href="{{ route('paciente.medicos.show', $medico->id) }}" class="text-decoration-none">
                         <div class="card shadow-2 p-3 text-center h-100" style="border-radius:12px;cursor:pointer;">
                             <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"

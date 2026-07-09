@@ -10,7 +10,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Datos de la cita</h5>
                 <table class="table neu-table align-middle mb-0">
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-12 col-md-7">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Receta</h5>
 
@@ -51,19 +51,19 @@
                         <label class="form-label">Medicamentos</label>
                         <div id="medicamentos-wrapper">
                             <div class="row g-2 mb-2 medicamento-row">
-                                <div class="col-md-4">
+                                <div class="col-12 col-md-4">
                                     <input type="text" name="medicamentos[0][nombre]" class="form-control" placeholder="Medicamento">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <input type="text" name="medicamentos[0][dosis]" class="form-control" placeholder="Dosis">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <input type="text" name="medicamentos[0][frecuencia]" class="form-control" placeholder="Frecuencia">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <input type="text" name="medicamentos[0][duracion]" class="form-control" placeholder="Duración">
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-12 col-md-2">
                                     <button type="button" class="btn btn-outline-secondary btn-sm neu-btn-primary w-100" onclick="agregarMedicamento()"><i class="fa fa-plus me-1"></i>+</button>
                                 </div>
                             </div>
@@ -106,19 +106,19 @@ function agregarMedicamento() {
     const row = document.createElement('div');
     row.className = 'row g-2 mb-2 medicamento-row';
     row.innerHTML = `
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <input type="text" name="medicamentos[${medIndex}][nombre]" class="form-control" placeholder="Medicamento">
         </div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <input type="text" name="medicamentos[${medIndex}][dosis]" class="form-control" placeholder="Dosis">
         </div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <input type="text" name="medicamentos[${medIndex}][frecuencia]" class="form-control" placeholder="Frecuencia">
         </div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <input type="text" name="medicamentos[${medIndex}][duracion]" class="form-control" placeholder="Duración">
         </div>
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <button type="button" class="btn btn-outline-secondary btn-sm neu-btn-danger w-100" onclick="this.parentElement.parentElement.remove()"><i class="fa fa-xmark me-1"></i>×</button>
         </div>
     `;

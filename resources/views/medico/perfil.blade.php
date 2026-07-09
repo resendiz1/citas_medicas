@@ -53,23 +53,23 @@
     <div class="card shadow-2 p-4 mb-4">
         <h5 class="fw-bold mb-3" style="color:#1266f1">Información Personal</h5>
         <div class="row g-3 view-mode">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label text-muted small">Nombre</label>
                 <p class="fw-bold mb-0">{{ $user->name }}</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label text-muted small">Email</label>
                 <p class="fw-bold mb-0">{{ $user->email }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Fecha de Nacimiento</label>
                 <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Teléfono</label>
                 <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Dirección</label>
                 <p class="fw-bold mb-0">{{ $user->direccion ?? '—' }}</p>
             </div>
@@ -99,31 +99,31 @@
                             <small class="text-muted">JPG, PNG, GIF, WebP — Máx. 2MB</small>
                         </div>
                     </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <label class="form-label text-muted small">Nombre</label>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
                            class="form-control @error('name') is-invalid @enderror">
                     @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                     <label class="form-label text-muted small">Email</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
                            class="form-control @error('email') is-invalid @enderror">
                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Fecha de Nacimiento</label>
                     <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', optional($user->fecha_nacimiento)->format('Y-m-d')) }}"
                            class="form-control @error('fecha_nacimiento') is-invalid @enderror">
                     @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Teléfono</label>
                     <input type="text" name="telefono" value="{{ old('telefono', $user->telefono) }}"
                            class="form-control @error('telefono') is-invalid @enderror">
                     @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Dirección</label>
                     <input type="text" name="direccion" value="{{ old('direccion', $user->direccion) }}"
                            class="form-control @error('direccion') is-invalid @enderror">
@@ -133,7 +133,7 @@
 
             <h5 class="fw-bold mb-3 mt-4" style="color:#1266f1">Información Profesional</h5>
             <div class="row g-3 edit-mode">
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Especialidad</label>
                     <select name="tipo_medico_id"
                             class="form-control @error('tipo_medico_id') is-invalid @enderror">
@@ -146,25 +146,25 @@
                     </select>
                     @error('tipo_medico_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Cédula Profesional</label>
                     <input type="text" name="cedula_profesional" value="{{ old('cedula_profesional', optional($perfil)->cedula_profesional) }}"
                            class="form-control @error('cedula_profesional') is-invalid @enderror">
                     @error('cedula_profesional') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Universidad</label>
                     <input type="text" name="universidad" value="{{ old('universidad', optional($perfil)->universidad) }}"
                            class="form-control @error('universidad') is-invalid @enderror">
                     @error('universidad') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Años de Experiencia</label>
                     <input type="number" name="experiencia_anios" value="{{ old('experiencia_anios', optional($perfil)->experiencia_anios) }}"
                            class="form-control @error('experiencia_anios') is-invalid @enderror" min="0" max="100">
                     @error('experiencia_anios') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-4">
                     <label class="form-label text-muted small">Observaciones</label>
                     <input type="text" name="observaciones" value="{{ old('observaciones', $user->observaciones) }}"
                            class="form-control @error('observaciones') is-invalid @enderror">
@@ -185,23 +185,23 @@
         </form>
 
         <div class="row g-3 mt-0 view-mode">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Especialidad</label>
                 <p class="fw-bold mb-0">{{ optional(optional($perfil)->tipoMedico)->nombre_tipo_medico ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Cédula Profesional</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->cedula_profesional ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Universidad</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->universidad ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Años de Experiencia</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->experiencia_anios ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Observaciones</label>
                 <p class="fw-bold mb-0">{{ $user->observaciones ?? '—' }}</p>
             </div>

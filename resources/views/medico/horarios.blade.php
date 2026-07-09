@@ -26,14 +26,11 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
-            </div>
         </form>
     </div>
 
     <div class="row g-4">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Agregar horario</h5>
                 <form action="{{ $user->esAdmin() ? route('admin.medicos.horarios.store', $medico->id) : route('medico.horarios.store') }}" method="POST">
@@ -68,7 +65,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-12 col-md-7">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Horarios registrados</h5>
                 @if ($horarios->isEmpty())

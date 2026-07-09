@@ -10,7 +10,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card shadow-2 p-4 h-100">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Datos personales</h5>
                 <div class="table-responsive">
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card shadow-2 p-4 h-100">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Contactos de emergencia</h5>
                 @forelse ($paciente->contactosEmergencia as $contacto)
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card shadow-2 p-4 h-100">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Alergias</h5>
                 @php $alergias = $paciente->alergias; @endphp
@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <div class="card shadow-2 p-4 h-100">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Enfermedades importantes</h5>
                 @php $enfermedades = $paciente->enfermedadesImportantes; @endphp

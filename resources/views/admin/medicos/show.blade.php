@@ -34,23 +34,23 @@
     <div class="card shadow-2 p-4 mb-4">
         <h5 class="fw-bold mb-3" style="color:#1266f1">Información Personal</h5>
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label text-muted small">Nombre</label>
                 <p class="fw-bold mb-0">{{ $user->name }}</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label text-muted small">Email</label>
                 <p class="fw-bold mb-0">{{ $user->email }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Fecha de Nacimiento</label>
                 <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Teléfono</label>
                 <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Dirección</label>
                 <p class="fw-bold mb-0">{{ $user->direccion ?? '—' }}</p>
             </div>
@@ -58,23 +58,23 @@
 
         <h5 class="fw-bold mb-3 mt-4" style="color:#1266f1">Información Profesional</h5>
         <div class="row g-3">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Especialidad</label>
                 <p class="fw-bold mb-0">{{ optional(optional($perfil)->tipoMedico)->nombre_tipo_medico ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Cédula Profesional</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->cedula_profesional ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Universidad</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->universidad ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Años de Experiencia</label>
                 <p class="fw-bold mb-0">{{ optional($perfil)->experiencia_anios ?? '—' }}</p>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Observaciones</label>
                 <p class="fw-bold mb-0">{{ $user->observaciones ?? '—' }}</p>
             </div>

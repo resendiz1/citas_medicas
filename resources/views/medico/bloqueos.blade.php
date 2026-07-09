@@ -12,7 +12,7 @@
     </div>
 
     <div class="row g-4">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Nuevo bloqueo</h5>
                 <form action="{{ $user->esAdmin() ? route('admin.medicos.bloqueos.store', $medico->id) : route('medico.bloqueos.store') }}" method="POST">
@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <div class="col-md-7">
+        <div class="col-12 col-md-7">
             <div class="card shadow-2 p-4">
                 <h5 class="mb-3 fw-bold" style="color:#1266f1;border-bottom:1px solid rgba(240,192,0,0.2);padding-bottom:0.75rem">Bloqueos registrados</h5>
                 @if ($bloqueos->isEmpty())

@@ -95,7 +95,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
+        <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-2 p-4">
                 <h4 class="mb-4 fw-bold">Solicitar Cita Médica</h4>
                 <form method="POST" action="{{ route('citas.store') }}" id="citaForm">
