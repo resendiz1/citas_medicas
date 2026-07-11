@@ -337,7 +337,7 @@ class PacienteController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . config('services.openrouter.api_key'),
                 'Content-Type'  => 'application/json',
-            ])->timeout(60)->post(config('services.openrouter.url') . '/chat/completions', [
+            ])->timeout(120)->post(config('services.openrouter.url') . '/chat/completions', [
                 'model'    => config('services.openrouter.model'),
                 'messages' => $messages,
                 'max_tokens' => 1024,
@@ -349,7 +349,15 @@ class PacienteController extends Controller
             }
 
             $data = $response->json();
-            $reply = $data['choices'][0]['message']['content'] ?? 'No se pudo obtener respuesta.';
+            if (isset($data['error'])) {
+                Log::error('OpenRouter API error in response', ['error' => $data['error']]);
+                return response()->json(['error' => 'El asistente no está disponible: ' . ($data['error']['message'] ?? 'Error desconocido')], 500);
+            }
+            $reply = $data['choices'][0]['message']['content'] ?? null;
+            if ($reply === null) {
+                Log::warning('OpenRouter unexpected response', ['body' => $response->body()]);
+                return response()->json(['error' => 'Respuesta inesperada del asistente. Intenta de nuevo.'], 500);
+            }
 
             return response()->json(['reply' => $reply]);
         } catch (\Exception $e) {

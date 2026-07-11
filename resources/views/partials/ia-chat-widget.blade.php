@@ -69,6 +69,10 @@
         sendBtn.disabled = true;
         sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
+        var thinkingTimer = setTimeout(function() {
+            addIaMessage('ai', '⏳ Pensando a fondo...');
+        }, 30000);
+
         fetch('{{ route("paciente.chat-ia") }}', {
             method: 'POST',
             headers: {
@@ -79,6 +83,11 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
+            clearTimeout(thinkingTimer);
+            var lastMsg = container.lastElementChild;
+            if (lastMsg && lastMsg.textContent.includes('Pensando a fondo')) {
+                lastMsg.remove();
+            }
             if (data.error) {
                 addIaMessage('ai', '⚠️ ' + data.error);
             } else {
@@ -87,6 +96,11 @@
             }
         })
         .catch(function() {
+            clearTimeout(thinkingTimer);
+            var lastMsg = container.lastElementChild;
+            if (lastMsg && lastMsg.textContent.includes('Pensando a fondo')) {
+                lastMsg.remove();
+            }
             addIaMessage('ai', '⚠️ Error de conexión. Intenta de nuevo.');
         })
         .finally(function() {
