@@ -20,10 +20,27 @@ class NotificacionController extends Controller
             return $payload;
         });
 
-        if ($data->isNotEmpty()) {
-            $user->unreadNotifications->markAsRead();
-        }
+        $notifications->each(function ($n) {
+            $tipo = $n->data['tipo'] ?? null;
+            if ($tipo !== 'mensaje') {
+                $n->markAsRead();
+            }
+        });
 
         return response()->json($data);
+    }
+
+    public function marcarChatLeidas(Request $request)
+    {
+        $request->validate(['cita_id' => 'required|integer']);
+        $user = $request->user();
+
+        $user->unreadNotifications()
+            ->where('data->tipo', 'mensaje')
+            ->where('data->cita_id', $request->cita_id)
+            ->get()
+            ->each->markAsRead();
+
+        return response()->json(['ok' => true]);
     }
 }

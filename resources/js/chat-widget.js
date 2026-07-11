@@ -20,7 +20,11 @@ document.addEventListener('visibilitychange', function () {
         detenerBgPoll();
     } else {
         if (chatCitaActual) iniciarPoll(chatCitaActual);
-        if (!chatBgInterval) iniciarBgPoll();
+        if (!chatBgInterval) {
+            chatBgReady = false;
+            chatInitBg();
+            verificarNoLeidos();
+        }
     }
 });
 
@@ -65,10 +69,12 @@ function abrirChat() {
             sel.innerHTML = citas.map(function (c) {
                 return '<option value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
             }).join('');
-            sel.value = citas[0].id;
-            chatNoLeidos = {};
-            actualizarBadge();
-            cambiarChatCita(citas[0].id);
+            if (chatCitaActual && citas.some(function (c) { return c.id === chatCitaActual; })) {
+                sel.value = chatCitaActual;
+            } else {
+                sel.value = citas[0].id;
+                cambiarChatCita(citas[0].id);
+            }
         })
         .catch(function () {
             sel.innerHTML = '<option value="">Error</option>';
@@ -193,32 +199,36 @@ function detenerPoll() {
     }
 }
 
+function verificarNoLeidos() {
+    fetch(chatCitasUrl)
+        .then(function (r) { return r.json(); })
+        .then(function (citas) {
+            citas.forEach(function (c) {
+                var actualId = c.ultimo_id;
+                if (!chatBgReady) {
+                    chatUltimosMsgs[c.id] = actualId;
+                    return;
+                }
+                var anteriorId = chatUltimosMsgs[c.id];
+                if (actualId && actualId !== anteriorId) {
+                    chatUltimosMsgs[c.id] = actualId;
+                    if (c.id !== chatCitaActual) {
+                        chatNoLeidos[c.id] = (chatNoLeidos[c.id] || 0) + 1;
+                    }
+                }
+            });
+            chatBgReady = true;
+            actualizarBadge();
+        })
+        .catch(function () {});
+}
+
 function iniciarBgPoll() {
     detenerBgPoll();
     if (document.hidden) return;
     chatBgInterval = setInterval(function () {
         if (document.hidden) return;
-        fetch(chatCitasUrl)
-            .then(function (r) { return r.json(); })
-            .then(function (citas) {
-                citas.forEach(function (c) {
-                    var actualId = c.ultimo_id;
-                    if (!chatBgReady) {
-                        chatUltimosMsgs[c.id] = actualId;
-                        return;
-                    }
-                    var anteriorId = chatUltimosMsgs[c.id];
-                    if (actualId && actualId !== anteriorId) {
-                        chatUltimosMsgs[c.id] = actualId;
-                        if (c.id !== chatCitaActual) {
-                            chatNoLeidos[c.id] = (chatNoLeidos[c.id] || 0) + 1;
-                        }
-                    }
-                });
-                chatBgReady = true;
-                if (Object.keys(chatNoLeidos).length > 0) actualizarBadge();
-            })
-            .catch(function () {});
+        verificarNoLeidos();
     }, 6000);
 }
 
@@ -246,6 +256,23 @@ function chatInitBg() {
 }
 
 window.toggleChatWidget = toggleChatWidget;
+
+window.abrirChatCita = function (citaId) {
+    if (!chatCitasUrl) return;
+    if (!chatWidgetAbierto) toggleChatWidget();
+    var sel = document.getElementById('chat-cita-select');
+    var exists = chatCitasList.some(function (c) { return c.id === citaId; });
+    if (!exists) {
+        chatCitasList.push({ id: citaId, 'con quien': 'Cita #' + citaId, fecha: '' });
+    }
+    sel.value = citaId;
+    cambiarChatCita(citaId);
+    fetch('/notificaciones/chat-leidas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') },
+        body: JSON.stringify({ cita_id: citaId }),
+    }).catch(function () {});
+};
 
 export function initChatWidget(citasUrl, userId) {
     chatCitasUrl = citasUrl;

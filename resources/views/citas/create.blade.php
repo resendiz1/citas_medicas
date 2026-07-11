@@ -140,8 +140,8 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="fa fa-xmark me-1"></i>Cancelar</a>
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-calendar-check me-1"></i>Solicitar cita</button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></a>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-calendar-check me-1"></i><span class="btn-text">Solicitar cita</span></button>
                     </div>
                 </form>
             </div>

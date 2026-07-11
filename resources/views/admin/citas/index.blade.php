@@ -61,18 +61,19 @@
                                     @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
                                     @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
                                     @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
-                                    @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
+                                    @case('finalizada') <span class="btn btn-primary btn-sm"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
                                     @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
                                     @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
                                     @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
                                 @endswitch
                             </td>
-                            <td style="overflow:visible;position:relative">
-                                <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown" style="border:none;background:transparent;box-shadow:none">
+                            <td>
+                                <div data-drop-wrap="{{ $cita->id }}">
+                                    <button onclick="toggleDrop({{ $cita->id }})" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" style="border:none;background:transparent;box-shadow:none">
                                         <i class="fa fa-ellipsis-vertical"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end neu-dropdown" style="min-width:190px;z-index:9999">
+                                    <div data-drop-menu="{{ $cita->id }}" class="shadow-2" style="display:none;position:fixed;min-width:190px;font-size:0.85rem;z-index:99999;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:0.375rem;padding:0.5rem 0">
+                                    <ul style="list-style:none;padding:0;margin:0">
                                         @if ($cita->estado === 'pendiente')
                                             <li>
                                                 <form action="{{ route('citas.estado', $cita->id) }}" method="POST" class="d-inline w-100">
@@ -178,6 +179,7 @@
                                             </form>
                                         </li>
                                     </ul>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -223,15 +225,4 @@
 </div>
 @endsection
 
-@push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script>
-document.querySelectorAll('.table-responsive .dropdown').forEach(function (el) {
-    el.addEventListener('show.bs.dropdown', function () {
-        const menu = this.querySelector('.dropdown-menu');
-        if (!menu) return;
-        gsap.fromTo(menu, { opacity: 0, y: -6, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: 'power2.out', clearProps: 'scale' });
-    });
-});
-</script>
-@endpush
+

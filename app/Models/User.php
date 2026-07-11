@@ -90,4 +90,28 @@ class User extends Authenticatable
     {
         return $this->role === 'recepcionista';
     }
+
+    public function hasCompleteProfile(): bool
+    {
+        return $this->getProfileIncompleteReason() === null;
+    }
+
+    public function getProfileIncompleteReason(): ?string
+    {
+        if ($this->esMedico()) {
+            if (!$this->medicoPerfil) return 'faltan datos profesionales';
+            if (!$this->medicoPerfil->tipo_medico_id) return 'falta seleccionar la especialidad';
+            if (!$this->medicoPerfil->cedula_profesional) return 'falta la cédula profesional';
+            if (!$this->telefono) return 'falta el teléfono';
+            if (!$this->fecha_nacimiento) return 'falta la fecha de nacimiento';
+            return null;
+        }
+        if ($this->esPaciente()) {
+            if (!$this->telefono) return 'falta el teléfono';
+            if (!$this->fecha_nacimiento) return 'falta la fecha de nacimiento';
+            if ($this->contactosEmergencia()->count() === 0) return 'falta agregar al menos un contacto de emergencia';
+            return null;
+        }
+        return null;
+    }
 }

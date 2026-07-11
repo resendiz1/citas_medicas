@@ -6,7 +6,14 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-5">
-            <div class="card shadow-2 p-4 mt-5">
+            <div class="text-center mb-2 mt-5">
+                <small class="text-muted" style="font-size:0.75rem">
+                    <i class="fa fa-info-circle me-1"></i>Selecciona un rol arriba antes de usar Google.
+                    El registro con Google usará el rol que elijas.
+                    Si eliges <strong>Médico</strong>, tu cuenta quedará pendiente de aprobación por un administrador.
+                </small>
+            </div>
+            <div class="card shadow-2 p-4">
                 <h4 class="text-center mb-4">Registro</h4>
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
@@ -51,7 +58,7 @@
                             @error('role') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fa fa-user-plus me-1"></i>Crear cuenta</button>
+                        <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fa fa-user-plus me-1"></i><span class="btn-text">Crear cuenta</span></button>
 
                         <div class="text-center mb-3">
                             <span style="font-size:0.85rem;color:var(--text-secondary)">o</span>

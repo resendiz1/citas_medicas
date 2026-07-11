@@ -1,0 +1,9 @@
+{
+  "name": "Citas Médicas",
+  "short_name": "Citas Médicas",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1266f1",
+  "icons": []
+}

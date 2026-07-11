@@ -9,8 +9,8 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">Perfil del Médico</h4>
                 <div>
-                    <a href="{{ route('citas.create', ['medico_id' => $medico->id]) }}" class="btn btn-primary neu-btn-sm me-2"><i class="fa fa-calendar-check me-1"></i>Solicitar cita</a>
-                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i>Volver</a>
+                    <a href="{{ route('citas.create', ['medico_id' => $medico->id]) }}" class="btn btn-primary neu-btn-sm me-2"><i class="fa fa-calendar-check me-1"></i><span class="btn-text">Solicitar cita</span></a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i><span class="btn-text">Volver</span></a>
                 </div>
             </div>
 

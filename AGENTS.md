@@ -70,6 +70,12 @@
 - Médico registra bloqueos (fecha inicio, fecha fin, motivo)
 - Admin gestiona bloqueos de cualquier médico
 
+### Chat Widget
+- Widget global con FAB y selector de citas por dropdown
+- Mensajes separados por cita (`chatMensajesCache[citaId]`, polling por cita con `since_id`)
+- Echo canal privado `chat.cita.{id}` (paciente o médico autorizados)
+- Fix: race condition en `abrirChatCita` corregida — fetch async ya no sobrescribe cita seleccionada
+
 ### Notificaciones en Tiempo Real
 - `CitaEstadoNotificacion`: canales `mail` + `database`
 - Email al crear cita (médico) y al cambiar estado (paciente/médico)
@@ -141,3 +147,4 @@ resources/js/app.js             - Polling cada 10s + Notyf toast de notificacion
 ## Próximos Pasos / No Implementado
 - Configurar driver de mail real (SMTP) en `.env`
 - Tests
+- Reinstalar `php-mysql` (OS level) para que `php artisan tinker` funcione

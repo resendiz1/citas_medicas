@@ -14,6 +14,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\EstadisticaController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\PushSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,10 +34,14 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/ayuda', function () { return view('ayuda'); })->name('ayuda');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/citas/check', [DashboardController::class, 'checkNuevas'])->name('dashboard.citas.check');
 
     Route::get('/notificaciones/poll', [NotificacionController::class, 'poll'])->name('notificaciones.poll');
+    Route::post('/notificaciones/chat-leidas', [NotificacionController::class, 'marcarChatLeidas'])->name('notificaciones.chat-leidas');
+    Route::post('/push/subscribe', [PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
 
     Route::middleware('role:paciente')->group(function () {
         Route::get('/paciente/perfil', [PacienteController::class, 'perfilShow'])->name('paciente.perfil');
@@ -51,6 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/paciente/enfermedades', [PacienteController::class, 'enfermedadStore'])->name('paciente.enfermedades.store');
         Route::put('/paciente/enfermedades/{enfermedadImportante}', [PacienteController::class, 'enfermedadUpdate'])->name('paciente.enfermedades.update');
         Route::delete('/paciente/enfermedades/{enfermedadImportante}', [PacienteController::class, 'enfermedadDestroy'])->name('paciente.enfermedades.destroy');
+        Route::post('/paciente/chat-ia', [PacienteController::class, 'chatIA'])->name('paciente.chat-ia');
         Route::get('/citas/crear', [CitaController::class, 'create'])->name('citas.create');
         Route::post('/citas', [CitaController::class, 'store'])->name('citas.store');
         Route::post('/citas/{cita}/reprogramacion/confirmar', [CitaController::class, 'confirmarReprogramacion'])->name('citas.reprogramacion.confirmar');
@@ -85,6 +91,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/medico/bloqueos/{id}', [MedicoBloqueoController::class, 'destroy'])->name('medico.bloqueos.destroy');
         Route::get('/citas/{cita}/consulta-medica', [ConsultaMedicaController::class, 'create'])->name('consulta-medica.create');
         Route::post('/citas/{cita}/consulta-medica', [ConsultaMedicaController::class, 'store'])->name('consulta-medica.store');
+        Route::post('/citas/{cita}/consulta-medica/generar-receta', [ConsultaMedicaController::class, 'generarReceta'])->name('consulta-medica.generar-receta');
+        Route::get('/medico/historial-citas', [MedicoController::class, 'historialCitas'])->name('medico.historial-citas');
         Route::post('/medico/documentos', [MedicoController::class, 'documentosStore'])->name('medico.documentos.store');
         Route::delete('/medico/documentos/{id}', [MedicoController::class, 'documentosDestroy'])->name('medico.documentos.destroy');
     });
@@ -133,6 +141,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pacientes/{id}/editar', [AdminController::class, 'pacientesEdit'])->name('pacientes.edit');
         Route::put('/pacientes/{id}', [AdminController::class, 'pacientesUpdate'])->name('pacientes.update');
         Route::delete('/pacientes/{id}', [AdminController::class, 'pacientesDestroy'])->name('pacientes.destroy');
+        Route::post('/reset', [AdminController::class, 'reset'])->name('reset');
     });
 
     Route::get('/estadisticas', [EstadisticaController::class, 'index'])->name('estadisticas.index');

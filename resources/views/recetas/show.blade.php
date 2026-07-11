@@ -8,7 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Receta Médica</h4>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Volver al dashboard</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i><span class="btn-text">Volver al dashboard</span></a>
     </div>
 
     <div class="row g-4">
@@ -74,9 +74,15 @@
                         <thead>
                             <tr>
                                 <th>Medicamento</th>
+                                <th>Genérico</th>
+                                <th>Comercial</th>
+                                <th>Presentación</th>
+                                <th>Forma farm.</th>
                                 <th>Dosis</th>
+                                <th>Vía</th>
                                 <th>Frecuencia</th>
                                 <th>Duración</th>
+                                <th>Cant.</th>
                                 <th>Indicaciones</th>
                             </tr>
                         </thead>
@@ -84,9 +90,15 @@
                             @foreach ($receta->medicamentos as $med)
                                 <tr>
                                     <td style="color:var(--text-emphasis);font-weight:500">{{ $med->medicamento }}</td>
+                                    <td style="color:var(--text-primary)">{{ $med->nombre_generico ?? '—' }}</td>
+                                    <td style="color:var(--text-primary)">{{ $med->nombre_comercial ?? '—' }}</td>
+                                    <td style="color:var(--text-primary)">{{ $med->presentacion ?? '—' }}</td>
+                                    <td style="color:var(--text-primary)">{{ $med->forma_farmaceutica ?? '—' }}</td>
                                     <td style="color:var(--text-primary)">{{ $med->dosis ?? '—' }}</td>
+                                    <td style="color:var(--text-primary)">{{ $med->via_administracion ?? '—' }}</td>
                                     <td style="color:var(--text-primary)">{{ $med->frecuencia ?? '—' }}</td>
                                     <td style="color:var(--text-primary)">{{ $med->duracion ?? '—' }}</td>
+                                    <td style="color:var(--text-primary)">{{ $med->cantidad_total ?? '—' }}</td>
                                     <td style="color:var(--text-primary)">{{ $med->indicaciones ?? '—' }}</td>
                                 </tr>
                             @endforeach
@@ -106,7 +118,7 @@
 
             @if ($user->esMedico() || $user->esAdmin())
             <div class="mt-4 text-end">
-                <a href="{{ route('recetas.create', $receta->cita->id) }}" class="btn btn-primary neu-btn-sm"><i class="fa fa-plus me-1"></i>Nueva receta para esta cita</a>
+                <a href="{{ route('recetas.create', $receta->cita->id) }}" class="btn btn-primary neu-btn-sm"><i class="fa fa-plus me-1"></i><span class="btn-text">Nueva receta para esta cita</span></a>
             </div>
             @endif
         </div>

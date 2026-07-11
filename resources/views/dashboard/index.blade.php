@@ -119,13 +119,13 @@
                                         <form action="{{ route('admin.medicos.aprobar', $medico->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('¿Aprobar a {{ $medico->name }}?')">
-                                                <i class="fa fa-check me-1"></i>Aprobar
+                                                <i class="fa fa-check me-1"></i><span class="btn-text">Aprobar</span>
                                             </button>
                                         </form>
                                         <form action="{{ route('admin.medicos.destroy', $medico->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Rechazar y eliminar a {{ $medico->name }}?\n\nSe eliminará permanentemente.')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="btn btn-outline-secondary btn-sm" style="color:#ff4444;border-color:#ff4444">
-                                                <i class="fa fa-xmark me-1"></i>Rechazar
+                                                <i class="fa fa-xmark me-1"></i><span class="btn-text">Rechazar</span>
                                             </button>
                                         </form>
                                     </td>
@@ -137,11 +137,26 @@
             </div>
         </div>
         @endif
+        @if ($user->esAdmin())
+        <div class="mt-4">
+            <div class="card shadow-2 p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <form action="{{ route('admin.reset') }}" method="POST" onsubmit="return confirm('¿Estás seguro de restablecer la base de datos?\n\nSe eliminarán TODOS los pacientes, médicos, citas, recetas, consultas y mensajes. Solo se conservará tu cuenta de administrador.\n\nEsta acción no se puede deshacer.')">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fa fa-trash-can me-1"></i><span class="btn-text">Restablecer BD</span>
+                        </button>
+                    </form>
+                    <span class="text-muted small">Elimina todos los datos excepto tu cuenta de administrador</span>
+                </div>
+            </div>
+        </div>
+        @endif
         @if ($user->esRecepcionista())
         <div class="card shadow-2 p-4 mt-4" id="citas-section">
             <h5 class="mb-3 fw-bold" style="color:#1266f1">Todas las Citas</h5>
-            <div class="table-responsive">
-                <table class="table neu-table align-middle mb-0">
+                <div class="table-responsive">
+                    <table class="table neu-table align-middle mb-0">
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -165,7 +180,7 @@
                                         @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
                                         @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
                                         @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
-                                        @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
+                                        @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="btn btn-primary btn-sm"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
                                         @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
                                         @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
                                         @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
@@ -223,7 +238,7 @@
         @if ($user->esMedico())
         @php $medPerfil = $user->medicoPerfil; @endphp
         @if (!$medPerfil || !$medPerfil->aprobado)
-        <div class="alert alert-warning d-flex align-items-center gap-3 mb-4" role="alert" style="border:2px solid #ffc107;background:rgba(255,193,7,0.08);border-radius:16px;padding:18px 20px">
+        <div id="pending-approval-alert" class="alert alert-warning d-flex align-items-center gap-3 mb-4" role="alert" style="border:2px solid #ffc107;background:rgba(255,193,7,0.08);border-radius:16px;padding:18px 20px">
             <i class="fa fa-clock fa-lg" style="color:#ffc107"></i>
             <div>
                 <strong style="color:#856404">Registro pendiente de aprobación</strong><br>
@@ -234,16 +249,16 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 fw-bold" style="color:var(--text-primary)">Mis Citas</h5>
             <div class="d-flex gap-2">
-                <a href="{{ route('medico.perfil') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-user me-1"></i>Mi Perfil</a>
+                <a href="{{ route('medico.perfil') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-user me-1"></i><span class="btn-text">Mi Perfil</span></a>
             </div>
         </div>
         @elseif ($user->esPaciente())
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 fw-bold" style="color:var(--text-primary)">Mis Citas</h5>
             <div class="d-flex gap-2">
-                <a href="{{ route('paciente.perfil') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-user me-1"></i>Mi Perfil</a>
-                <a href="{{ route('paciente.historial') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-clock-rotate-left me-1"></i>Mi Historial</a>
-                <a href="{{ route('citas.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa fa-calendar-plus me-1"></i>+ Nueva cita</a>
+                <a href="{{ route('paciente.perfil') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-user me-1"></i><span class="btn-text">Mi Perfil</span></a>
+                <a href="{{ route('paciente.historial') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-clock-rotate-left me-1"></i><span class="btn-text">Mi Historial</span></a>
+                <a href="{{ route('citas.create') }}" class="btn btn-primary neu-btn-sm"><i class="fa fa-calendar-plus me-1"></i><span class="btn-text">+ Nueva cita</span></a>
             </div>
         </div>
         @else
@@ -280,7 +295,7 @@
                                             @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
                                             @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
                                             @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
-                                            @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
+                                            @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="btn btn-primary btn-sm"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
                                             @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
                                             @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
                                             @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
@@ -308,8 +323,8 @@
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer border-0">
-                                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                                                            <button type="submit" class="btn btn-secondary btn-sm"><i class="fa fa-calendar-check me-1"></i>Guardar reprogramación</button>
+                                                            <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                                                            <button type="submit" class="btn btn-secondary btn-sm"><i class="fa fa-calendar-check me-1"></i><span class="btn-text">Guardar reprogramación</span></button>
                                                         </div>
                                                     </form>
                                                 </div>

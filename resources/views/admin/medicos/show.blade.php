@@ -24,8 +24,8 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.medicos.edit', $user->id) }}" class="btn btn-outline-secondary"><i class="fa fa-pen-to-square me-1"></i>Editar</a>
-                    <a href="{{ route('admin.medicos') }}" class="btn btn-outline-secondary"><i class="fa fa-arrow-left me-1"></i>Volver</a>
+                    <a href="{{ route('admin.medicos.edit', $user->id) }}" class="btn btn-outline-secondary"><i class="fa fa-pen-to-square me-1"></i><span class="btn-text">Editar</span></a>
+                    <a href="{{ route('admin.medicos') }}" class="btn btn-outline-secondary"><i class="fa fa-arrow-left me-1"></i><span class="btn-text">Volver</span></a>
                 </div>
             </div>
         </div>

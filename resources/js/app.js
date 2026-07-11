@@ -1,7 +1,8 @@
 import 'mdb-ui-kit/js/mdb.umd.min.js';
 import flatpickr from 'flatpickr';
 import { Spanish } from 'flatpickr/dist/l10n/es.js';
-import { Notyf } from 'notyf';
+import toastr from 'toastr';
+import 'toastr/build/toastr.min.css';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { initChatWidget } from './chat-widget.js';
@@ -93,6 +94,32 @@ window.actualizarEstadoCita = function (citaId, nuevoEstado) {
     }
 };
 
+window.toggleDrop = function toggleDrop(id) {
+    var menu = document.querySelector('[data-drop-menu="' + id + '"]');
+    var btn = document.querySelector('[data-drop-wrap="' + id + '"] button');
+    if (!menu || !btn) return;
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+        return;
+    }
+    document.querySelectorAll('[data-drop-menu]').forEach(function(m) { m.style.display = 'none'; });
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    var r = btn.getBoundingClientRect();
+    var h = menu.offsetHeight;
+    var spaceAbove = r.top;
+    var spaceBelow = window.innerHeight - r.bottom;
+    menu.style.left = Math.max(4, r.right - 220) + 'px';
+    if (spaceAbove >= h + 8) {
+        menu.style.top = (r.top - h - 4) + 'px';
+    } else {
+        menu.style.top = (r.bottom + 4) + 'px';
+    }
+    menu.style.maxHeight = Math.min(h, Math.max(spaceAbove, spaceBelow) - 8) + 'px';
+    menu.style.overflowY = 'auto';
+    menu.style.visibility = 'visible';
+};
+
 window.closeModal = function closeModal(id) {
     const modal = document.getElementById(id);
     if (!modal) return;
@@ -138,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 menu.previousElementSibling?.classList.remove('show');
             });
         }
+        if (!e.target.closest('[data-drop-wrap]')) {
+            document.querySelectorAll('[data-drop-menu]').forEach(function(m) { m.style.display = 'none'; });
+        }
     });
 
     document.addEventListener('click', function (e) {
@@ -181,29 +211,21 @@ document.addEventListener('DOMContentLoaded', function () {
         time_24hr: true,
     });
 
-    const notyf = new Notyf({
-        duration: 5000,
-        position: { x: 'right', y: 'top' },
-        dismissible: true,
-        types: [
-            {
-                type: 'success',
-                background: '#00b894',
-                icon: false,
-            },
-            {
-                type: 'error',
-                background: '#ff4444',
-                icon: false,
-            },
-        ],
-    });
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        timeOut: 5000,
+        showDuration: 300,
+        hideDuration: 1000,
+    };
 
-    const flashSuccess = document.getElementById('flash-success');
-    if (flashSuccess) notyf.success(flashSuccess.dataset.message);
-
-    const flashError = document.getElementById('flash-error');
-    if (flashError) notyf.error(flashError.dataset.message);
+    const flashAlert = document.querySelector('.alert-success, .alert-danger');
+    if (flashAlert) {
+        const msg = flashAlert.textContent.trim();
+        if (flashAlert.classList.contains('alert-success')) toastr.success(msg);
+        else if (flashAlert.classList.contains('alert-danger')) toastr.error(msg);
+    }
 
     const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
     const docForm = document.querySelector('#documentosModal form');
@@ -214,24 +236,33 @@ document.addEventListener('DOMContentLoaded', function () {
             const ext = input.files[0].name.split('.').pop().toLowerCase();
             if (!allowedExtensions.includes(ext)) {
                 e.preventDefault();
-                notyf.error('Solo se permiten archivos PDF e imágenes (JPG, PNG, GIF, WebP).');
+                toastr.error('Solo se permiten archivos PDF e imágenes (JPG, PNG, GIF, WebP).');
             }
         });
     }
 
     const notifPollUrl = document.querySelector('meta[name="notificaciones-poll"]')?.getAttribute('content');
     if (notifPollUrl) {
-        const shown = new Set();
+        const shown = new Set(JSON.parse(localStorage.getItem('shown_notif_ids') || '[]'));
+        function saveShown() {
+            localStorage.setItem('shown_notif_ids', JSON.stringify([...shown]));
+        }
+        window.addEventListener('beforeunload', saveShown);
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'hidden') saveShown();
+        });
         setInterval(async () => {
             try {
                 const res = await fetch(notifPollUrl);
                 if (!res.ok) return;
                 const notifications = await res.json();
                 for (const n of notifications) {
+                    if (n.tipo === 'mensaje') continue;
                     if (shown.has(n.id)) continue;
                     shown.add(n.id);
-                    notyf.success(n.message || 'Nueva notificación');
+                    toastr.success(n.message || 'Nueva notificación');
                 }
+                saveShown();
             } catch {
             }
         }, 10000);
@@ -293,8 +324,19 @@ document.addEventListener('DOMContentLoaded', function () {
     if (userId && typeof window.Echo !== 'undefined' && window.Echo) {
         try {
             window.Echo.private('App.Models.User.' + userId)
+                .listen('.MedicoAprobado', function () {
+                    var alert = document.getElementById('pending-approval-alert');
+                    if (alert) {
+                        gsap.to(alert, { opacity: 0, y: -10, duration: 0.4, ease: 'power2.in', onComplete: function() { alert.remove(); } });
+                    }
+                });
+        } catch (err) {
+            console.warn('Echo sub for MedicoAprobado failed', err);
+        }
+        try {
+            window.Echo.private('App.Models.User.' + userId)
                 .listen('.CitaCreada', function () {
-                    location.reload();
+                    setTimeout(function () { location.reload(); }, 2000);
                 });
         } catch (err) {
             console.warn('Echo sub for CitaCreada failed', err);
@@ -334,4 +376,45 @@ document.addEventListener('DOMContentLoaded', function () {
             gsap.from(rows, { opacity: 0, x: -20, stagger: 0.04, duration: 0.3, ease: 'power2.out', delay: 0.3 });
         }
     }
+
+    // --- WEB PUSH NOTIFICATIONS ---
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        var vapidKey = document.querySelector('meta[name="vapid-public-key"]')?.getAttribute('content');
+        if (vapidKey) {
+            navigator.serviceWorker.register('/sw.js').then(function (reg) {
+                return reg.pushManager.getSubscription().then(function (sub) {
+                    if (sub) return sub;
+                    return reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+                    });
+                });
+            }).then(function (sub) {
+                var data = {
+                    endpoint: sub.endpoint,
+                    public_key: sub.toJSON().keys?.p256dh || null,
+                    auth_token: sub.toJSON().keys?.auth || null,
+                    encoding: 'aesgcm',
+                };
+                fetch('/push/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') },
+                    body: JSON.stringify(data),
+                });
+            }).catch(function (err) {
+                console.warn('Push subscription failed:', err);
+            });
+        }
+    }
 });
+
+function urlBase64ToUint8Array(base64String) {
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    var rawData = window.atob(base64);
+    var output = new Uint8Array(rawData.length);
+    for (var i = 0; i < rawData.length; ++i) {
+        output[i] = rawData.charCodeAt(i);
+    }
+    return output;
+}

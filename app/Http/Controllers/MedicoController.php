@@ -122,6 +122,18 @@ class MedicoController extends Controller
         return redirect()->route('medico.perfil')->with('success', 'Perfil actualizado correctamente.');
     }
 
+    public function historialCitas()
+    {
+        $user = Auth::user();
+
+        $citas = $user->citasComoMedico()
+            ->with('paciente', 'consultaMedica', 'medico', 'ultimaReceta')
+            ->orderBy('fecha_hora', 'desc')
+            ->paginate(15);
+
+        return view('medico.historial-citas', compact('citas'));
+    }
+
     public function toggleActivo()
     {
         $perfil = Auth::user()->medicoPerfil;

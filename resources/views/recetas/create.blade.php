@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Generar Receta Médica</h4>
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Volver</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i><span class="btn-text">Volver</span></a>
     </div>
 
     <div class="row g-4">
@@ -64,7 +64,7 @@
                                     <input type="text" name="medicamentos[0][duracion]" class="form-control" placeholder="Duración">
                                 </div>
                                 <div class="col-12 col-md-2">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm neu-btn-primary w-100" onclick="agregarMedicamento()"><i class="fa fa-plus me-1"></i>+</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm neu-btn-primary w-100" onclick="agregarMedicamento()"><i class="fa fa-plus me-1"></i><span class="btn-text">+</span></button>
                                 </div>
                             </div>
                         </div>
@@ -88,8 +88,8 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="fa fa-xmark me-1"></i>Cancelar</a>
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-disk me-1"></i>Guardar receta</button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></a>
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar receta</span></button>
                     </div>
                 </form>
             </div>
@@ -119,7 +119,7 @@ function agregarMedicamento() {
             <input type="text" name="medicamentos[${medIndex}][duracion]" class="form-control" placeholder="Duración">
         </div>
         <div class="col-12 col-md-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm neu-btn-danger w-100" onclick="this.parentElement.parentElement.remove()"><i class="fa fa-xmark me-1"></i>×</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm neu-btn-danger w-100" onclick="this.parentElement.parentElement.remove()"><i class="fa fa-xmark me-1"></i><span class="btn-text">×</span></button>
         </div>
     `;
     wrapper.appendChild(row);

@@ -60,9 +60,14 @@ class CitaController extends Controller
     {
         $data = $request->validate([
             'medico_id'  => 'required|exists:users,id',
-            'fecha_hora' => 'required|date|after:now',
+            'fecha_hora' => 'required|date',
             'motivo'     => 'required|string|max:1000',
         ]);
+
+        $fecha = \Carbon\Carbon::parse($data['fecha_hora']);
+        if ($fecha->lessThan(now()->subMinutes(2))) {
+            return redirect()->back()->with('error', 'La fecha y hora deben ser actuales o futuras.')->withInput();
+        }
 
         $medico = User::where('role', 'medico')->find($data['medico_id']);
         if (!$medico || !$medico->medicoPerfil || !$medico->medicoPerfil->activo || !$medico->medicoPerfil->aprobado) {
@@ -179,6 +184,9 @@ class CitaController extends Controller
 
         try {
             $cita->medico->notify(new CitaEstadoNotificacion($cita, 'creada'));
+            if ($cita->paciente) {
+                $cita->paciente->notify(new CitaEstadoNotificacion($cita, 'creada'));
+            }
         } catch (\Throwable $e) {
             report($e);
         }
@@ -234,8 +242,12 @@ class CitaController extends Controller
 
         if ($nuevoEstado === 'reprogramada') {
             $request->validate([
-                'fecha_reprogramada' => 'required|date|after:now',
+                'fecha_reprogramada' => 'required|date',
             ]);
+            $fechaReprogramada = \Carbon\Carbon::parse($request->input('fecha_reprogramada'));
+            if ($fechaReprogramada->lessThan(now()->subMinutes(2))) {
+                return redirect()->back()->with('error', 'La nueva fecha debe ser actual o futura.');
+            }
             $updateData['fecha_reprogramada'] = $request->input('fecha_reprogramada');
             $updateData['reprogramacion_rechazada'] = null;
         }
@@ -332,6 +344,7 @@ class CitaController extends Controller
             'medico.medicoPerfil.tipoMedico',
             'historiales.user',
             'consultaMedica.dolores',
+            'consultaMedica.sintomasRegistrados',
             'recetas.medicamentos',
             'recetas.documentos',
             'recetas.cita.paciente',

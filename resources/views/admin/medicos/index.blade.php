@@ -69,11 +69,12 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1" data-mdb-toggle="dropdown">
+                                <div data-drop-wrap="{{ $medico->id }}">
+                                    <button onclick="toggleDrop({{ $medico->id }})" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" style="border:none;background:transparent;box-shadow:none">
                                         <i class="fa fa-ellipsis-vertical"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end neu-dropdown" style="min-width:170px">
+                                    <div data-drop-menu="{{ $medico->id }}" class="shadow-2" style="display:none;position:fixed;min-width:170px;font-size:0.85rem;z-index:99999;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:0.375rem;padding:0.5rem 0">
+                                    <ul style="list-style:none;padding:0;margin:0">
                                         <li><a class="dropdown-item" href="{{ route('admin.medicos.show', $medico->id) }}"><i class="fa fa-eye fa-fw me-1"></i> Perfil</a></li>
                                         <li><a class="dropdown-item" href="{{ route('admin.medicos.edit', $medico->id) }}"><i class="fa fa-pen-to-square fa-fw me-1"></i> Editar</a></li>
                                         <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,0.08)"></li>
@@ -87,6 +88,7 @@
                                             </form>
                                         </li>
                                     </ul>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

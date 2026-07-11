@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     @if (!$perfil || !$perfil->aprobado)
-    <div class="alert alert-warning d-flex align-items-center gap-3 mb-4" role="alert" style="border:2px solid #ffc107;background:rgba(255,193,7,0.08);border-radius:16px;padding:18px 20px">
+    <div id="pending-approval-alert" class="alert alert-warning d-flex align-items-center gap-3 mb-4" role="alert" style="border:2px solid #ffc107;background:rgba(255,193,7,0.08);border-radius:16px;padding:18px 20px">
         <i class="fa fa-clock fa-lg" style="color:#ffc107"></i>
         <div>
             <strong style="color:#856404">Registro pendiente de aprobación</strong><br>
@@ -44,7 +44,7 @@
                             </span>
                         </div>
                     </form>
-                    <button type="button" id="btn-editar" class="btn btn-primary" onclick="toggleEdit()"><i class="fa fa-pen-to-square me-1"></i>Editar</button>
+                    <button type="button" id="btn-editar" class="btn btn-primary" onclick="toggleEdit()"><i class="fa fa-pen-to-square me-1"></i><span class="btn-text">Editar</span></button>
                 </div>
             </div>
         </div>
@@ -63,11 +63,11 @@
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Fecha de Nacimiento</label>
-                <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}</p>
+                <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}@if (!$user->fecha_nacimiento) <i class="fa fa-info-circle text-warning ms-1" title="Campo requerido"></i>@endif</p>
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Teléfono</label>
-                <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}</p>
+                <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}@if (!$user->telefono) <i class="fa fa-info-circle text-warning ms-1" title="Campo requerido"></i>@endif</p>
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Dirección</label>
@@ -179,19 +179,19 @@
             </div>
 
             <div class="mt-4 text-end d-flex gap-2 justify-content-end edit-mode">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar cambios</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar cambios</span></button>
             </div>
         </form>
 
         <div class="row g-3 mt-0 view-mode">
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Especialidad</label>
-                <p class="fw-bold mb-0">{{ optional(optional($perfil)->tipoMedico)->nombre_tipo_medico ?? '—' }}</p>
+                <p class="fw-bold mb-0">{{ optional(optional($perfil)->tipoMedico)->nombre_tipo_medico ?? '—' }}@if (!$perfil || !$perfil->tipo_medico_id) <i class="fa fa-info-circle text-warning ms-1" title="Campo requerido"></i>@endif</p>
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Cédula Profesional</label>
-                <p class="fw-bold mb-0">{{ optional($perfil)->cedula_profesional ?? '—' }}</p>
+                <p class="fw-bold mb-0">{{ optional($perfil)->cedula_profesional ?? '—' }}@if (!$perfil || !$perfil->cedula_profesional) <i class="fa fa-info-circle text-warning ms-1" title="Campo requerido"></i>@endif</p>
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Universidad</label>
@@ -227,7 +227,7 @@
     <div class="card shadow-2 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0" style="color:#1266f1">Mis Documentos</h5>
-            <button type="button" class="btn btn-primary btn-sm" data-mdb-toggle="modal" data-mdb-target="#documentosModal"><i class="fa fa-upload me-1"></i>+ Subir</button>
+            <button type="button" class="btn btn-primary btn-sm" data-mdb-toggle="modal" data-mdb-target="#documentosModal"><i class="fa fa-upload me-1"></i><span class="btn-text">+ Subir</span></button>
         </div>
 
         @error('documento')
@@ -281,7 +281,7 @@
                                         <form action="{{ route('medico.documentos.destroy', $doc->id) }}" method="POST"
                                               class="d-inline" onsubmit="return confirm('¿Eliminar este documento?')">
                                             @csrf @method('DELETE')
-                                            <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
+                                            <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i><span class="btn-text">Eliminar</span></button>
                                         </form>
                                     </div>
                                 </td>
@@ -293,6 +293,7 @@
         @endif
         <br><br>
     </div>
+
 </div>
 
 <div class="modal fade" id="documentosModal" tabindex="-1" aria-hidden="true">
@@ -321,8 +322,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-upload me-1"></i>Subir</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-upload me-1"></i><span class="btn-text">Subir</span></button>
                 </div>
             </form>
         </div>

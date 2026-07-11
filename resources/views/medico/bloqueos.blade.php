@@ -8,7 +8,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold" style="color:#1266f1">Bloqueos de {{ $medico->name }}</h4>
-        <a href="{{ $user->esAdmin() ? route('admin.medicos') : route('dashboard') }}" class="btn btn-outline-secondary btn-sm">&larr; Volver</a>
+        <a href="{{ $user->esAdmin() ? route('admin.medicos') : route('dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-arrow-left me-1"></i><span class="btn-text">Volver</span></a>
     </div>
 
     <div class="row g-4">
@@ -32,7 +32,7 @@
                         <label class="form-label">Motivo</label>
                         <textarea name="motivo" class="form-control" rows="2" maxlength="500"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary neu-btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
+                    <button type="submit" class="btn btn-primary neu-btn-sm"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar</span></button>
                 </form>
             </div>
         </div>
@@ -62,7 +62,7 @@
                                         <td>
                                             <form action="{{ $user->esAdmin() ? route('admin.medicos.bloqueos.destroy', [$medico->id, $b->id]) : route('medico.bloqueos.destroy', $b->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este bloqueo?')">
                                                 @csrf @method('DELETE')
-                                                <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
+                                                <button class="btn btn-danger btn-sm"><i class="fa fa-trash-can me-1"></i><span class="btn-text">Eliminar</span></button>
                                             </form>
                                         </td>
                                     </tr>

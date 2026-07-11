@@ -8,8 +8,10 @@ use App\Models\MedicoPerfil;
 use App\Models\RecetaDocumento;
 use App\Models\TipoMedico;
 use App\Models\User;
+use App\Events\MedicoAprobado;
 use App\Notifications\MedicoRegistroNotificacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -46,9 +48,10 @@ class AdminController extends Controller
         $medico = User::where('role', 'medico')->findOrFail($id);
 
         if (!$medico->medicoPerfil) {
+            $tipoId = TipoMedico::first()?->id ?? 1;
             MedicoPerfil::create([
                 'user_id'        => $medico->id,
-                'tipo_medico_id' => 1,
+                'tipo_medico_id' => $tipoId,
                 'activo'         => true,
                 'aprobado'       => true,
             ]);
@@ -58,6 +61,12 @@ class AdminController extends Controller
 
         try {
             $medico->notify(new MedicoRegistroNotificacion($medico, 'aprobado'));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        try {
+            broadcast(new MedicoAprobado($medico->id));
         } catch (\Throwable $e) {
             report($e);
         }
@@ -203,6 +212,7 @@ class AdminController extends Controller
         }
 
         if ($cita->consultaMedica) {
+            $cita->consultaMedica->sintomasRegistrados()->delete();
             $cita->consultaMedica->dolores()->delete();
             $cita->consultaMedica()->delete();
         }
@@ -302,5 +312,69 @@ class AdminController extends Controller
         $paciente->delete();
 
         return redirect()->route('admin.pacientes')->with('success', 'Paciente eliminado correctamente.');
+    }
+
+    public function reset()
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        DB::table('dolores')->delete();
+        DB::table('sintomas')->delete();
+        DB::table('diagnosticos')->delete();
+        DB::table('consulta_medicamentos')->delete();
+        DB::table('receta_medicamentos')->delete();
+        DB::table('receta_documentos')->delete();
+        DB::table('recetas')->delete();
+        DB::table('consulta_medicas')->delete();
+        DB::table('cita_historiales')->delete();
+        DB::table('mensajes')->delete();
+        DB::table('citas_medicas')->delete();
+        DB::table('medico_horarios')->delete();
+        DB::table('medico_bloqueos')->delete();
+        DB::table('medico_documentos')->delete();
+        DB::table('medico_perfiles')->delete();
+        DB::table('user_alergias')->delete();
+        DB::table('user_enfermedades_importantes')->delete();
+        DB::table('contactos_emergencia')->delete();
+        DB::table('alergias')->delete();
+        DB::table('enfermedades_importantes')->delete();
+        DB::table('notifications')->delete();
+        DB::table('push_subscriptions')->delete();
+        User::where('role', '!=', 'admin')->delete();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+        $this->seedReferenceData();
+
+        return redirect()->route('dashboard')->with('success', 'Base de datos restablecida. Solo se conservó el usuario administrador.');
+    }
+
+    private function seedReferenceData(): void
+    {
+        if (TipoMedico::count() === 0) {
+            DB::statement('ALTER TABLE tipo_medicos AUTO_INCREMENT = 1');
+            $tipos = ['Medicina General','Cardiología','Pediatría','Dermatología','Ginecología','Neurología','Traumatología','Oftalmología','Otorrinolaringología','Psiquiatría'];
+            foreach ($tipos as $t) { TipoMedico::create(['nombre_tipo_medico' => $t]); }
+        }
+        if (\App\Models\Alergia::count() === 0) {
+            $alergias = [
+                ['nombre' => 'Penicilina', 'descripcion' => 'Alergia a antibióticos tipo penicilina'],
+                ['nombre' => 'Polen', 'descripcion' => 'Alergia estacional al polen de plantas'],
+                ['nombre' => 'Frutos secos', 'descripcion' => 'Alergia a nueces, almendras, cacahuates, etc.'],
+                ['nombre' => 'Lácteos', 'descripcion' => 'Intolerancia o alergia a productos lácteos'],
+                ['nombre' => 'Ácaros', 'descripcion' => 'Alergia a ácaros del polvo'],
+            ];
+            foreach ($alergias as $a) { \App\Models\Alergia::create($a); }
+        }
+        if (\App\Models\EnfermedadImportante::count() === 0) {
+            $enfermedades = [
+                ['nombre' => 'Diabetes tipo 2', 'descripcion' => 'Enfermedad metabólica crónica'],
+                ['nombre' => 'Hipertensión arterial', 'descripcion' => 'Presión arterial elevada de forma crónica'],
+                ['nombre' => 'Asma', 'descripcion' => 'Enfermedad inflamatoria crónica de las vías respiratorias'],
+                ['nombre' => 'Cardiopatía isquémica', 'descripcion' => 'Enfermedad de las arterias coronarias'],
+                ['nombre' => 'Hipotiroidismo', 'descripcion' => 'Glándula tiroides poco activa'],
+            ];
+            foreach ($enfermedades as $e) { \App\Models\EnfermedadImportante::create($e); }
+        }
     }
 }

@@ -24,8 +24,8 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2 mt-3">
-                    <a href="{{ route('paciente.historial') }}" class="btn btn-primary"><i class="fa fa-clock-rotate-left me-1"></i>Mi Historial</a>
-                    <button type="button" id="btn-editar" class="btn btn-outline-secondary"  onclick="toggleEdit()"><i class="fa fa-pen-to-square me-1"></i>Editar</button>
+                    <a href="{{ route('paciente.historial') }}" class="btn btn-primary"><i class="fa fa-clock-rotate-left me-1"></i><span class="btn-text">Mi Historial</span></a>
+                    <button type="button" id="btn-editar" class="btn btn-outline-secondary"  onclick="toggleEdit()"><i class="fa fa-pen-to-square me-1"></i><span class="btn-text">Editar</span></button>
                 </div>
             </div>
         </div>
@@ -44,11 +44,11 @@
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Fecha de Nacimiento</label>
-                <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}</p>
+                <p class="fw-bold mb-0">{{ optional($user->fecha_nacimiento)->format('d/m/Y') ?? '—' }}@if (!$user->fecha_nacimiento) <i class="fa fa-info-circle text-warning ms-1" title="Campo requerido"></i>@endif</p>
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Teléfono</label>
-                <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}</p>
+                <p class="fw-bold mb-0">{{ $user->telefono ?? '—' }}@if (!$user->telefono) <i class="fa fa-info-circle text-warning ms-1" title="Campo requerido"></i>@endif</p>
             </div>
             <div class="col-12 col-md-4">
                 <label class="form-label text-muted small">Dirección</label>
@@ -122,8 +122,8 @@
                 </div>
             </div>
             <div class="mt-4 text-end d-flex gap-2 justify-content-end edit-mode">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar cambios</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleEdit()"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar cambios</span></button>
             </div>
         </form>
     </div>
@@ -133,11 +133,11 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0" style="color:#1266f1">Contactos de Emergencia</h5>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#contactoModal" onclick="resetContactoModal()">
-                <i class="fa fa-plus me-1"></i>+ Agregar
+                <i class="fa fa-plus me-1"></i><span class="btn-text">+ Agregar</span>
             </button>
         </div>
         @if ($user->contactosEmergencia->isEmpty())
-            <div class="d-flex flex-column align-items-center py-3"><i class="fa fa-address-book fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No registrado.</p></div>
+            <div class="d-flex flex-column align-items-center py-3"><i class="fa fa-address-book fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No registrado. <i class="fa fa-info-circle text-warning ms-1" title="Se requiere al menos un contacto de emergencia"></i></p></div>
         @else
         <div class="table-responsive">
             <table class="table neu-table align-middle mb-0">
@@ -167,7 +167,7 @@
                                 </button>
                                 <form action="{{ route('paciente.contactos.destroy', $contacto) }}" method="POST" onsubmit="return confirm('¿Eliminar este contacto?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-trash-can me-1"></i><span class="btn-text">Eliminar</span></button>
                                 </form>
                             </div>
                         </td>
@@ -185,7 +185,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0" style="color:#1266f1">Alergias</h5>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#alergiaModal" onclick="resetAlergiaModal()">
-                <i class="fa fa-plus me-1"></i>+ Agregar
+                <i class="fa fa-plus me-1"></i><span class="btn-text">+ Agregar</span>
             </button>
         </div>
         @if ($user->alergias->isEmpty())
@@ -215,7 +215,7 @@
                                 </button>
                                 <form action="{{ route('paciente.alergias.destroy', $alergia) }}" method="POST" onsubmit="return confirm('¿Eliminar esta alergia?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-trash-can me-1"></i><span class="btn-text">Eliminar</span></button>
                                 </form>
                             </div>
                         </td>
@@ -233,7 +233,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0" style="color:#1266f1">Enfermedades Importantes</h5>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-toggle="modal" data-mdb-target="#enfermedadModal" onclick="resetEnfermedadModal()">
-                <i class="fa fa-plus me-1"></i>+ Agregar
+                <i class="fa fa-plus me-1"></i><span class="btn-text">+ Agregar</span>
             </button>
         </div>
         @if ($user->enfermedadesImportantes->isEmpty())
@@ -265,7 +265,7 @@
                                 </button>
                                 <form action="{{ route('paciente.enfermedades.destroy', $enfermedad) }}" method="POST" onsubmit="return confirm('¿Eliminar esta enfermedad?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-trash-can me-1"></i>Eliminar</button>
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-trash-can me-1"></i><span class="btn-text">Eliminar</span></button>
                                 </form>
                             </div>
                         </td>
@@ -313,8 +313,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar</span></button>
                     </div>
                 </form>
             </div>
@@ -358,8 +358,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar</span></button>
                     </div>
                 </form>
             </div>
@@ -402,8 +402,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i>Cancelar</button>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i>Guardar</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-mdb-dismiss="modal"><i class="fa fa-xmark me-1"></i><span class="btn-text">Cancelar</span></button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="fa fa-floppy-disk me-1"></i><span class="btn-text">Guardar</span></button>
                     </div>
                 </form>
             </div>
@@ -440,14 +440,14 @@
                                 @case('confirmada') <span class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
                                 @case('en_espera') <span class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
                                 @case('en_consulta') <span class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
-                                @case('finalizada') <span class="badge" style="border:2px solid #555;color:#555;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
+                                @case('finalizada') <span class="btn btn-primary btn-sm"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
                                 @case('cancelada') <span class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
                                 @case('no_asistio') <span class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
                                 @case('reprogramada') <span class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
                             @endswitch
                         </td>
                         <td>
-                            <a href="{{ route('citas.show', $cita->id) }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-eye me-1"></i>Ver detalles</a>
+                            <a href="{{ route('citas.show', $cita->id) }}" class="btn btn-outline-secondary btn-sm"><i class="fa fa-eye me-1"></i><span class="btn-text">Ver detalles</span></a>
                         </td>
                     </tr>
                     @endforeach
@@ -578,5 +578,6 @@ function editarEnfermedad(id, fecha, tratamiento, observaciones) {
     document.getElementById('enfermedadId').value = id;
     new mdb.Modal(document.getElementById('enfermedadModal')).show();
 }
+
 </script>
 @endpush
