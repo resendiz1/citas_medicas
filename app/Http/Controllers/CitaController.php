@@ -191,7 +191,7 @@ class CitaController extends Controller
             report($e);
         }
 
-        return redirect()->route('dashboard')->with('success', 'Cita creada correctamente.');
+        return redirect()->route('dashboard')->with('success', 'Cita creada correctamente. Se está esperando la confirmación del médico.');
     }
 
     public function updateEstado(Request $request, $id)
@@ -236,6 +236,14 @@ class CitaController extends Controller
 
         if (!isset($transitions[$estadoActual]) || !in_array($nuevoEstado, $transitions[$estadoActual])) {
             return redirect()->back()->with('error', 'Transición de estado no válida desde "' . $estadoActual . '" a "' . $nuevoEstado . '".');
+        }
+
+        if (in_array($nuevoEstado, ['confirmada', 'cancelada', 'reprogramada']) && $cita->fecha_hora->isPast()) {
+            return redirect()->back()->with('error', 'No puedes modificar una cita cuya fecha ya pasó.');
+        }
+
+        if (in_array($nuevoEstado, ['en_espera', 'en_consulta', 'no_asistio', 'finalizada']) && !$cita->fecha_hora->isToday()) {
+            return redirect()->back()->with('error', 'Solo puedes realizar esta acción en citas del día de hoy.');
         }
 
         $updateData = ['estado' => $nuevoEstado];

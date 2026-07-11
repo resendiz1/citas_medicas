@@ -27,7 +27,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-2">
         <div class="container">
-            <a class="navbar-brand fw-bold me-3 d-flex flex-column align-items-start text-white" href="{{ route('dashboard') }}">Citas Médicas<small style="font-size:0.65rem;font-weight:400;opacity:0.8">&lt;JuanPancho's/&gt;</small></a>
+            <a class="navbar-brand fw-bold me-3 d-flex flex-column align-items-start lh-1 text-white" href="{{ route('dashboard') }}">Citas Médicas<small style="font-size:0.6rem;font-weight:400;opacity:0.7">&lt;juanPancho's&gt;</small></a>
             <button class="navbar-toggler border-0" type="button" onclick="event.stopPropagation();document.getElementById('navbarNav').classList.toggle('show');this.classList.toggle('collapsed')" aria-label="Toggle navigation">
                 <i class="fas fa-bars fa-lg"></i>
             </button>
@@ -48,6 +48,7 @@
                         @endif
                         @if (auth()->user()->esMedico())
                             <li class="nav-item"><a class="nav-link{{ request()->routeIs('medico.historial-citas') ? ' active' : '' }}" href="{{ route('medico.historial-citas') }}"><i class="fa fa-clock-rotate-left me-1"></i>Historial de citas</a></li>
+                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('medico.chat-ia*') ? ' active' : '' }}" href="{{ route('medico.chat-ia') }}"><i class="fa fa-robot me-1"></i>Asistente IA</a></li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle{{ request()->routeIs('medico.horarios*') || request()->routeIs('medico.bloqueos*') ? ' active' : '' }}" href="#" data-mdb-toggle="dropdown"><i class="fa fa-calendar-days me-1"></i>Mi agenda</a>
                                 <ul class="dropdown-menu">
@@ -55,9 +56,6 @@
                                     <li><a class="dropdown-item{{ request()->routeIs('medico.bloqueos*') ? ' active' : '' }}" href="{{ route('medico.bloqueos') }}"><i class="fa fa-ban me-1"></i>Bloqueos</a></li>
                                 </ul>
                             </li>
-                        @endif
-                        @if (auth()->user()->esPaciente())
-                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('paciente.perfil') ? ' active' : '' }}" href="{{ route('paciente.perfil') }}#ia-chat"><i class="fa fa-robot me-1"></i>Mis medicamentos</a></li>
                         @endif
                         @if (auth()->user()->esMedico() || auth()->user()->esPaciente())
                             <li class="nav-item"><a class="nav-link{{ request()->routeIs('ayuda') ? ' active' : '' }}" href="{{ route('ayuda') }}"><i class="fa fa-headset me-1"></i>Ayuda</a></li>
@@ -126,6 +124,8 @@
             @include('partials.ia-chat-widget')
         @endif
     @endauth
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>if(typeof marked!=='undefined'){marked.setOptions({breaks:true,gfm:true})}</script>
     @stack('scripts')
     <script>
     document.addEventListener('click', function (e) {

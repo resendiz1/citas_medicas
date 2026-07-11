@@ -99,12 +99,13 @@ class User extends Authenticatable
     public function getProfileIncompleteReason(): ?string
     {
         if ($this->esMedico()) {
-            if (!$this->medicoPerfil) return 'faltan datos profesionales';
-            if (!$this->medicoPerfil->tipo_medico_id) return 'falta seleccionar la especialidad';
-            if (!$this->medicoPerfil->cedula_profesional) return 'falta la cédula profesional';
-            if (!$this->telefono) return 'falta el teléfono';
-            if (!$this->fecha_nacimiento) return 'falta la fecha de nacimiento';
-            return null;
+            $faltan = [];
+            if (!$this->medicoPerfil) return 'faltan datos profesionales (perfil médico)';
+            if (!$this->medicoPerfil->tipo_medico_id) $faltan[] = 'especialidad';
+            if (!$this->medicoPerfil->cedula_profesional) $faltan[] = 'cédula profesional';
+            if (!$this->telefono) $faltan[] = 'teléfono';
+            if (!$this->fecha_nacimiento) $faltan[] = 'fecha de nacimiento';
+            return empty($faltan) ? null : 'faltan: ' . implode(', ', $faltan);
         }
         if ($this->esPaciente()) {
             if (!$this->telefono) return 'falta el teléfono';

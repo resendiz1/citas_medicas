@@ -1,4 +1,4 @@
-<div id="ia-chat-widget" class="ia-chat-widget">
+<div id="ia-chat-widget" class="ia-chat-widget" data-historial-url="{{ route('paciente.chat-ia.historial') }}" data-chat-url="{{ route('paciente.chat-ia') }}">
     <button id="ia-chat-fab" class="ia-chat-fab" onclick="toggleIaChat()">
         <i class="fa fa-robot"></i>
         <span class="ia-chat-badge d-none">Beta</span>
@@ -12,11 +12,7 @@
             <button class="btn btn-sm p-0 text-white fs-5" onclick="toggleIaChat()">&times;</button>
         </div>
         <p class="small text-muted px-3 py-1 mb-0" style="font-size:0.7rem;background:rgba(255,255,255,0.05)">Pregunta sobre tus medicamentos, dosis u horarios.</p>
-        <div id="ia-chat-messages" class="ia-chat-messages">
-            <div class="ia-message ia-message-ai">
-                <i class="fa fa-robot me-1" style="color:#1266f1"></i>Hola, soy tu asistente. Pregúntame sobre tus tratamientos.
-            </div>
-        </div>
+        <div id="ia-chat-messages" class="ia-chat-messages"></div>
         <div class="ia-chat-input">
             <input type="text" id="ia-chat-input" class="form-control form-control-sm" placeholder="Ej. ¿Cada cuánto debo tomarlo?" maxlength="2000">
             <button id="ia-chat-send" class="btn btn-primary btn-sm"><i class="fa fa-paper-plane me-1"></i><span class="btn-text">Enviar</span></button>
@@ -27,29 +23,29 @@
 @push('scripts')
 <script>
 (function() {
-    var messages = [];
     var container = document.getElementById('ia-chat-messages');
     var input = document.getElementById('ia-chat-input');
     var sendBtn = document.getElementById('ia-chat-send');
     var panel = document.getElementById('ia-chat-panel');
+    var chatUrl = document.getElementById('ia-chat-widget').getAttribute('data-chat-url');
+    var historialUrl = document.getElementById('ia-chat-widget').getAttribute('data-historial-url');
     var isOpen = false;
+    var historialCargado = false;
 
-    window.toggleIaChat = function() {
-        isOpen = !isOpen;
-        panel.classList.toggle('d-none', !isOpen);
-        if (isOpen && container) container.scrollTop = container.scrollHeight;
-    };
-
-    function addIaMessage(role, text) {
-        var div = document.createElement('div');
-        div.className = 'ia-message ia-message-' + role;
-        if (role === 'ai') {
-            div.innerHTML = '<i class="fa fa-robot me-1" style="color:#1266f1"></i>' + escapeHtml(text);
-        } else {
-            div.textContent = text;
-        }
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
+    function playNotifSound() {
+        try {
+            var ctx = new (window.AudioContext || window.webkitAudioContext)();
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.value = 660;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.2);
+        } catch(e) {}
     }
 
     function escapeHtml(text) {
@@ -58,28 +54,71 @@
         return d.innerHTML;
     }
 
+    function mdToHtml(t){try{return marked.parse(t)}catch(e){return escapeHtml(t)}}
+
+    function addIaMessage(role, text) {
+        var div = document.createElement('div');
+        div.className = 'ia-message ia-message-' + role;
+        if (role === 'assistant') {
+            div.innerHTML = '<i class="fa fa-robot me-1" style="color:#1266f1"></i>' + mdToHtml(text);
+        } else {
+            div.textContent = text;
+        }
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function cargarHistorial() {
+        if (historialCargado) return;
+        container.innerHTML = '';
+        fetch(historialUrl)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.length === 0) {
+                    addIaMessage('assistant', 'Hola, soy tu asistente. Pregúntame sobre tus tratamientos.');
+                } else {
+                    data.forEach(function(m) {
+                        addIaMessage(m.role, m.content);
+                    });
+                }
+                historialCargado = true;
+            })
+            .catch(function() {
+                addIaMessage('assistant', 'Hola, soy tu asistente. Pregúntame sobre tus tratamientos.');
+                historialCargado = true;
+            });
+    }
+
+    window.toggleIaChat = function() {
+        isOpen = !isOpen;
+        panel.classList.toggle('d-none', !isOpen);
+        if (isOpen) {
+            cargarHistorial();
+            setTimeout(function() { container.scrollTop = container.scrollHeight; }, 100);
+        }
+    };
+
     function sendIaMessage() {
         var text = input.value.trim();
         if (!text) return;
 
         addIaMessage('user', text);
-        messages.push({role: 'user', content: text});
         input.value = '';
         input.disabled = true;
         sendBtn.disabled = true;
         sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
         var thinkingTimer = setTimeout(function() {
-            addIaMessage('ai', '⏳ Pensando a fondo...');
+            addIaMessage('assistant', '⏳ Pensando a fondo...');
         }, 30000);
 
-        fetch('{{ route("paciente.chat-ia") }}', {
+        fetch(chatUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             },
-            body: JSON.stringify({messages: messages}),
+            body: JSON.stringify({message: text}),
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -89,10 +128,10 @@
                 lastMsg.remove();
             }
             if (data.error) {
-                addIaMessage('ai', '⚠️ ' + data.error);
+                addIaMessage('assistant', '⚠️ ' + data.error);
             } else {
-                addIaMessage('ai', data.reply);
-                messages.push({role: 'assistant', content: data.reply});
+                addIaMessage('assistant', data.reply);
+                if (!isOpen) playNotifSound();
             }
         })
         .catch(function() {
@@ -101,7 +140,7 @@
             if (lastMsg && lastMsg.textContent.includes('Pensando a fondo')) {
                 lastMsg.remove();
             }
-            addIaMessage('ai', '⚠️ Error de conexión. Intenta de nuevo.');
+            addIaMessage('assistant', '⚠️ Error de conexión. Intenta de nuevo.');
         })
         .finally(function() {
             input.disabled = false;
@@ -116,7 +155,6 @@
         if (e.key === 'Enter') sendIaMessage();
     });
 
-    // If hash #ia-chat is present, open automatically
     if (window.location.hash === '#ia-chat') {
         setTimeout(function() { toggleIaChat(); }, 500);
     }
@@ -131,8 +169,23 @@
 .ia-chat-panel-header { display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:#1266f1;color:#fff;font-weight:700;font-size:0.85rem }
 .ia-chat-messages { height:300px;overflow-y:auto;padding:0.75rem;display:flex;flex-direction:column;gap:0.6rem;background:rgba(18,102,241,0.03) }
 .ia-message { max-width:88%;padding:0.5rem 0.85rem;border-radius:12px;font-size:0.82rem;line-height:1.5;word-wrap:break-word }
-.ia-message-ai { align-self:flex-start;background:#e8f0fe;color:#121212;border-radius:12px 12px 12px 4px }
 .ia-message-user { align-self:flex-end;background:#1266f1;color:#fff;border-radius:12px 12px 4px 12px }
+.ia-message-assistant { align-self:flex-start;background:#e8f0fe;color:#121212;border-radius:12px 12px 12px 4px }
+.ia-message-assistant strong { font-weight:700 }
+.ia-message-assistant em { font-style:italic }
+.ia-message-assistant h1, .ia-message-assistant h2, .ia-message-assistant h3 { margin:0.3rem 0;font-weight:700 }
+.ia-message-assistant h1 { font-size:0.95rem }
+.ia-message-assistant h2 { font-size:0.9rem }
+.ia-message-assistant h3 { font-size:0.85rem }
+.ia-message-assistant p { margin:0.15rem 0 }
+.ia-message-assistant ul, .ia-message-assistant ol { margin:0.15rem 0;padding-left:1.2rem }
+.ia-message-assistant table { border-collapse:collapse;width:100%;margin:0.3rem 0;font-size:0.75rem }
+.ia-message-assistant th, .ia-message-assistant td { border:1px solid #d0d7de;padding:0.2rem 0.4rem;text-align:left }
+.ia-message-assistant th { background:#e8f0fe;font-weight:700 }
+.ia-message-assistant code { background:#f0f0f0;padding:0.1rem 0.2rem;border-radius:3px;font-size:0.78rem }
+.ia-message-assistant pre { background:#f5f5f5;padding:0.4rem;border-radius:6px;overflow-x:auto;margin:0.3rem 0 }
+.ia-message-assistant pre code { background:transparent;padding:0 }
+.ia-message-assistant blockquote { border-left:2px solid #1266f1;padding-left:0.5rem;margin:0.3rem 0;color:#555 }
 .ia-chat-input { display:flex;gap:0.4rem;padding:0.6rem 0.75rem;border-top:1px solid rgba(18,102,241,0.1);background:#fff }
 .ia-chat-input input { border-radius:8px;font-size:0.82rem }
 .ia-chat-input button { border-radius:8px;white-space:nowrap;font-size:0.82rem }

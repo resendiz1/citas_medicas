@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/paciente/enfermedades', [PacienteController::class, 'enfermedadStore'])->name('paciente.enfermedades.store');
         Route::put('/paciente/enfermedades/{enfermedadImportante}', [PacienteController::class, 'enfermedadUpdate'])->name('paciente.enfermedades.update');
         Route::delete('/paciente/enfermedades/{enfermedadImportante}', [PacienteController::class, 'enfermedadDestroy'])->name('paciente.enfermedades.destroy');
+        Route::get('/paciente/chat-ia/historial', [PacienteController::class, 'chatIAHistorial'])->name('paciente.chat-ia.historial');
         Route::post('/paciente/chat-ia', [PacienteController::class, 'chatIA'])->name('paciente.chat-ia');
         Route::get('/citas/crear', [CitaController::class, 'create'])->name('citas.create');
         Route::post('/citas', [CitaController::class, 'store'])->name('citas.store');
@@ -93,6 +94,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/citas/{cita}/consulta-medica', [ConsultaMedicaController::class, 'store'])->name('consulta-medica.store');
         Route::post('/citas/{cita}/consulta-medica/generar-receta', [ConsultaMedicaController::class, 'generarReceta'])->name('consulta-medica.generar-receta');
         Route::get('/medico/historial-citas', [MedicoController::class, 'historialCitas'])->name('medico.historial-citas');
+        Route::get('/medico/chat-ia', [MedicoController::class, 'chatIAIndex'])->name('medico.chat-ia');
+        Route::get('/medico/chat-ia/historial', [MedicoController::class, 'chatIAHistorial'])->name('medico.chat-ia.historial');
+        Route::post('/medico/chat-ia', [MedicoController::class, 'chatIASend'])->name('medico.chat-ia.send');
         Route::post('/medico/documentos', [MedicoController::class, 'documentosStore'])->name('medico.documentos.store');
         Route::delete('/medico/documentos/{id}', [MedicoController::class, 'documentosDestroy'])->name('medico.documentos.destroy');
     });
@@ -121,6 +125,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/citas', [AdminController::class, 'citas'])->name('citas');
         Route::delete('/citas/{id}', [AdminController::class, 'citasDestroy'])->name('citas.destroy');
         Route::get('/medicos', [AdminController::class, 'medicos'])->name('medicos');
+        Route::get('/medicos/{medico}/chat-ia/historial', [AdminController::class, 'medicoChatIAHistorial'])->name('medicos.chat-ia.historial');
+        Route::post('/medicos/{medico}/chat-ia', [AdminController::class, 'medicoChatIA'])->name('medicos.chat-ia');
         Route::get('/medicos/{id}', [AdminController::class, 'medicosShow'])->name('medicos.show');
         Route::post('/medicos/{id}/aprobar', [AdminController::class, 'medicosAprobar'])->name('medicos.aprobar');
         Route::get('/medicos/crear', [AdminController::class, 'medicosCreate'])->name('medicos.create');

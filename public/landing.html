@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Citas Médicas — Gestión de consultas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#f8faff;color:#121212;overflow-x:hidden}
+.primary{color:#1266f1}
+.bg-primary{background:#1266f1}
+.btn{padding:0.75rem 2rem;border-radius:50px;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.3s ease;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none}
+.btn-primary{background:#1266f1;color:#fff;box-shadow:0 4px 14px rgba(18,102,241,0.3)}
+.btn-primary:hover{background:#0d4fbf;transform:translateY(-2px);box-shadow:0 8px 25px rgba(18,102,241,0.4)}
+.btn-outline{background:transparent;color:#1266f1;border:2px solid #1266f1}
+.btn-outline:hover{background:#1266f1;color:#fff;transform:translateY(-2px)}
+.btn-white{background:#fff;color:#1266f1}
+.btn-white:hover{background:#f0f4ff;transform:translateY(-2px)}
+.container{max-width:1200px;margin:0 auto;padding:0 2rem}
+.section{padding:6rem 0}
+.section-title{font-size:2.2rem;font-weight:800;margin-bottom:0.75rem;text-align:center}
+.section-sub{font-size:1.05rem;color:#5a6a7a;text-align:center;max-width:600px;margin:0 auto 4rem;line-height:1.7}
+.card{background:#fff;border-radius:20px;padding:2.5rem 2rem;box-shadow:0 2px 20px rgba(18,102,241,0.06);transition:transform 0.4s ease,box-shadow 0.4s ease}
+.card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(18,102,241,0.12)}
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1rem 2rem;transition:all 0.4s ease}
+nav.scrolled{background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);box-shadow:0 1px 20px rgba(0,0,0,0.06)}
+nav .container{display:flex;align-items:center;justify-content:space-between}
+nav .logo{font-weight:800;font-size:1.3rem;color:#1266f1}
+nav .logo small{font-weight:400;font-size:0.65rem;opacity:0.7;display:block;margin-top:-2px}
+nav .nav-links{display:flex;gap:2rem;align-items:center}
+nav .nav-links a{text-decoration:none;color:#121212;font-weight:500;font-size:0.9rem;transition:color 0.3s}
+nav .nav-links a:hover{color:#1266f1}
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;padding-top:80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0d2670 0%,#1266f1 50%,#1a8aff 100%);z-index:0}
+.hero-bg .shape{position:absolute;border-radius:50%}
+.hero-bg .s1{width:500px;height:500px;background:rgba(255,255,255,0.04);top:-100px;right:-100px}
+.hero-bg .s2{width:300px;height:300px;background:rgba(255,255,255,0.05);bottom:50px;left:-80px}
+.hero-bg .s3{width:200px;height:200px;background:rgba(255,255,255,0.03);bottom:200px;right:30%}
+.hero .container{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;width:100%}
+.hero-text h1{font-size:3.2rem;font-weight:800;color:#fff;line-height:1.15;margin-bottom:1.2rem}
+.hero-text p{font-size:1.1rem;color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:2rem;max-width:520px}
+.hero-text .badge-free{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;padding:0.4rem 1rem;border-radius:50px;font-size:0.8rem;font-weight:600;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,0.2)}
+.hero-buttons{display:flex;gap:1rem;flex-wrap:wrap}
+.hero-mockup{position:relative;display:flex;justify-content:center}
+.mockup-phone{width:300px;height:600px;background:#0d1b3e;border-radius:40px;border:4px solid rgba(255,255,255,0.15);padding:12px;box-shadow:0 30px 80px rgba(0,0,0,0.3);position:relative}
+.mockup-screen{width:100%;height:100%;background:#fff;border-radius:30px;overflow:hidden;padding:1.2rem 1rem}
+.mockup-screen .m-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+.mockup-screen .m-header .m-dot{width:8px;height:8px;border-radius:50%;background:#1266f1}
+.mockup-screen .m-header span{font-size:0.7rem;font-weight:700;color:#1266f1}
+.mockup-screen .m-card{border-radius:12px;padding:0.7rem;margin-bottom:0.6rem;border:1px solid #eef2f7}
+.mockup-screen .m-card .m-row{display:flex;justify-content:space-between;align-items:center;font-size:0.65rem}
+.mockup-screen .m-card .m-row strong{font-size:0.7rem}
+.mockup-screen .m-card .m-badge{font-size:0.55rem;padding:0.15rem 0.5rem;border-radius:20px;border:1.5px solid #1266f1;color:#1266f1}
+.mockup-screen .m-btn{background:#1266f1;color:#fff;text-align:center;padding:0.5rem;border-radius:8px;font-size:0.65rem;font-weight:600;margin-top:0.8rem}
+.mockup-float{position:absolute;width:140px;padding:0.8rem;border-radius:14px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,0.15);display:flex;align-items:center;gap:0.6rem;font-size:0.7rem;font-weight:600}
+.mockup-float i{font-size:1.2rem;color:#1266f1}
+.mockup-float.f1{top:40px;right:-60px}
+.mockup-float.f2{bottom:80px;left:-70px}
+/* Features */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem}
+.feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;margin-bottom:1.2rem}
+.feature-card h4{font-size:1.1rem;font-weight:700;margin-bottom:0.5rem}
+.feature-card p{font-size:0.88rem;color:#5a6a7a;line-height:1.6}
+/* How it works */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5rem}
+.how-step{text-align:center}
+.how-num{width:48px;height:48px;border-radius:50%;background:#1266f1;color:#fff;font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem}
+.how-step h4{font-weight:700;margin-bottom:0.5rem}
+.how-step p{font-size:0.88rem;color:#5a6a7a;line-height:1.6}
+/* Pricing */
+.pricing{background:linear-gradient(135deg,#0d2670,#1266f1);color:#fff;text-align:center}
+.pricing .section-sub{color:rgba(255,255,255,0.7)}
+.pricing-cards{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:800px;margin:0 auto}
+.pricing-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);border-radius:20px;padding:2.5rem 2rem;border:1px solid rgba(255,255,255,0.12);text-align:left;transition:transform 0.4s}
+.pricing-card:hover{transform:translateY(-6px)}
+.pricing-card h4{font-size:1.1rem;font-weight:700;margin-bottom:0.3rem}
+.pricing-card .price{font-size:2.2rem;font-weight:800;margin:0.8rem 0}
+.pricing-card .price small{font-size:0.9rem;font-weight:400;opacity:0.7}
+.pricing-card ul{list-style:none;padding:0;margin:1.2rem 0}
+.pricing-card li{padding:0.4rem 0;font-size:0.88rem;opacity:0.85;display:flex;align-items:center;gap:0.5rem}
+.pricing-card li i{color:#4ade80}
+.pricing-card .btn{width:100%;justify-content:center}
+.pricing-card.featured{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.25)}
+/* Footer */
+footer{background:#0a1a3e;color:rgba(255,255,255,0.7);padding:3rem 0;text-align:center}
+footer .footer-links{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:1.5rem}
+footer .footer-links a{color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.85rem;transition:color 0.3s}
+footer .footer-links a:hover{color:#fff}
+footer .social{display:flex;justify-content:center;gap:1.2rem;margin-bottom:1.5rem}
+footer .social a{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none;transition:all 0.3s}
+footer .social a:hover{background:rgba(255,255,255,0.1);color:#fff;transform:translateY(-3px)}
+footer .copy{font-size:0.8rem;opacity:0.5}
+/* Animations */
+.gsap-reveal{opacity:0;transform:translateY(40px)}
+.gsap-reveal-left{opacity:0;transform:translateX(-60px)}
+.gsap-reveal-right{opacity:0;transform:translateX(60px)}
+.gsap-scale{opacity:0;transform:scale(0.85)}
+/* Responsive */
+@media(max-width:900px){
+  .hero .container{grid-template-columns:1fr;text-align:center}
+  .hero-text p{margin-left:auto;margin-right:auto}
+  .hero-buttons{justify-content:center}
+  .hero-text h1{font-size:2.4rem}
+  .mockup-float.f1{right:10px}
+  .mockup-float.f2{left:10px}
+  .how-grid{grid-template-columns:1fr}
+  .pricing-cards{grid-template-columns:1fr}
+  .section{padding:4rem 0}
+  nav .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+<div class="container">
+<a href="#" class="logo">Citas Médicas<small>&lt;JuanPancho's/&gt;</small></a>
+<div class="nav-links">
+<a href="#features">Funciones</a>
+<a href="#how">Cómo funciona</a>
+<a href="#pricing">Precios</a>
+<a href="https://juanpanchoslandingadministrable-production.up.railway.app/" target="_blank" class="btn btn-primary" style="padding:0.5rem 1.5rem;font-size:0.85rem">Ir a la App</a>
+</div>
+</div>
+</nav>
+
+<section class="hero">
+<div class="hero-bg">
+<div class="shape s1"></div>
+<div class="shape s2"></div>
+<div class="shape s3"></div>
+</div>
+<div class="container">
+<div class="hero-text">
+<div class="badge-free gsap-reveal"><i class="fa fa-gem me-1"></i> 100% gratuita</div>
+<h1 class="gsap-reveal">Agenda, controla y da seguimiento a tus consultas médicas</h1>
+<p class="gsap-reveal">Plataforma integral para pacientes y médicos. Agenda citas, chatea con tu médico, consulta recetas digitales y lleva tu historial clínico desde cualquier lugar.</p>
+<div class="hero-buttons gsap-reveal">
+<a href="https://juanpanchoslandingadministrable-production.up.railway.app/register" class="btn btn-white"><i class="fa fa-user-plus"></i>Crear cuenta gratis</a>
+<a href="#features" class="btn btn-outline" style="border-color:#fff;color:#fff">Conocer más</a>
+</div>
+</div>
+<div class="hero-mockup gsap-scale">
+<div class="mockup-phone">
+<div class="mockup-screen">
+<div class="m-header"><div class="m-dot"></div><span>Citas Médicas</span><div style="width:8px"></div></div>
+<div class="m-card"><div class="m-row"><strong>Dr. Juan Pérez</strong><span class="m-badge">Pendiente</span></div><div style="font-size:0.6rem;color:#888;margin-top:4px">10 Jul 2026 · 17:00</div></div>
+<div class="m-card"><div class="m-row"><strong>Dra. María García</strong><span class="m-badge" style="border-color:#00b894;color:#00b894">Confirmada</span></div><div style="font-size:0.6rem;color:#888;margin-top:4px">12 Jul 2026 · 09:30</div></div>
+<div class="m-card"><div class="m-row"><strong>Dr. Luis Medina</strong><span class="m-badge" style="border-color:#1e90ff;color:#1e90ff">En consulta</span></div><div style="font-size:0.6rem;color:#888;margin-top:4px">15 Jul 2026 · 11:00</div></div>
+<div class="m-btn"><i class="fa fa-plus me-1"></i>Nueva cita</div>
+</div>
+</div>
+<div class="mockup-float f1 gsap-reveal"><i class="fa fa-robot"></i><div><div style="font-size:0.6rem;font-weight:400;opacity:0.6">Asistente IA</div>Pregunta sobre tus medicamentos</div></div>
+<div class="mockup-float f2 gsap-reveal"><i class="fa fa-comments"></i><div><div style="font-size:0.6rem;font-weight:400;opacity:0.6">Chat en vivo</div>Comunicación directa con tu médico</div></div>
+</div>
+</div>
+</section>
+
+<section class="section" id="features">
+<div class="container">
+<h2 class="section-title gsap-reveal">Todo lo que necesitas en un solo lugar</h2>
+<p class="section-sub gsap-reveal">Una plataforma diseñada para hacer más fácil la gestión de citas médicas, tanto para pacientes como para médicos.</p>
+<div class="features-grid">
+<div class="card feature-card gsap-reveal"><div class="feature-icon" style="background:#1266f1"><i class="fa fa-calendar-check"></i></div><h4>Agenda tu cita</h4><p>Selecciona médico, especialidad, fecha y horario disponible. Recibe confirmación al instante.</p></div>
+<div class="card feature-card gsap-reveal"><div class="feature-icon" style="background:#14a44d"><i class="fa fa-notes-medical"></i></div><h4>Recetas digitales</h4><p>Accede a tus recetas médicas en línea con medicamentos, dosis e indicaciones. Descárgalas cuando quieras.</p></div>
+<div class="card feature-card gsap-reveal"><div class="feature-icon" style="background:#e4a11b"><i class="fa fa-user-md"></i></div><h4>Perfiles clínicos</h4><p>Historial completo de consultas, diagnósticos, estudios y tratamientos, siempre disponible.</p></div>
+<div class="card feature-card gsap-reveal"><div class="feature-icon" style="background:#9370db"><i class="fa fa-comments"></i></div><h4>Chat integrado</h4><p>Comunicación directa y segura con tu médico. Mensajes en tiempo real por cada cita.</p></div>
+<div class="card feature-card gsap-reveal"><div class="feature-icon" style="background:#1e90ff"><i class="fa fa-robot"></i></div><h4>Asistente IA</h4><p>Consulta sobre tus medicamentos, horarios y dosis con nuestro asistente inteligente.</p></div>
+<div class="card feature-card gsap-reveal"><div class="feature-icon" style="background:#ff6b6b"><i class="fa fa-bell"></i></div><h4>Notificaciones</h4><p>Recibe alertas en tiempo real sobre cambios de estado, nuevos mensajes y recordatorios.</p></div>
+</div>
+</div>
+</section>
+
+<section class="section" id="how" style="background:#f0f5ff">
+<div class="container">
+<h2 class="section-title gsap-reveal">Cómo funciona</h2>
+<p class="section-sub gsap-reveal">En tres pasos simples puedes empezar a gestionar tus citas médicas.</p>
+<div class="how-grid">
+<div class="how-step gsap-reveal"><div class="how-num">1</div><h4>Crea tu cuenta</h4><p>Regístrate como paciente o médico. El proceso es rápido y completamente gratuito.</p></div>
+<div class="how-step gsap-reveal"><div class="how-num">2</div><h4>Agenda o gestiona</h4><p>Los pacientes agendan citas; los médicos gestionan horarios, bloqueos y consultas.</p></div>
+<div class="how-step gsap-reveal"><div class="how-num">3</div><h4>Da seguimiento</h4><p>Revisa recetas, historial clínico, chatea con tu médico y mantén todo bajo control.</p></div>
+</div>
+</div>
+</section>
+
+<section class="section pricing" id="pricing">
+<div class="container">
+<h2 class="section-title gsap-reveal" style="color:#fff">Precios claros, sin sorpresas</h2>
+<p class="section-sub gsap-reveal">La plataforma es completamente gratuita. Solo pagas si necesitas modificaciones personalizadas para tu consultorio o clínica.</p>
+<div class="pricing-cards">
+<div class="pricing-card gsap-reveal">
+<h4>Plan Gratuito</h4>
+<div class="price">$0 <small>/mes</small></div>
+<ul><li><i class="fa fa-check"></i>Agenda de citas ilimitada</li><li><i class="fa fa-check"></i>Chat con médicos</li><li><i class="fa fa-check"></i>Recetas digitales</li><li><i class="fa fa-check"></i>Historial clínico</li><li><i class="fa fa-check"></i>Asistente IA</li><li><i class="fa fa-check"></i>Notificaciones en tiempo real</li></ul>
+<a href="https://juanpanchoslandingadministrable-production.up.railway.app/register" class="btn btn-white">Crear cuenta gratis</a>
+</div>
+<div class="pricing-card featured gsap-reveal">
+<h4>Plan Personalizado</h4>
+<div class="price">A convenir</div>
+<ul><li><i class="fa fa-check"></i>Todo lo del plan gratuito</li><li><i class="fa fa-check"></i>Modificaciones a medida</li><li><i class="fa fa-check"></i>Módulos adicionales</li><li><i class="fa fa-check"></i>Integración con otros sistemas</li><li><i class="fa fa-check"></i>Soporte prioritario</li><li><i class="fa fa-check"></i>Capacitación del personal</li></ul>
+<a href="https://juanpanchoslandingadministrable-production.up.railway.app/" target="_blank" class="btn btn-white">Solicitar cotización</a>
+</div>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<div class="social">
+<a href="https://wa.me/2381501369" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+<a href="https://wa.me/2211959921" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+<a href="tel:2381271940" aria-label="Teléfono"><i class="fa fa-phone"></i></a>
+</div>
+<div class="footer-links">
+<a href="#features">Funciones</a>
+<a href="#how">Cómo funciona</a>
+<a href="#pricing">Precios</a>
+<a href="https://juanpanchoslandingadministrable-production.up.railway.app/" target="_blank">Ir a la App</a>
+</div>
+<div class="copy">&copy; 2026 &lt;JuanPancho's/&gt; &mdash; Hecho con <i class="fa fa-heart" style="color:#ff4444"></i> para la salud digital</div>
+</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// Navbar scroll
+window.addEventListener('scroll', function() {
+document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Animaciones al entrar
+gsap.utils.toArray('.gsap-reveal').forEach(function(el) {
+gsap.from(el, {
+scrollTrigger: {trigger: el, start: 'top 85%', toggleActions: 'play none none none'},
+opacity: 0,
+y: 50,
+duration: 0.7,
+ease: 'power3.out'
+});
+});
+
+gsap.utils.toArray('.gsap-reveal-left').forEach(function(el) {
+gsap.from(el, {
+scrollTrigger: {trigger: el, start: 'top 85%'},
+opacity: 0,
+x: -60,
+duration: 0.7,
+ease: 'power3.out'
+});
+});
+
+gsap.utils.toArray('.gsap-reveal-right').forEach(function(el) {
+gsap.from(el, {
+scrollTrigger: {trigger: el, start: 'top 85%'},
+opacity: 0,
+x: 60,
+duration: 0.7,
+ease: 'power3.out'
+});
+});
+
+gsap.utils.toArray('.gsap-scale').forEach(function(el) {
+gsap.from(el, {
+scrollTrigger: {trigger: el, start: 'top 80%'},
+opacity: 0,
+scale: 0.85,
+duration: 0.8,
+ease: 'back.out(1.7)'
+});
+});
+
+// Hero stagger
+var heroEls = document.querySelectorAll('.hero-text .gsap-reveal, .hero-mockup.gsap-scale');
+gsap.from(heroEls, {
+opacity: 0,
+y: 40,
+duration: 0.8,
+stagger: 0.2,
+ease: 'power3.out',
+delay: 0.3
+});
+
+gsap.from('.hero-mockup.gsap-scale', {
+opacity: 0,
+scale: 0.85,
+duration: 1,
+delay: 0.6,
+ease: 'back.out(1.7)'
+});
+
+// Mockup floats staggered
+gsap.from('.mockup-float', {
+opacity: 0,
+x: function(i) {return i === 0 ? 40 : -40},
+duration: 0.8,
+delay: 1,
+stagger: 0.3,
+ease: 'power3.out'
+});
+
+// Feature cards stagger
+var featureCards = document.querySelectorAll('.feature-card');
+featureCards.forEach(function(card, i) {
+gsap.from(card, {
+scrollTrigger: {trigger: card, start: 'top 88%'},
+opacity: 0,
+y: 40,
+duration: 0.6,
+delay: i * 0.1,
+ease: 'power3.out'
+});
+});
+</script>
+</body>
+</html>
