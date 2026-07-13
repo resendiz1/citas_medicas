@@ -7,8 +7,8 @@
     @php $user = auth()->user(); @endphp
 
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-2 p-4 d-flex align-items-center gap-3">
+        <div class="col-12{{ $user->esMedico() || $user->esPaciente() ? ' col-lg-8' : '' }}">
+            <div class="card shadow-2 p-4 d-flex align-items-center gap-3 h-100">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                      style="width:48px;height:48px;background:#1266f1;color:#121212;font-size:1.2rem;font-weight:bold;overflow:hidden">
                     @if ($user->foto_url)
@@ -32,9 +32,34 @@
                 </div>
             </div>
         </div>
+        @if ($user->esMedico() || $user->esPaciente())
+        <div class="col-12 col-lg-4 mt-3 mt-lg-0">
+            <div class="card shadow-2 p-2 h-100">
+                <h6 class="fw-bold mb-2" style="color:#1266f1;font-size:0.85rem"><i class="fa fa-calendar me-1"></i>Calendario de Citas</h6>
+                <div id="role-calendar" style="max-width:100%;font-size:0.7rem"></div>
+            </div>
+        </div>
+        @endif
     </div>
 
-    @if ($user->esAdmin() || $user->esRecepcionista())
+    @push('head')
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css" rel="stylesheet">
+    <style>
+    #role-calendar .fc-daygrid-day-frame { min-height: 24px !important; }
+    #role-calendar .fc-daygrid-day-number { font-size: 0.7rem !important; padding: 2px !important; }
+    #role-calendar .fc-daygrid-day-events { min-height: auto !important; }
+    #role-calendar .fc-daygrid-event { font-size: 0.6rem !important; padding: 0 2px !important; margin: 0 !important; border-radius: 2px !important; }
+    #role-calendar .fc-header-toolbar { margin-bottom: 0.4rem !important; }
+    #role-calendar .fc-toolbar-title { font-size: 0.85rem !important; }
+    #role-calendar .fc-button { font-size: 0.7rem !important; padding: 0.15rem 0.4rem !important; }
+    #role-calendar .fc-col-header-cell-cushion { font-size: 0.65rem !important; padding: 2px 0 !important; }
+    #role-calendar .fc-scrollgrid { border: none !important; }
+    #role-calendar .fc-theme-standard td, #role-calendar .fc-theme-standard th { border-color: rgba(0,0,0,0.06) !important; }
+    #role-calendar .fc-day-other .fc-daygrid-day-top { opacity: 0.3; }
+    </style>
+    @endpush
+
+    @if ($user->esAdmin())
         <div class="row g-4">
             @if ($user->esAdmin())
             <div class="col-12 col-md-6 col-lg-3">
@@ -68,7 +93,7 @@
             @endif
             @endif
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas') }}" class="text-decoration-none">
+                <a href="{{ route('admin.citas') }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center">
                         <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-calendar-check fa-xl"></i></div>
                         <h5>Citas</h5>
@@ -77,7 +102,7 @@
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-3">
-                <a href="{{ $user->esRecepcionista() ? '#citas-section' : route('admin.citas', ['estado' => 'pendiente']) }}" class="text-decoration-none">
+                <a href="{{ route('admin.citas', ['estado' => 'pendiente']) }}" class="text-decoration-none">
                     <div class="card border-0 shadow-2 p-4 text-center">
                         <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-clock fa-xl"></i></div>
                         <h5>Pendientes</h5>
@@ -85,15 +110,6 @@
                     </div>
                 </a>
             </div>
-            @if ($user->esRecepcionista())
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="card border-0 shadow-2 p-4 text-center">
-                    <div class="stat-icon mx-auto mb-3" style="color:#1266f1"><i class="fa fa-calendar-day fa-xl"></i></div>
-                    <h5>Hoy</h5>
-                    <p class="display-6 mb-0 fw-bold">{{ $citasHoy }}</p>
-                </div>
-            </div>
-            @endif
         </div>
         @if ($user->esAdmin() && $medicosPendientes > 0)
         <div class="mt-4">
@@ -150,58 +166,6 @@
                     <span class="text-muted small">Elimina todos los datos excepto tu cuenta de administrador</span>
                 </div>
             </div>
-        </div>
-        @endif
-        @if ($user->esRecepcionista())
-        <div class="card shadow-2 p-4 mt-4" id="citas-section">
-            <h5 class="mb-3 fw-bold" style="color:#1266f1">Todas las Citas</h5>
-                <div class="table-responsive">
-                    <table class="table neu-table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Paciente</th>
-                            <th>Médico</th>
-                            <th>Especialidad</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($citas as $cita)
-                            <tr>
-                                <td>{{ $cita->fecha_hora->format('d/m/Y H:i') }}</td>
-                                <td>{{ $cita->paciente->name }}</td>
-                                <td>{{ $cita->medico->name }}</td>
-                                <td class="text-muted">{{ $cita->medico->medicoPerfil->tipoMedico->nombre_tipo_medico ?? '—' }}</td>
-                                <td data-cita-id="{{ $cita->id }}">
-                                    @switch($cita->estado)
-                                        @case('pendiente') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1266f1;color:#1266f1;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-clock me-1"></i>Pendiente</span> @break
-                                        @case('confirmada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #00b894;color:#00b894;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-check me-1"></i>Confirmada</span> @break
-                                        @case('en_espera') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ffa500;color:#ffa500;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-hourglass-half me-1"></i>En espera</span> @break
-                                        @case('en_consulta') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #1e90ff;color:#1e90ff;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-stethoscope me-1"></i>En consulta</span> @break
-                                        @case('finalizada') <span id="estado-badge-{{ $cita->id }}" class="btn btn-primary btn-sm"><i class="fa fa-circle-check me-1"></i>Finalizada</span> @break
-                                        @case('cancelada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #ff4444;color:#ff4444;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-circle-xmark me-1"></i>Cancelada</span> @break
-                                        @case('no_asistio') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #dc143c;color:#dc143c;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-user-slash me-1"></i>No asistió</span> @break
-                                        @case('reprogramada') <span id="estado-badge-{{ $cita->id }}" class="badge" style="border:2px solid #9370db;color:#9370db;background:transparent;padding:0.5rem 0.75rem"><i class="fa fa-calendar me-1"></i>Reprogramada</span> @break
-                                    @endswitch
-                                </td>
-                                <td data-cita-acciones="{{ $cita->id }}">
-                                    @include('dashboard._acciones', ['cita' => $cita])
-                                </td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="6" class="text-center py-5"><div class="d-flex flex-column align-items-center gap-2"><i class="fa fa-calendar-xmark fa-2x text-muted opacity-50"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No hay citas.</p></div></td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            @if ($citas instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                <div class="mt-3 d-flex justify-content-center">
-                    {{ $citas->links() }}
-                </div>
-            @endif
-            <br><br>
         </div>
         @endif
     @else
@@ -345,6 +309,135 @@
             <br><br>
         </div>
     @endif
+
+@if ($user->esMedico() || $user->esPaciente())
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calEl = document.getElementById('role-calendar');
+    if (!calEl) { console.error('role-calendar not found'); return; }
+
+    var userRole = '{{ auth()->user()->role }}';
+    var csrfToken = '{{ csrf_token() }}';
+
+    var estadoLabels = {
+        'pendiente': 'Pendiente',
+        'confirmada': 'Confirmada',
+        'en_espera': 'En espera',
+        'en_consulta': 'En consulta',
+        'finalizada': 'Finalizada',
+        'cancelada': 'Cancelada',
+        'no_asistio': 'No asistió',
+        'reprogramada': 'Reprogramada'
+    };
+
+    var events = [
+        @foreach ($citas as $cita)
+        {
+            id: '{{ $cita->id }}',
+            title: '{{ $cita->estado }}',
+            start: '{{ $cita->fecha_hora->format('Y-m-d') }}',
+            allDay: true,
+            updateUrl: '{{ route('citas.estado', ['cita' => $cita->id]) }}',
+            @switch($cita->estado)
+                @case('pendiente') color: '#1266f1', @break
+                @case('confirmada') color: '#00b894', @break
+                @case('en_espera') color: '#ffa500', @break
+                @case('en_consulta') color: '#1e90ff', @break
+                @case('finalizada') color: '#6c757d', @break
+                @case('cancelada') color: '#ff4444', @break
+                @case('no_asistio') color: '#dc143c', @break
+                @case('reprogramada') color: '#9370db', @break
+                @default color: '#1266f1',
+            @endswitch
+        },
+        @endforeach
+    ];
+
+    function canDrag(estado) {
+        if (userRole === 'medico') {
+            return estado === 'pendiente' || estado === 'confirmada';
+        }
+        return false;
+    }
+
+    try {
+        var calendar = new FullCalendar.Calendar(calEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            height: 260,
+            contentHeight: 220,
+            events: events,
+            editable: true,
+            headerToolbar: {
+                left: 'prev',
+                center: 'title',
+                right: 'next'
+            },
+            titleFormat: { year: 'numeric', month: 'long' },
+            dayHeaderFormat: { weekday: 'short' },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes'
+            },
+            dayCellClassNames: function() { return ['fc-day-compact']; },
+            eventDidMount: function(info) {
+                info.el.setAttribute('title', estadoLabels[info.event.title] || info.event.title);
+                if (!canDrag(info.event.title)) {
+                    info.el.style.cursor = 'default';
+                }
+            },
+            eventDrop: function(info) {
+                var estado = info.event.title;
+                if (!canDrag(estado)) { info.revert(); return; }
+
+                var fechaLocal = new Date(info.event.start).toLocaleDateString('es-MX', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                if (!confirm('Reprogramar esta cita para el ' + fechaLocal + '?')) {
+                    info.revert();
+                    return;
+                }
+
+                var formData = new URLSearchParams();
+                formData.append('estado', 'reprogramada');
+                formData.append('fecha_reprogramada', info.event.start.toISOString().slice(0, 16));
+                formData.append('_token', csrfToken);
+                formData.append('_method', 'PUT');
+
+                fetch(info.event.extendedProps.updateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: formData.toString()
+                })
+                .then(function(r) {
+                    if (r.redirected) { window.location.href = r.url; return null; }
+                    if (!r.ok) { return r.json().then(function(d) { throw new Error(d.error || 'Error'); }); }
+                    return r.json();
+                })
+                .then(function(data) {
+                    if (data && data.success) { location.reload(); }
+                    else { info.revert(); }
+                })
+                .catch(function(err) {
+                    info.revert();
+                    alert(err.message || 'Error al reprogramar');
+                });
+            }
+        });
+
+        calendar.render();
+    } catch(e) {
+        calEl.innerHTML = '<div class="text-danger p-3">Error al cargar el calendario: ' + e.message + '</div>';
+    }
+});
+</script>
+@endif
 
 </div>
 @endsection

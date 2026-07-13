@@ -167,4 +167,5 @@
         <br><br>
     </div>
 </div>
+@include('partials.admin-medico-ia-chat')
 @endsection

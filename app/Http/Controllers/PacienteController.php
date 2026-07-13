@@ -281,7 +281,8 @@ class PacienteController extends Controller
         $context .= "Responde SOLO con información basada en los datos clínicos del paciente proporcionados abajo. ";
         $context .= "Si no sabes la respuesta, di que no tienes esa información. NO inventes datos médicos.\n\n";
         $context .= "IMPORTANTE: Puedes CANCELAR citas pendientes usando la herramienta disponible. ";
-        $context .= "SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la cancelación.\n\n";
+        $context .= "SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la cancelación.\n";
+        $context .= "NUNCA muestres código, etiquetas HTML, XML, markdown de código, ni nada entre <> en tus respuestas. Responde solo en lenguaje natural.\n\n";
 
         $edad = $user->fecha_nacimiento ? now()->diffInYears($user->fecha_nacimiento) : 'No registrada';
         $context .= "Paciente: {$user->name}\nEdad: {$edad}\n\n";

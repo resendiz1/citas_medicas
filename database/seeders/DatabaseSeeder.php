@@ -12,18 +12,16 @@ class DatabaseSeeder extends Seeder
             TipoMedicoSeeder::class,
             AlergiaSeeder::class,
             EnfermedadImportanteSeeder::class,
-            ContactoEmergenciaSeeder::class,
+            AdminUserSeeder::class,
             MedicoSeeder::class,
             MedicoPerfilSeeder::class,
             PacienteSeeder::class,
+            MedicoHorarioSeeder::class,
+            MedicoBloqueoSeeder::class,
             CitaMedicaSeeder::class,
-        ]);
-
-        \App\Models\User::create([
-            'name'     => 'Administrador',
-            'email'    => 'admin@citas.com',
-            'password' => bcrypt('admin123'),
-            'role'     => 'admin',
+            RecetaSeeder::class,
+            ConsultaMedicaSeeder::class,
+            CitaHistorialSeeder::class,
         ]);
     }
 }

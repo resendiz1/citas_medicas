@@ -89,9 +89,15 @@ class AdminController extends Controller
         $context = "Eres un asistente virtual de salud para administradores. ";
         $context .= "Responde preguntas sobre los pacientes, citas y actividad del médico indicado. ";
         $context .= "Usa SOLO la información proporcionada abajo. No inventes datos.\n\n";
-        $context .= "IMPORTANTE: Puedes MODIFICAR el estado de las citas usando las herramientas disponibles. ";
-        $context .= "Para acciones destructivas (cancelar, no_asistio), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta. ";
-        $context .= "Para las demás acciones, puedes ejecutarlas directamente.\n\n";
+        $context .= "IMPORTANTE: Tienes estas herramientas disponibles:\n";
+        $context .= "- Citas: confirmar_cita, cancelar_cita, reprogramar_cita, marcar_no_asistio, pasar_en_espera, pasar_en_consulta, finalizar_cita\n";
+        $context .= "- Horarios: listar_horarios, crear_horario, eliminar_horario\n";
+        $context .= "- Bloqueos: listar_bloqueos, crear_bloqueo, eliminar_bloqueo\n";
+        $context .= "Para acciones destructivas (cancelar cita, no_asistio, eliminar horario, eliminar bloqueo), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta. ";
+        $context .= "CRÍTICO: Siempre debes llamar a la herramienta real para ejecutar cualquier acción. NUNCA digas 'Listo, ya se actualizó' o 'Hecho' sin haber llamado a la herramienta correspondiente. ";
+        $context .= "Si el usuario te pide actualizar algo, crear horario/bloqueo, etc., DEBES llamar a la función tool. ";
+        $context .= "No confirmes una acción hasta que la herramienta se haya ejecutado y devuelto éxito. Las falsas confirmaciones son inaceptables.\n";
+        $context .= "NUNCA muestres código, etiquetas HTML, XML, markdown de código, ni nada entre <> en tus respuestas. Responde solo en lenguaje natural.\n\n";
 
         $especialidad = optional($medico->medicoPerfil)->tipoMedico->nombre_tipo_medico ?? 'No asignada';
         $cedula = optional($medico->medicoPerfil)->cedula_profesional ?? 'No registrada';
@@ -102,6 +108,26 @@ class AdminController extends Controller
         $context .= "Cédula: {$cedula}\n";
         $context .= "Email: {$medico->email}\n";
         $context .= "Teléfono: {$telefono}\n\n";
+
+        $horarios = MedicoHorario::where('medico_id', $medico->id)->orderBy('dia_semana')->get();
+        if ($horarios->count()) {
+            $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            $context .= "=== HORARIOS DEL MÉDICO ===\n";
+            foreach ($horarios as $h) {
+                $dia = $dias[$h->dia_semana] ?? "Día {$h->dia_semana}";
+                $context .= "ID {$h->id}: {$dia} {$h->hora_inicio}-{$h->hora_fin}" . ($h->activo ? '' : ' (inactivo)') . "\n";
+            }
+            $context .= "\n";
+        }
+
+        $bloqueos = MedicoBloqueo::where('medico_id', $medico->id)->orderBy('fecha_inicio')->get();
+        if ($bloqueos->count()) {
+            $context .= "=== BLOQUEOS DEL MÉDICO ===\n";
+            foreach ($bloqueos as $b) {
+                $context .= "ID {$b->id}: {$b->fecha_inicio->format('d/m/Y')} - {$b->fecha_fin->format('d/m/Y')}" . ($b->motivo ? ": {$b->motivo}" : '') . "\n";
+            }
+            $context .= "\n";
+        }
 
         $citas = CitaMedica::where('medico_id', $medico->id)
             ->with(['paciente', 'consultaMedica.diagnosticos', 'consultaMedica.medicamentos', 'recetas.medicamentos'])
@@ -189,13 +215,24 @@ class AdminController extends Controller
                 return response()->json(['error' => 'El asistente no está disponible.'], 500);
             }
 
+            Log::info('OpenRouter response', [
+                'has_tool_calls' => isset($data['choices'][0]['message']['tool_calls']),
+                'tool_count' => isset($data['choices'][0]['message']['tool_calls']) ? count($data['choices'][0]['message']['tool_calls']) : 0,
+                'tool_names' => isset($data['choices'][0]['message']['tool_calls']) ? array_map(fn($tc) => $tc['function']['name'], $data['choices'][0]['message']['tool_calls']) : [],
+                'content_preview' => substr($data['choices'][0]['message']['content'] ?? '', 0, 200),
+            ]);
+
             $choice = $data['choices'][0]['message'] ?? null;
             if ($choice === null) {
                 Log::warning('OpenRouter unexpected response', ['body' => $response->body()]);
                 return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
             }
 
-            if (isset($choice['tool_calls'])) {
+            $maxRounds = 5;
+            $round = 0;
+
+            while (isset($choice['tool_calls']) && $round < $maxRounds) {
+                $round++;
                 $messages[] = ['role' => 'assistant', 'content' => $choice['content'] ?? null, 'tool_calls' => $choice['tool_calls']];
 
                 foreach ($choice['tool_calls'] as $toolCall) {
@@ -213,7 +250,7 @@ class AdminController extends Controller
                     ];
                 }
 
-                $response2 = Http::withHeaders([
+                $responseNext = Http::withHeaders([
                     'Authorization' => 'Bearer ' . config('services.openrouter.api_key'),
                     'Content-Type'  => 'application/json',
                 ])->timeout(120)->post(config('services.openrouter.url') . '/chat/completions', [
@@ -222,16 +259,30 @@ class AdminController extends Controller
                     'max_tokens' => 2048,
                 ]);
 
-                if ($response2->failed()) {
-                    Log::error('OpenRouter follow-up API error', ['status' => $response2->status(), 'body' => $response2->body()]);
+                if ($responseNext->failed()) {
+                    Log::error('OpenRouter follow-up API error', ['status' => $responseNext->status(), 'body' => $responseNext->body()]);
                     return response()->json(['error' => 'Error al procesar la acción.'], 500);
                 }
 
-                $data2 = $response2->json();
-                $reply = $data2['choices'][0]['message']['content'] ?? 'Acción ejecutada.';
-            } else {
-                $reply = $choice['content'] ?? null;
-                if ($reply === null) {
+                $dataNext = $responseNext->json();
+                $choice = $dataNext['choices'][0]['message'] ?? null;
+                if ($choice === null) {
+                    return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
+                }
+
+                Log::info('AdminChat OpenRouter response (round ' . $round . ')', [
+                    'has_tool_calls' => isset($choice['tool_calls']),
+                    'tool_count' => isset($choice['tool_calls']) ? count($choice['tool_calls']) : 0,
+                    'tool_names' => isset($choice['tool_calls']) ? array_map(fn($tc) => $tc['function']['name'], $choice['tool_calls']) : [],
+                    'content_preview' => substr($choice['content'] ?? '', 0, 200),
+                ]);
+            }
+
+            $reply = $choice['content'] ?? null;
+            if ($reply === null) {
+                if ($round > 0) {
+                    $reply = 'Acción ejecutada.';
+                } else {
                     Log::warning('OpenRouter unexpected response (no content)', ['body' => $response->body()]);
                     return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
                 }
@@ -690,20 +741,110 @@ class AdminController extends Controller
                     ],
                 ],
             ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'listar_horarios',
+                    'description' => 'Lista todos los horarios del médico con día, hora inicio, hora fin y estado activo/inactivo.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'crear_horario',
+                    'description' => 'Crea un nuevo horario de trabajo. Día 0=Domingo, 1=Lunes, ..., 6=Sábado. hora_inicio y hora_fin en formato H:i (ej. 09:00, 17:30). hora_fin debe ser posterior a hora_inicio.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'dia_semana' => ['type' => 'integer', 'description' => 'Día de la semana: 0=Domingo, 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado'],
+                            'hora_inicio' => ['type' => 'string', 'description' => 'Hora de inicio en formato H:i (ej. 09:00)'],
+                            'hora_fin' => ['type' => 'string', 'description' => 'Hora de fin en formato H:i (ej. 17:00). Debe ser después de hora_inicio.'],
+                        ],
+                        'required' => ['dia_semana', 'hora_inicio', 'hora_fin'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'eliminar_horario',
+                    'description' => 'Elimina un horario por su ID. Pregunta confirmación antes de ejecutar.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'horario_id' => ['type' => 'integer', 'description' => 'ID del horario a eliminar'],
+                        ],
+                        'required' => ['horario_id'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'listar_bloqueos',
+                    'description' => 'Lista todos los bloqueos de disponibilidad del médico con fechas y motivo.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'crear_bloqueo',
+                    'description' => 'Crea un bloqueo de disponibilidad. El médico no estará disponible entre fecha_inicio y fecha_fin. Las fechas deben ser actuales o futuras.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'fecha_inicio' => ['type' => 'string', 'description' => 'Fecha de inicio en formato Y-m-d (ej. 2026-07-20)'],
+                            'fecha_fin' => ['type' => 'string', 'description' => 'Fecha de fin en formato Y-m-d (ej. 2026-07-25). Debe ser igual o posterior a fecha_inicio.'],
+                            'motivo' => ['type' => 'string', 'description' => 'Motivo del bloqueo (opcional)'],
+                        ],
+                        'required' => ['fecha_inicio', 'fecha_fin'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'eliminar_bloqueo',
+                    'description' => 'Elimina un bloqueo por su ID. Pregunta confirmación antes de ejecutar.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'bloqueo_id' => ['type' => 'integer', 'description' => 'ID del bloqueo a eliminar'],
+                        ],
+                        'required' => ['bloqueo_id'],
+                    ],
+                ],
+            ],
         ];
     }
 
     private function executeAdminTool(string $name, array $args, User $admin, User $medico): array
     {
         return match ($name) {
-            'confirmar_cita'   => $this->adminToolConfirmarCita((int)($args['cita_id'] ?? 0), $admin),
-            'cancelar_cita'    => $this->adminToolCancelarCita((int)($args['cita_id'] ?? 0), $admin, $args['comentario'] ?? ''),
-            'reprogramar_cita' => $this->adminToolReprogramarCita((int)($args['cita_id'] ?? 0), $args['nueva_fecha'] ?? '', $admin),
+            'confirmar_cita'    => $this->adminToolConfirmarCita((int)($args['cita_id'] ?? 0), $admin),
+            'cancelar_cita'     => $this->adminToolCancelarCita((int)($args['cita_id'] ?? 0), $admin, $args['comentario'] ?? ''),
+            'reprogramar_cita'  => $this->adminToolReprogramarCita((int)($args['cita_id'] ?? 0), $args['nueva_fecha'] ?? '', $admin),
             'marcar_no_asistio' => $this->adminToolMarcarNoAsistio((int)($args['cita_id'] ?? 0), $admin),
-            'pasar_en_espera'  => $this->adminToolPasarEnEspera((int)($args['cita_id'] ?? 0), $admin),
+            'pasar_en_espera'   => $this->adminToolPasarEnEspera((int)($args['cita_id'] ?? 0), $admin),
             'pasar_en_consulta' => $this->adminToolPasarEnConsulta((int)($args['cita_id'] ?? 0), $admin),
-            'finalizar_cita'   => $this->adminToolFinalizarCita((int)($args['cita_id'] ?? 0), $admin),
-            default            => ['success' => false, 'error' => "Función desconocida: {$name}"],
+            'finalizar_cita'    => $this->adminToolFinalizarCita((int)($args['cita_id'] ?? 0), $admin),
+            'listar_horarios'   => $this->adminToolListarHorarios($medico),
+            'crear_horario'     => $this->adminToolCrearHorario((int)($args['dia_semana'] ?? 0), $args['hora_inicio'] ?? '', $args['hora_fin'] ?? '', $medico),
+            'eliminar_horario'  => $this->adminToolEliminarHorario((int)($args['horario_id'] ?? 0), $medico),
+            'listar_bloqueos'   => $this->adminToolListarBloqueos($medico),
+            'crear_bloqueo'     => $this->adminToolCrearBloqueo($args['fecha_inicio'] ?? '', $args['fecha_fin'] ?? '', $args['motivo'] ?? '', $medico),
+            'eliminar_bloqueo'  => $this->adminToolEliminarBloqueo((int)($args['bloqueo_id'] ?? 0), $medico),
+            default             => ['success' => false, 'error' => "Función desconocida: {$name}"],
         };
     }
 
@@ -806,6 +947,135 @@ class AdminController extends Controller
         if (!$cita->fecha_hora->isToday()) return ['success' => false, 'error' => 'Solo puedes finalizar citas del día de hoy.'];
 
         return $this->adminAplicarTransicion($cita, 'finalizada', $admin, 'Consulta finalizada.');
+    }
+
+    private function adminToolListarHorarios(User $medico): array
+    {
+        $horarios = MedicoHorario::where('medico_id', $medico->id)->orderBy('dia_semana')->orderBy('hora_inicio')->get();
+        if ($horarios->isEmpty()) return ['success' => true, 'message' => 'El médico no tiene horarios registrados.', 'data' => []];
+
+        $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        $result = [];
+        foreach ($horarios as $h) {
+            $result[] = [
+                'id' => $h->id,
+                'dia' => $dias[$h->dia_semana] ?? "Día {$h->dia_semana}",
+                'dia_semana' => $h->dia_semana,
+                'hora_inicio' => substr($h->hora_inicio, 0, 5),
+                'hora_fin' => substr($h->hora_fin, 0, 5),
+                'activo' => $h->activo,
+            ];
+        }
+        return ['success' => true, 'message' => count($result) . ' horario(s) encontrado(s).', 'data' => $result];
+    }
+
+    private function adminToolCrearHorario(int $diaSemana, string $horaInicio, string $horaFin, User $medico): array
+    {
+        if ($diaSemana < 0 || $diaSemana > 6) return ['success' => false, 'error' => 'Día inválido. Usa 0=Domingo a 6=Sábado.'];
+        if (!preg_match('/^\d{2}:\d{2}$/', $horaInicio) || !preg_match('/^\d{2}:\d{2}$/', $horaFin)) {
+            return ['success' => false, 'error' => 'Formato de hora inválido. Usa H:i (ej. 09:00).'];
+        }
+        if ($horaFin <= $horaInicio) return ['success' => false, 'error' => 'hora_fin debe ser posterior a hora_inicio.'];
+
+        try {
+            MedicoHorario::create([
+                'medico_id'   => $medico->id,
+                'dia_semana'  => $diaSemana,
+                'hora_inicio' => $horaInicio,
+                'hora_fin'    => $horaFin,
+                'activo'      => true,
+            ]);
+
+            $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            $dia = $dias[$diaSemana] ?? "Día {$diaSemana}";
+            return ['success' => true, 'message' => "Horario creado: {$dia} de {$horaInicio} a {$horaFin}."];
+        } catch (\Exception $e) {
+            Log::error('Admin crear horario error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al crear el horario.'];
+        }
+    }
+
+    private function adminToolEliminarHorario(int $horarioId, User $medico): array
+    {
+        $horario = MedicoHorario::find($horarioId);
+        if (!$horario) return ['success' => false, 'error' => "Horario #{$horarioId} no encontrado."];
+        if ($horario->medico_id !== $medico->id) return ['success' => false, 'error' => 'Este horario no pertenece al médico seleccionado.'];
+
+        $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        $dia = $dias[$horario->dia_semana] ?? "Día {$horario->dia_semana}";
+        $info = "{$dia} de {$horario->hora_inicio} a {$horario->hora_fin}";
+
+        try {
+            $horario->delete();
+            return ['success' => true, 'message' => "Horario eliminado: {$info}."];
+        } catch (\Exception $e) {
+            Log::error('Admin eliminar horario error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al eliminar el horario.'];
+        }
+    }
+
+    private function adminToolListarBloqueos(User $medico): array
+    {
+        $bloqueos = MedicoBloqueo::where('medico_id', $medico->id)->orderBy('fecha_inicio')->get();
+        if ($bloqueos->isEmpty()) return ['success' => true, 'message' => 'El médico no tiene bloqueos registrados.', 'data' => []];
+
+        $result = [];
+        foreach ($bloqueos as $b) {
+            $result[] = [
+                'id' => $b->id,
+                'fecha_inicio' => $b->fecha_inicio->format('Y-m-d'),
+                'fecha_fin' => $b->fecha_fin->format('Y-m-d'),
+                'motivo' => $b->motivo ?? 'Sin motivo',
+            ];
+        }
+        return ['success' => true, 'message' => count($result) . ' bloqueo(s) encontrado(s).', 'data' => $result];
+    }
+
+    private function adminToolCrearBloqueo(string $fechaInicio, string $fechaFin, string $motivo, User $medico): array
+    {
+        try {
+            $inicio = \Carbon\Carbon::parse($fechaInicio);
+            $fin = \Carbon\Carbon::parse($fechaFin);
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => 'Formato de fecha inválido. Usa Y-m-d (ej. 2026-07-20).'];
+        }
+
+        if ($fin->lessThan($inicio)) return ['success' => false, 'error' => 'fecha_fin debe ser igual o posterior a fecha_inicio.'];
+        if ($inicio->lessThan(now()->startOfDay())) return ['success' => false, 'error' => 'El bloqueo debe comenzar en una fecha actual o futura.'];
+
+        try {
+            MedicoBloqueo::create([
+                'medico_id'    => $medico->id,
+                'fecha_inicio' => $inicio->format('Y-m-d') . ' 00:00:00',
+                'fecha_fin'    => $fin->format('Y-m-d') . ' 23:59:59',
+                'motivo'       => $motivo ?: null,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => "Bloqueo creado del {$inicio->format('d/m/Y')} al {$fin->format('d/m/Y')}" . ($motivo ? ": {$motivo}" : '') . '.',
+            ];
+        } catch (\Exception $e) {
+            Log::error('Admin crear bloqueo error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al crear el bloqueo.'];
+        }
+    }
+
+    private function adminToolEliminarBloqueo(int $bloqueoId, User $medico): array
+    {
+        $bloqueo = MedicoBloqueo::find($bloqueoId);
+        if (!$bloqueo) return ['success' => false, 'error' => "Bloqueo #{$bloqueoId} no encontrado."];
+        if ($bloqueo->medico_id !== $medico->id) return ['success' => false, 'error' => 'Este bloqueo no pertenece al médico seleccionado.'];
+
+        $info = "{$bloqueo->fecha_inicio->format('d/m/Y')} - {$bloqueo->fecha_fin->format('d/m/Y')}";
+
+        try {
+            $bloqueo->delete();
+            return ['success' => true, 'message' => "Bloqueo eliminado: {$info}."];
+        } catch (\Exception $e) {
+            Log::error('Admin eliminar bloqueo error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al eliminar el bloqueo.'];
+        }
     }
 
     private function adminAplicarTransicion(CitaMedica $cita, string $nuevoEstado, User $user, string $comentario, array $extraData = []): array

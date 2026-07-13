@@ -155,12 +155,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/estadisticas/paciente', [EstadisticaController::class, 'paciente'])->name('estadisticas.paciente');
     Route::get('/estadisticas/admin/general', [EstadisticaController::class, 'adminGeneral'])->name('estadisticas.admin.general');
     Route::get('/estadisticas/admin/{medico}', [EstadisticaController::class, 'admin'])->name('estadisticas.admin');
-
-    Route::middleware('role:recepcionista')->group(function () {
-        Route::get('/recepcionista/pacientes', [AdminController::class, 'pacientes'])->name('recepcionista.pacientes');
-        Route::get('/recepcionista/pacientes/{id}', function ($id) {
-            $paciente = App\Models\User::where('role', 'paciente')->with('contactosEmergencia', 'alergias', 'enfermedadesImportantes')->findOrFail($id);
-            return view('recepcionista.paciente-show', compact('paciente'));
-        })->name('recepcionista.pacientes.show');
-    });
 });

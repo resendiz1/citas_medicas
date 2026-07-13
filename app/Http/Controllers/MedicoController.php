@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\CitaHistorial;
 use App\Models\CitaMedica;
 use App\Models\IaChatMensaje;
+use App\Models\MedicoBloqueo;
 use App\Models\MedicoDocumento;
+use App\Models\MedicoHorario;
 use App\Models\Mensaje;
 use App\Models\TipoMedico;
 use App\Models\User;
@@ -200,9 +202,17 @@ class MedicoController extends Controller
         $context = "Eres un asistente virtual de salud experto para médicos. ";
         $context .= "Responde preguntas sobre TODA la información del médico: sus datos personales, horarios, bloqueos, pacientes, citas, consultas, diagnósticos, recetas y más. ";
         $context .= "Usa SOLO la información proporcionada abajo. No inventes datos.\n\n";
-        $context .= "IMPORTANTE: Puedes MODIFICAR el estado de las citas usando las herramientas disponibles. ";
-        $context .= "Para acciones destructivas (cancelar, no_asistio), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta. ";
-        $context .= "Para las demás acciones (confirmar, pasar a espera, pasar a consulta, finalizar), puedes ejecutarlas directamente.\n\n";
+        $context .= "IMPORTANTE: Tienes estas herramientas disponibles:\n";
+        $context .= "- Citas: confirmar_cita, cancelar_cita, reprogramar_cita, marcar_no_asistio, pasar_en_espera, pasar_en_consulta, finalizar_cita\n";
+        $context .= "- Horarios: listar_horarios, crear_horario, eliminar_horario\n";
+        $context .= "- Bloqueos: listar_bloqueos, crear_bloqueo, eliminar_bloqueo\n";
+        $context .= "- Perfil: ver_mi_perfil, actualizar_perfil, actualizar_intervalo, listar_documentos, eliminar_documento\n";
+        $context .= "- Pacientes: ver_perfil_paciente\n";
+        $context .= "Para acciones destructivas (cancelar cita, no_asistio, eliminar horario, eliminar bloqueo, eliminar_documento), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta. ";
+        $context .= "CRÍTICO: Siempre debes llamar a la herramienta real para ejecutar cualquier acción. NUNCA digas 'Listo, ya se actualizó' o 'Hecho' sin haber llamado a la herramienta correspondiente. ";
+        $context .= "Si el usuario te pide actualizar su perfil, cambiar intervalo, crear horario/bloqueo, etc., DEBES llamar a la función tool. ";
+        $context .= "No confirmes una acción hasta que la herramienta se haya ejecutado y devuelto éxito. Las falsas confirmaciones (decir que se hizo sin llamar a la herramienta) son inaceptables.\n";
+        $context .= "NUNCA muestres código, etiquetas HTML, XML, markdown de código, ni nada entre <> en tus respuestas. Responde solo en lenguaje natural.\n\n";
 
         $context .= "=== DATOS DEL MÉDICO ===\n";
         $telefono = $user->telefono ?? 'No registrado';
@@ -415,13 +425,24 @@ class MedicoController extends Controller
                 return response()->json(['error' => 'El asistente no está disponible.'], 500);
             }
 
+            Log::info('MedicoChat OpenRouter response', [
+                'has_tool_calls' => isset($data['choices'][0]['message']['tool_calls']),
+                'tool_count' => isset($data['choices'][0]['message']['tool_calls']) ? count($data['choices'][0]['message']['tool_calls']) : 0,
+                'tool_names' => isset($data['choices'][0]['message']['tool_calls']) ? array_map(fn($tc) => $tc['function']['name'], $data['choices'][0]['message']['tool_calls']) : [],
+                'content_preview' => substr($data['choices'][0]['message']['content'] ?? '', 0, 200),
+            ]);
+
             $choice = $data['choices'][0]['message'] ?? null;
             if ($choice === null) {
                 Log::warning('OpenRouter unexpected response', ['body' => $response->body()]);
                 return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
             }
 
-            if (isset($choice['tool_calls'])) {
+            $maxRounds = 5;
+            $round = 0;
+
+            while (isset($choice['tool_calls']) && $round < $maxRounds) {
+                $round++;
                 $messages[] = ['role' => 'assistant', 'content' => $choice['content'] ?? null, 'tool_calls' => $choice['tool_calls']];
 
                 foreach ($choice['tool_calls'] as $toolCall) {
@@ -439,7 +460,7 @@ class MedicoController extends Controller
                     ];
                 }
 
-                $response2 = Http::withHeaders([
+                $responseNext = Http::withHeaders([
                     'Authorization' => 'Bearer ' . config('services.openrouter.api_key'),
                     'Content-Type'  => 'application/json',
                 ])->timeout(120)->post(config('services.openrouter.url') . '/chat/completions', [
@@ -448,16 +469,30 @@ class MedicoController extends Controller
                     'max_tokens' => 2048,
                 ]);
 
-                if ($response2->failed()) {
-                    Log::error('OpenRouter follow-up API error', ['status' => $response2->status(), 'body' => $response2->body()]);
+                if ($responseNext->failed()) {
+                    Log::error('OpenRouter follow-up API error', ['status' => $responseNext->status(), 'body' => $responseNext->body()]);
                     return response()->json(['error' => 'Error al procesar la acción.'], 500);
                 }
 
-                $data2 = $response2->json();
-                $reply = $data2['choices'][0]['message']['content'] ?? 'Acción ejecutada.';
-            } else {
-                $reply = $choice['content'] ?? null;
-                if ($reply === null) {
+                $dataNext = $responseNext->json();
+                $choice = $dataNext['choices'][0]['message'] ?? null;
+                if ($choice === null) {
+                    return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
+                }
+
+                Log::info('MedicoChat OpenRouter response (round ' . $round . ')', [
+                    'has_tool_calls' => isset($choice['tool_calls']),
+                    'tool_count' => isset($choice['tool_calls']) ? count($choice['tool_calls']) : 0,
+                    'tool_names' => isset($choice['tool_calls']) ? array_map(fn($tc) => $tc['function']['name'], $choice['tool_calls']) : [],
+                    'content_preview' => substr($choice['content'] ?? '', 0, 200),
+                ]);
+            }
+
+            $reply = $choice['content'] ?? null;
+            if ($reply === null) {
+                if ($round > 0) {
+                    $reply = 'Acción ejecutada.';
+                } else {
                     Log::warning('OpenRouter unexpected response (no content)', ['body' => $response->body()]);
                     return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
                 }
@@ -478,7 +513,7 @@ class MedicoController extends Controller
 
     private function getToolsArray(): array
     {
-        return [
+        return array_merge([
             [
                 'type' => 'function',
                 'function' => [
@@ -579,20 +614,211 @@ class MedicoController extends Controller
                     ],
                 ],
             ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'listar_horarios',
+                    'description' => 'Lista todos los horarios del médico con día, hora inicio, hora fin y estado activo/inactivo.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'crear_horario',
+                    'description' => 'Crea un nuevo horario de trabajo. Día 0=Domingo, 1=Lunes, ..., 6=Sábado. hora_inicio y hora_fin en formato H:i (ej. 09:00, 17:30). hora_fin debe ser posterior a hora_inicio.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'dia_semana' => ['type' => 'integer', 'description' => 'Día de la semana: 0=Domingo, 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado'],
+                            'hora_inicio' => ['type' => 'string', 'description' => 'Hora de inicio en formato H:i (ej. 09:00)'],
+                            'hora_fin' => ['type' => 'string', 'description' => 'Hora de fin en formato H:i (ej. 17:00). Debe ser después de hora_inicio.'],
+                        ],
+                        'required' => ['dia_semana', 'hora_inicio', 'hora_fin'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'eliminar_horario',
+                    'description' => 'Elimina un horario por su ID. Pregunta confirmación antes de ejecutar.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'horario_id' => ['type' => 'integer', 'description' => 'ID del horario a eliminar'],
+                        ],
+                        'required' => ['horario_id'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'listar_bloqueos',
+                    'description' => 'Lista todos los bloqueos de disponibilidad del médico con fechas y motivo.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'crear_bloqueo',
+                    'description' => 'Crea un bloqueo de disponibilidad. El médico no estará disponible entre fecha_inicio y fecha_fin. Las fechas deben ser actuales o futuras.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'fecha_inicio' => ['type' => 'string', 'description' => 'Fecha de inicio en formato Y-m-d (ej. 2026-07-20)'],
+                            'fecha_fin' => ['type' => 'string', 'description' => 'Fecha de fin en formato Y-m-d (ej. 2026-07-25). Debe ser igual o posterior a fecha_inicio.'],
+                            'motivo' => ['type' => 'string', 'description' => 'Motivo del bloqueo (opcional)'],
+                        ],
+                        'required' => ['fecha_inicio', 'fecha_fin'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'eliminar_bloqueo',
+                    'description' => 'Elimina un bloqueo por su ID. Pregunta confirmación antes de ejecutar.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'bloqueo_id' => ['type' => 'integer', 'description' => 'ID del bloqueo a eliminar'],
+                        ],
+                        'required' => ['bloqueo_id'],
+                    ],
+                ],
+            ],
+        ], $this->getProfileToolsArray());
+    }
+
+    private function getProfileToolsArray(): array
+    {
+        return [
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'actualizar_perfil',
+                    'description' => 'Actualiza los datos de tu perfil. Campos: nombre, email, teléfono, dirección, fecha de nacimiento, especialidad (tipo_medico_id), cédula profesional, universidad, años de experiencia, descripción.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => ['type' => 'string', 'description' => 'Nombre completo'],
+                            'email' => ['type' => 'string', 'description' => 'Correo electrónico'],
+                            'telefono' => ['type' => 'string', 'description' => 'Teléfono de contacto'],
+                            'direccion' => ['type' => 'string', 'description' => 'Dirección'],
+                            'fecha_nacimiento' => ['type' => 'string', 'description' => 'Fecha de nacimiento en formato Y-m-d (ej. 1990-05-15)'],
+                            'tipo_medico_id' => ['type' => 'integer', 'description' => 'ID de especialidad (1=Medicina General, 2=Cardiología, 3=Pediatría, 4=Dermatología, 5=Ginecología, 6=Neurología, 7=Traumatología, 8=Oftalmología, 9=Otorrinolaringología, 10=Psiquiatría)'],
+                            'cedula_profesional' => ['type' => 'string', 'description' => 'Cédula profesional'],
+                            'universidad' => ['type' => 'string', 'description' => 'Universidad de egreso'],
+                            'experiencia_anios' => ['type' => 'integer', 'description' => 'Años de experiencia (0-100)'],
+                            'descripcion' => ['type' => 'string', 'description' => 'Descripción profesional'],
+                        ],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'actualizar_intervalo',
+                    'description' => 'Cambia el intervalo entre citas (minutos). Valores permitidos: 15, 20, 30, 45, 60, 90, 120.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'intervalo_minutos' => ['type' => 'integer', 'description' => 'Intervalo en minutos: 15, 20, 30, 45, 60, 90 o 120'],
+                        ],
+                        'required' => ['intervalo_minutos'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'listar_documentos',
+                    'description' => 'Lista todos los documentos profesionales subidos.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'eliminar_documento',
+                    'description' => 'Elimina un documento por su ID. Pregunta confirmación antes.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'documento_id' => ['type' => 'integer', 'description' => 'ID del documento a eliminar'],
+                        ],
+                        'required' => ['documento_id'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'ver_mi_perfil',
+                    'description' => 'Muestra tus datos de perfil: nombre, email, teléfono, especialidad, cédula, universidad, experiencia, descripción, estado activo/inactivo.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'ver_perfil_paciente',
+                    'description' => 'Muestra los datos de un paciente: información personal, alergias, enfermedades importantes y contactos de emergencia.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'paciente_id' => ['type' => 'integer', 'description' => 'ID del paciente'],
+                        ],
+                        'required' => ['paciente_id'],
+                    ],
+                ],
+            ],
         ];
     }
 
     private function executeChatTool(string $name, array $args, User $user): array
     {
         return match ($name) {
-            'confirmar_cita'   => $this->toolConfirmarCita((int)($args['cita_id'] ?? 0), $user),
-            'cancelar_cita'    => $this->toolCancelarCita((int)($args['cita_id'] ?? 0), $user, $args['comentario'] ?? ''),
-            'reprogramar_cita' => $this->toolReprogramarCita((int)($args['cita_id'] ?? 0), $args['nueva_fecha'] ?? '', $user),
+            'confirmar_cita'    => $this->toolConfirmarCita((int)($args['cita_id'] ?? 0), $user),
+            'cancelar_cita'     => $this->toolCancelarCita((int)($args['cita_id'] ?? 0), $user, $args['comentario'] ?? ''),
+            'reprogramar_cita'  => $this->toolReprogramarCita((int)($args['cita_id'] ?? 0), $args['nueva_fecha'] ?? '', $user),
             'marcar_no_asistio' => $this->toolMarcarNoAsistio((int)($args['cita_id'] ?? 0), $user),
-            'pasar_en_espera'  => $this->toolPasarEnEspera((int)($args['cita_id'] ?? 0), $user),
+            'pasar_en_espera'   => $this->toolPasarEnEspera((int)($args['cita_id'] ?? 0), $user),
             'pasar_en_consulta' => $this->toolPasarEnConsulta((int)($args['cita_id'] ?? 0), $user),
-            'finalizar_cita'   => $this->toolFinalizarCita((int)($args['cita_id'] ?? 0), $user),
-            default            => ['success' => false, 'error' => "Función desconocida: {$name}"],
+            'finalizar_cita'    => $this->toolFinalizarCita((int)($args['cita_id'] ?? 0), $user),
+            'listar_horarios'   => $this->toolListarHorarios($user),
+            'crear_horario'     => $this->toolCrearHorario((int)($args['dia_semana'] ?? 0), $args['hora_inicio'] ?? '', $args['hora_fin'] ?? '', $user),
+            'eliminar_horario'  => $this->toolEliminarHorario((int)($args['horario_id'] ?? 0), $user),
+            'listar_bloqueos'   => $this->toolListarBloqueos($user),
+            'crear_bloqueo'       => $this->toolCrearBloqueo($args['fecha_inicio'] ?? '', $args['fecha_fin'] ?? '', $args['motivo'] ?? '', $user),
+            'eliminar_bloqueo'    => $this->toolEliminarBloqueo((int)($args['bloqueo_id'] ?? 0), $user),
+            'actualizar_perfil'   => $this->toolActualizarPerfil($args, $user),
+            'actualizar_intervalo' => $this->toolActualizarIntervalo((int)($args['intervalo_minutos'] ?? 0), $user),
+            'listar_documentos'   => $this->toolListarDocumentos($user),
+            'eliminar_documento'  => $this->toolEliminarDocumento((int)($args['documento_id'] ?? 0), $user),
+            'ver_mi_perfil'       => $this->toolVerMiPerfil($user),
+            'ver_perfil_paciente' => $this->toolVerPerfilPaciente((int)($args['paciente_id'] ?? 0), $user),
+            default               => ['success' => false, 'error' => "Función desconocida: {$name}"],
         };
     }
 
@@ -702,6 +928,300 @@ class MedicoController extends Controller
         if (!$cita->fecha_hora->isToday()) return ['success' => false, 'error' => 'Solo puedes finalizar citas del día de hoy.'];
 
         return $this->aplicarTransicion($cita, 'finalizada', $user, 'Consulta finalizada.');
+    }
+
+    private function toolListarHorarios(User $user): array
+    {
+        $horarios = MedicoHorario::where('medico_id', $user->id)->orderBy('dia_semana')->orderBy('hora_inicio')->get();
+        if ($horarios->isEmpty()) return ['success' => true, 'message' => 'No tienes horarios registrados.', 'data' => []];
+
+        $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        $result = [];
+        foreach ($horarios as $h) {
+            $result[] = [
+                'id' => $h->id,
+                'dia' => $dias[$h->dia_semana] ?? "Día {$h->dia_semana}",
+                'dia_semana' => $h->dia_semana,
+                'hora_inicio' => substr($h->hora_inicio, 0, 5),
+                'hora_fin' => substr($h->hora_fin, 0, 5),
+                'activo' => $h->activo,
+            ];
+        }
+        return ['success' => true, 'message' => count($result) . ' horario(s) encontrado(s).', 'data' => $result];
+    }
+
+    private function toolCrearHorario(int $diaSemana, string $horaInicio, string $horaFin, User $user): array
+    {
+        if ($diaSemana < 0 || $diaSemana > 6) return ['success' => false, 'error' => 'Día inválido. Usa 0=Domingo a 6=Sábado.'];
+        if (!preg_match('/^\d{2}:\d{2}$/', $horaInicio) || !preg_match('/^\d{2}:\d{2}$/', $horaFin)) {
+            return ['success' => false, 'error' => 'Formato de hora inválido. Usa H:i (ej. 09:00).'];
+        }
+        if ($horaFin <= $horaInicio) return ['success' => false, 'error' => 'hora_fin debe ser posterior a hora_inicio.'];
+
+        try {
+            MedicoHorario::create([
+                'medico_id'   => $user->id,
+                'dia_semana'  => $diaSemana,
+                'hora_inicio' => $horaInicio,
+                'hora_fin'    => $horaFin,
+                'activo'      => true,
+            ]);
+
+            $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            $dia = $dias[$diaSemana] ?? "Día {$diaSemana}";
+            return ['success' => true, 'message' => "Horario creado: {$dia} de {$horaInicio} a {$horaFin}."];
+        } catch (\Exception $e) {
+            Log::error('Crear horario error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al crear el horario.'];
+        }
+    }
+
+    private function toolEliminarHorario(int $horarioId, User $user): array
+    {
+        $horario = MedicoHorario::find($horarioId);
+        if (!$horario) return ['success' => false, 'error' => "Horario #{$horarioId} no encontrado."];
+        if ($horario->medico_id !== $user->id) return ['success' => false, 'error' => 'Este horario no te pertenece.'];
+
+        $dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        $dia = $dias[$horario->dia_semana] ?? "Día {$horario->dia_semana}";
+        $info = "{$dia} de {$horario->hora_inicio} a {$horario->hora_fin}";
+
+        try {
+            $horario->delete();
+            return ['success' => true, 'message' => "Horario eliminado: {$info}."];
+        } catch (\Exception $e) {
+            Log::error('Eliminar horario error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al eliminar el horario.'];
+        }
+    }
+
+    private function toolListarBloqueos(User $user): array
+    {
+        $bloqueos = MedicoBloqueo::where('medico_id', $user->id)->orderBy('fecha_inicio')->get();
+        if ($bloqueos->isEmpty()) return ['success' => true, 'message' => 'No tienes bloqueos registrados.', 'data' => []];
+
+        $result = [];
+        foreach ($bloqueos as $b) {
+            $result[] = [
+                'id' => $b->id,
+                'fecha_inicio' => $b->fecha_inicio->format('Y-m-d'),
+                'fecha_fin' => $b->fecha_fin->format('Y-m-d'),
+                'motivo' => $b->motivo ?? 'Sin motivo',
+            ];
+        }
+        return ['success' => true, 'message' => count($result) . ' bloqueo(s) encontrado(s).', 'data' => $result];
+    }
+
+    private function toolCrearBloqueo(string $fechaInicio, string $fechaFin, string $motivo, User $user): array
+    {
+        try {
+            $inicio = \Carbon\Carbon::parse($fechaInicio);
+            $fin = \Carbon\Carbon::parse($fechaFin);
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => 'Formato de fecha inválido. Usa Y-m-d (ej. 2026-07-20).'];
+        }
+
+        if ($fin->lessThan($inicio)) return ['success' => false, 'error' => 'fecha_fin debe ser igual o posterior a fecha_inicio.'];
+        if ($inicio->lessThan(now()->startOfDay())) return ['success' => false, 'error' => 'El bloqueo debe comenzar en una fecha actual o futura.'];
+
+        try {
+            MedicoBloqueo::create([
+                'medico_id'    => $user->id,
+                'fecha_inicio' => $inicio->format('Y-m-d') . ' 00:00:00',
+                'fecha_fin'    => $fin->format('Y-m-d') . ' 23:59:59',
+                'motivo'       => $motivo ?: null,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => "Bloqueo creado del {$inicio->format('d/m/Y')} al {$fin->format('d/m/Y')}" . ($motivo ? ": {$motivo}" : '') . '.',
+            ];
+        } catch (\Exception $e) {
+            Log::error('Crear bloqueo error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al crear el bloqueo.'];
+        }
+    }
+
+    private function toolEliminarBloqueo(int $bloqueoId, User $user): array
+    {
+        $bloqueo = MedicoBloqueo::find($bloqueoId);
+        if (!$bloqueo) return ['success' => false, 'error' => "Bloqueo #{$bloqueoId} no encontrado."];
+        if ($bloqueo->medico_id !== $user->id) return ['success' => false, 'error' => 'Este bloqueo no te pertenece.'];
+
+        $info = "{$bloqueo->fecha_inicio->format('d/m/Y')} - {$bloqueo->fecha_fin->format('d/m/Y')}";
+
+        try {
+            $bloqueo->delete();
+            return ['success' => true, 'message' => "Bloqueo eliminado: {$info}."];
+        } catch (\Exception $e) {
+            Log::error('Eliminar bloqueo error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al eliminar el bloqueo.'];
+        }
+    }
+
+    private function toolActualizarPerfil(array $args, User $user): array
+    {
+        $allowed = ['name', 'email', 'telefono', 'direccion', 'fecha_nacimiento', 'tipo_medico_id', 'cedula_profesional', 'universidad', 'experiencia_anios', 'descripcion'];
+        $updateUser = [];
+        $updatePerfil = [];
+
+        if (isset($args['name'])) $updateUser['name'] = $args['name'];
+        if (isset($args['email'])) $updateUser['email'] = $args['email'];
+        if (isset($args['telefono'])) $updateUser['telefono'] = $args['telefono'];
+        if (isset($args['direccion'])) $updateUser['direccion'] = $args['direccion'];
+        if (isset($args['fecha_nacimiento'])) $updateUser['fecha_nacimiento'] = $args['fecha_nacimiento'];
+
+        if (isset($args['tipo_medico_id'])) $updatePerfil['tipo_medico_id'] = (int)$args['tipo_medico_id'];
+        if (isset($args['cedula_profesional'])) $updatePerfil['cedula_profesional'] = $args['cedula_profesional'];
+        if (isset($args['universidad'])) $updatePerfil['universidad'] = $args['universidad'];
+        if (isset($args['experiencia_anios'])) $updatePerfil['experiencia_anios'] = (int)$args['experiencia_anios'];
+        if (isset($args['descripcion'])) $updatePerfil['descripcion'] = $args['descripcion'];
+
+        if (empty($updateUser) && empty($updatePerfil)) {
+            return ['success' => false, 'error' => 'No se proporcionaron campos para actualizar.'];
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if (!empty($updateUser)) {
+                $user->update($updateUser);
+            }
+
+            $perfil = $user->medicoPerfil;
+            if ($perfil && !empty($updatePerfil)) {
+                $perfil->update($updatePerfil);
+            }
+
+            DB::commit();
+
+            $campos = array_merge(array_keys($updateUser), array_keys($updatePerfil));
+            return ['success' => true, 'message' => 'Perfil actualizado: ' . implode(', ', $campos) . '.'];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Actualizar perfil tool error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al actualizar el perfil.'];
+        }
+    }
+
+    private function toolActualizarIntervalo(int $intervaloMinutos, User $user): array
+    {
+        $permitidos = [15, 20, 30, 45, 60, 90, 120];
+        if (!in_array($intervaloMinutos, $permitidos)) {
+            return ['success' => false, 'error' => 'Intervalo inválido. Usa: 15, 20, 30, 45, 60, 90 o 120 minutos.'];
+        }
+
+        try {
+            $perfil = $user->medicoPerfil;
+            if (!$perfil) return ['success' => false, 'error' => 'No tienes un perfil de médico configurado.'];
+
+            $perfil->update(['intervalo_minutos' => $intervaloMinutos]);
+            return ['success' => true, 'message' => "Intervalo entre citas actualizado a {$intervaloMinutos} minutos."];
+        } catch (\Exception $e) {
+            Log::error('Actualizar intervalo tool error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al actualizar el intervalo.'];
+        }
+    }
+
+    private function toolListarDocumentos(User $user): array
+    {
+        $perfil = $user->medicoPerfil;
+        if (!$perfil || $perfil->documentos->isEmpty()) {
+            return ['success' => true, 'message' => 'No tienes documentos subidos.', 'data' => []];
+        }
+
+        $result = [];
+        foreach ($perfil->documentos as $doc) {
+            $result[] = [
+                'id' => $doc->id,
+                'nombre' => $doc->nombre ?? $doc->nombre_original,
+                'archivo' => $doc->nombre_original,
+                'tipo' => $doc->tipo_mime,
+                'tamano' => $doc->tamano,
+                'subido' => $doc->created_at->format('d/m/Y'),
+            ];
+        }
+        return ['success' => true, 'message' => count($result) . ' documento(s) encontrado(s).', 'data' => $result];
+    }
+
+    private function toolEliminarDocumento(int $documentoId, User $user): array
+    {
+        $doc = MedicoDocumento::find($documentoId);
+        if (!$doc) return ['success' => false, 'error' => "Documento #{$documentoId} no encontrado."];
+        if ($doc->medicoPerfil->user_id !== $user->id) return ['success' => false, 'error' => 'Este documento no te pertenece.'];
+
+        $nombre = $doc->nombre ?? $doc->nombre_original;
+
+        try {
+            Storage::disk('public')->delete($doc->ruta_archivo);
+            $doc->delete();
+            return ['success' => true, 'message' => "Documento '{$nombre}' eliminado."];
+        } catch (\Exception $e) {
+            Log::error('Eliminar documento tool error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al eliminar el documento.'];
+        }
+    }
+
+    private function toolVerMiPerfil(User $user): array
+    {
+        $perfil = $user->medicoPerfil;
+
+        $data = [
+            'nombre' => $user->name,
+            'email' => $user->email,
+            'telefono' => $user->telefono ?? 'No registrado',
+            'direccion' => $user->direccion ?? 'No registrada',
+            'fecha_nacimiento' => $user->fecha_nacimiento ? $user->fecha_nacimiento->format('d/m/Y') : 'No registrada',
+        ];
+
+        if ($perfil) {
+            $data['especialidad'] = optional($perfil->tipoMedico)->nombre_tipo_medico ?? 'No asignada';
+            $data['cedula_profesional'] = $perfil->cedula_profesional ?? 'No registrada';
+            $data['universidad'] = $perfil->universidad ?? 'No registrada';
+            $data['experiencia_anios'] = $perfil->experiencia_anios ?? 'No registrados';
+            $data['descripcion'] = $perfil->descripcion ?? 'No registrada';
+            $data['intervalo_minutos'] = $perfil->intervalo_minutos ?? 'No configurado';
+            $data['activo'] = $perfil->activo ? 'Sí' : 'No';
+            $data['documentos'] = $perfil->documentos->count();
+        }
+
+        return ['success' => true, 'message' => 'Datos del perfil:', 'data' => $data];
+    }
+
+    private function toolVerPerfilPaciente(int $pacienteId, User $user): array
+    {
+        $paciente = User::where('role', 'paciente')
+            ->with(['contactosEmergencia', 'alergias', 'enfermedadesImportantes'])
+            ->find($pacienteId);
+
+        if (!$paciente) return ['success' => false, 'error' => "Paciente #{$pacienteId} no encontrado."];
+
+        $data = [
+            'nombre' => $paciente->name,
+            'email' => $paciente->email,
+            'telefono' => $paciente->telefono ?? 'No registrado',
+            'direccion' => $paciente->direccion ?? 'No registrada',
+            'fecha_nacimiento' => $paciente->fecha_nacimiento ? $paciente->fecha_nacimiento->format('d/m/Y') : 'No registrada',
+        ];
+
+        if ($paciente->alergias->count()) {
+            $data['alergias'] = $paciente->alergias->pluck('nombre')->toArray();
+        }
+
+        if ($paciente->enfermedadesImportantes->count()) {
+            $data['enfermedades'] = $paciente->enfermedadesImportantes->pluck('nombre')->toArray();
+        }
+
+        if ($paciente->contactosEmergencia->count()) {
+            $data['contactos_emergencia'] = $paciente->contactosEmergencia->map(fn($c) => [
+                'nombre' => $c->nombre_completo,
+                'telefono' => $c->telefono,
+                'parentesco' => $c->parentesco,
+            ])->toArray();
+        }
+
+        return ['success' => true, 'message' => "Datos de {$paciente->name}:", 'data' => $data];
     }
 
     private function aplicarTransicion(CitaMedica $cita, string $nuevoEstado, User $user, string $comentario, array $extraData = []): array

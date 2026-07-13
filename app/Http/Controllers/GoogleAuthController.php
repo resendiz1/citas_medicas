@@ -27,7 +27,7 @@ class GoogleAuthController extends Controller
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
             return redirect()->route('login')->withErrors(['email' => 'Error al autenticar con Google.']);
         }
@@ -56,6 +56,6 @@ class GoogleAuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->to(route('dashboard'));
     }
 }

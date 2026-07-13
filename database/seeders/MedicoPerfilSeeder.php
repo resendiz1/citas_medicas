@@ -28,6 +28,7 @@ class MedicoPerfilSeeder extends Seeder
                 'experiencia_anios'  => 10,
                 'descripcion'        => 'Cardióloga especializada en ecocardiografía y prevención de enfermedades cardiovasculares.',
                 'activo'             => true,
+                'aprobado'           => true,
             ],
             [
                 'email'              => 'miguel.rios@citas.com',
@@ -37,6 +38,7 @@ class MedicoPerfilSeeder extends Seeder
                 'experiencia_anios'  => 8,
                 'descripcion'        => 'Pediatra apasionado por la salud infantil y el desarrollo temprano.',
                 'activo'             => true,
+                'aprobado'           => true,
             ],
             [
                 'email'              => 'sofia.vega@citas.com',
@@ -46,6 +48,7 @@ class MedicoPerfilSeeder extends Seeder
                 'experiencia_anios'  => 12,
                 'descripcion'        => 'Dermatóloga con experiencia en diagnósticos avanzados y tratamientos estéticos.',
                 'activo'             => true,
+                'aprobado'           => true,
             ],
             [
                 'email'              => 'luis.campos@citas.com',
@@ -71,6 +74,7 @@ class MedicoPerfilSeeder extends Seeder
                     'experiencia_anios'  => $p['experiencia_anios'],
                     'descripcion'        => $p['descripcion'],
                     'activo'             => $p['activo'],
+                    'aprobado'           => $p['aprobado'] ?? false,
                 ]
             );
         }

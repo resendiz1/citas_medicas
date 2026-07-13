@@ -22,6 +22,13 @@
     @endphp
     <link rel="stylesheet" href="/build/{{ $cssFile }}">
     <script src="/build/{{ $jsFile }}" defer></script>
+    <style>
+    .nav-icon-only .nav-text { display:inline-block; white-space:nowrap; max-width:0; opacity:0; overflow:hidden; vertical-align:middle; transition:max-width 0.25s ease, opacity 0.2s ease; }
+    .nav-icon-only .nav-link { display:flex; align-items:center; gap:2px; }
+    .nav-icon-only .nav-item:hover .nav-text { max-width:200px; opacity:1; }
+    .nav-icon-only .dropdown-toggle::after { display:none !important; }
+    .nav-icon-only .nav-text-caret { font-size:0.55rem; margin-left:1px; }
+    </style>
     @stack('head')
 </head>
 <body>
@@ -32,13 +39,13 @@
                 <i class="fas fa-bars fa-lg"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-icon-only">
                     @auth
-                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('dashboard') ? ' active' : '' }}" href="{{ route('dashboard') }}"><i class="fa fa-house me-1"></i>Inicio</a></li>
-                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('estadisticas.*') ? ' active' : '' }}" href="{{ route('estadisticas.index') }}"><i class="fa fa-chart-simple me-1"></i>Estadísticas</a></li>
+                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('dashboard') ? ' active' : '' }}" href="{{ route('dashboard') }}"><i class="fa fa-house"></i><span class="nav-text"> Inicio</span></a></li>
+                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('estadisticas.*') ? ' active' : '' }}" href="{{ route('estadisticas.index') }}"><i class="fa fa-chart-simple"></i><span class="nav-text"> Estadísticas</span></a></li>
                         @if (auth()->user()->esAdmin())
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle{{ request()->routeIs('admin.*') ? ' active' : '' }}" href="#" data-mdb-toggle="dropdown"><i class="fa fa-screwdriver-wrench me-1"></i>Gestión</a>
+                                <a class="nav-link dropdown-toggle{{ request()->routeIs('admin.*') ? ' active' : '' }}" href="#" data-mdb-toggle="dropdown"><i class="fa fa-screwdriver-wrench"></i><span class="nav-text"> Gestión<i class="fa fa-caret-down nav-text-caret"></i></span></a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item{{ request()->routeIs('admin.citas') ? ' active' : '' }}" href="{{ route('admin.citas') }}"><i class="fa fa-calendar me-1"></i>Citas</a></li>
                                     <li><a class="dropdown-item{{ request()->routeIs('admin.medicos*') ? ' active' : '' }}" href="{{ route('admin.medicos') }}"><i class="fa fa-user-doctor me-1"></i>Médicos</a></li>
@@ -47,10 +54,10 @@
                             </li>
                         @endif
                         @if (auth()->user()->esMedico())
-                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('medico.historial-citas') ? ' active' : '' }}" href="{{ route('medico.historial-citas') }}"><i class="fa fa-clock-rotate-left me-1"></i>Historial de citas</a></li>
-                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('medico.chat-ia*') ? ' active' : '' }}" href="{{ route('medico.chat-ia') }}"><i class="fa fa-robot me-1"></i>Asistente IA</a></li>
+                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('medico.historial-citas') ? ' active' : '' }}" href="{{ route('medico.historial-citas') }}"><i class="fa fa-clock-rotate-left"></i><span class="nav-text"> Historial de citas</span></a></li>
+                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('medico.chat-ia*') ? ' active' : '' }}" href="{{ route('medico.chat-ia') }}"><i class="fa fa-robot"></i><span class="nav-text"> Asistente IA</span></a></li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle{{ request()->routeIs('medico.horarios*') || request()->routeIs('medico.bloqueos*') ? ' active' : '' }}" href="#" data-mdb-toggle="dropdown"><i class="fa fa-calendar-days me-1"></i>Mi agenda</a>
+                                <a class="nav-link dropdown-toggle{{ request()->routeIs('medico.horarios*') || request()->routeIs('medico.bloqueos*') ? ' active' : '' }}" href="#" data-mdb-toggle="dropdown"><i class="fa fa-calendar-days"></i><span class="nav-text"> Mi agenda<i class="fa fa-caret-down nav-text-caret"></i></span></a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item{{ request()->routeIs('medico.horarios*') ? ' active' : '' }}" href="{{ route('medico.horarios') }}"><i class="fa fa-clock me-1"></i>Horarios</a></li>
                                     <li><a class="dropdown-item{{ request()->routeIs('medico.bloqueos*') ? ' active' : '' }}" href="{{ route('medico.bloqueos') }}"><i class="fa fa-ban me-1"></i>Bloqueos</a></li>
@@ -58,7 +65,7 @@
                             </li>
                         @endif
                         @if (auth()->user()->esMedico() || auth()->user()->esPaciente())
-                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('ayuda') ? ' active' : '' }}" href="{{ route('ayuda') }}"><i class="fa fa-headset me-1"></i>Ayuda</a></li>
+                            <li class="nav-item"><a class="nav-link{{ request()->routeIs('ayuda') ? ' active' : '' }}" href="{{ route('ayuda') }}"><i class="fa fa-headset"></i><span class="nav-text"> Ayuda</span></a></li>
                         @endif
                     @endauth
                 </ul>
@@ -69,9 +76,9 @@
                                 <span class="me-2">{{ auth()->user()->name }}</span>
                                 @switch(auth()->user()->role)
                                     @case('admin') <span class="badge border border-2 border-warning text-white bg-transparent px-3 py-2"><i class="fa fa-shield-halved me-1"></i>Admin</span> @break
+                                    @case('administrador') <span class="badge border border-2 border-warning text-white bg-transparent px-3 py-2"><i class="fa fa-shield me-1"></i>Admin</span> @break
                                     @case('medico') <span class="badge border border-2 border-success text-white bg-transparent px-3 py-2"><i class="fa fa-user-doctor me-1"></i>Médico</span> @break
                                     @case('paciente') <span class="badge border border-2 border-primary text-white bg-transparent px-3 py-2"><i class="fa fa-user me-1"></i>Paciente</span> @break
-                                    @case('recepcionista') <span class="badge border border-2 border-info text-white bg-transparent px-3 py-2"><i class="fa fa-phone me-1"></i>Recepcionista</span> @break
                                 @endswitch
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -142,6 +149,7 @@
             btn.setAttribute('title', el.textContent.trim());
         }
     });
+
     </script>
 </body>
 </html>

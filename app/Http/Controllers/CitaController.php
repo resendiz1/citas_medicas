@@ -235,15 +235,18 @@ class CitaController extends Controller
         ];
 
         if (!isset($transitions[$estadoActual]) || !in_array($nuevoEstado, $transitions[$estadoActual])) {
-            return redirect()->back()->with('error', 'Transición de estado no válida desde "' . $estadoActual . '" a "' . $nuevoEstado . '".');
+            $msg = 'Transición de estado no válida desde "' . $estadoActual . '" a "' . $nuevoEstado . '".';
+            return $request->wantsJson() ? response()->json(['error' => $msg], 422) : redirect()->back()->with('error', $msg);
         }
 
         if (in_array($nuevoEstado, ['confirmada', 'cancelada', 'reprogramada']) && $cita->fecha_hora->isPast()) {
-            return redirect()->back()->with('error', 'No puedes modificar una cita cuya fecha ya pasó.');
+            $msg = 'No puedes modificar una cita cuya fecha ya pasó.';
+            return $request->wantsJson() ? response()->json(['error' => $msg], 422) : redirect()->back()->with('error', $msg);
         }
 
         if (in_array($nuevoEstado, ['en_espera', 'en_consulta', 'no_asistio', 'finalizada']) && !$cita->fecha_hora->isToday()) {
-            return redirect()->back()->with('error', 'Solo puedes realizar esta acción en citas del día de hoy.');
+            $msg = 'Solo puedes realizar esta acción en citas del día de hoy.';
+            return $request->wantsJson() ? response()->json(['error' => $msg], 422) : redirect()->back()->with('error', $msg);
         }
 
         $updateData = ['estado' => $nuevoEstado];
@@ -254,7 +257,8 @@ class CitaController extends Controller
             ]);
             $fechaReprogramada = \Carbon\Carbon::parse($request->input('fecha_reprogramada'));
             if ($fechaReprogramada->lessThan(now()->subMinutes(2))) {
-                return redirect()->back()->with('error', 'La nueva fecha debe ser actual o futura.');
+                $msg = 'La nueva fecha debe ser actual o futura.';
+                return $request->wantsJson() ? response()->json(['error' => $msg], 422) : redirect()->back()->with('error', $msg);
             }
             $updateData['fecha_reprogramada'] = $request->input('fecha_reprogramada');
             $updateData['reprogramacion_rechazada'] = null;
@@ -310,6 +314,9 @@ class CitaController extends Controller
             report($e);
         }
 
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Estado de la cita actualizado correctamente.']);
+        }
         return redirect()->back()->with('success', 'Estado de la cita actualizado correctamente.');
     }
 

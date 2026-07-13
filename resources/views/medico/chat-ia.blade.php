@@ -16,12 +16,18 @@
         </div>
 
         <div class="p-4" style="border-top:1px solid rgba(18,102,241,0.1);background:#fff">
-            <form id="medico-chat-form" class="d-flex gap-3" autocomplete="off">
+            <form id="medico-chat-form" autocomplete="off">
                 @csrf
-                <input type="text" id="medico-chat-input" class="form-control" placeholder="Escribe tu pregunta aquí..." style="font-size:1.1rem;padding:0.75rem 1rem;border-radius:12px;border:2px solid #e0e0e0" autofocus>
-                <button type="submit" id="medico-chat-send" class="btn btn-primary" style="font-size:1.1rem;padding:0.75rem 2rem;border-radius:12px;white-space:nowrap">
-                    <i class="fa fa-paper-plane me-2"></i>Enviar
-                </button>
+                <div class="row g-2">
+                    <div class="col-12 col-md">
+                        <input type="text" id="medico-chat-input" class="form-control" placeholder="Escribe tu pregunta aquí..." style="font-size:1.1rem;padding:0.75rem 1rem;border-radius:12px;border:2px solid #e0e0e0" autofocus>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button type="submit" id="medico-chat-send" class="btn btn-primary w-100" style="font-size:1.1rem;padding:0.75rem 2rem;border-radius:12px;white-space:nowrap">
+                            <i class="fa fa-paper-plane me-2"></i>Enviar
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
