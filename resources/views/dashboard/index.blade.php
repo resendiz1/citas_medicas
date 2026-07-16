@@ -8,7 +8,8 @@
 
     <div class="row mb-4">
         <div class="col-12{{ $user->esMedico() || $user->esPaciente() ? ' col-lg-8' : '' }}">
-            <div class="card shadow-2 p-4 d-flex align-items-center gap-3 h-100">
+            <div class="card shadow-2 p-4 h-100">
+                <div class="d-flex align-items-center gap-3">
                 <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                      style="width:48px;height:48px;background:#1266f1;color:#121212;font-size:1.2rem;font-weight:bold;overflow:hidden">
                     @if ($user->foto_url)
@@ -31,6 +32,38 @@
                     </p>
                 </div>
             </div>
+            @if ($user->esPaciente())
+            <div class="mt-3 border-top pt-3">
+                <h6 class="fw-bold mb-2" style="color:var(--text-primary);font-size:0.85rem"><i class="fa fa-user-doctor me-1"></i>Médicos Disponibles</h6>
+                <div class="row g-2">
+                    @forelse ($medicos as $medico)
+                    <div class="col-12 col-md-4">
+                        <a href="{{ route('paciente.medicos.show', $medico->id) }}" class="text-decoration-none">
+                            <div class="card shadow-2 p-2 h-100 d-flex flex-row align-items-center gap-2" style="border-radius:12px;cursor:pointer;">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                     style="width:36px;height:36px;background:#1266f1;color:#121212;font-size:0.85rem;font-weight:bold;overflow:hidden">
+                                    @if ($medico->foto_url)
+                                        <img src="{{ Storage::url($medico->foto_url) }}" alt="Foto"
+                                             style="width:100%;height:100%;object-fit:cover;cursor:pointer"
+                                             onclick="window.open('{{ Storage::url($medico->foto_url) }}','_blank')">
+                                    @else
+                                        {{ strtoupper(substr($medico->name, 0, 1)) }}
+                                    @endif
+                                </div>
+                                <div class="min-w-0">
+                                    <h6 class="mb-0" style="font-size:0.78rem;color:var(--text-emphasis);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $medico->name }}</h6>
+                                    <small class="text-muted" style="font-size:0.65rem">{{ optional(optional($medico->medicoPerfil)->tipoMedico)->nombre_tipo_medico ?? 'General' }}</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    @empty
+                    <div class="col-12"><div class="d-flex flex-column align-items-center py-2"><i class="fa fa-user-doctor fa-lg text-muted opacity-50 mb-1"></i><p class="fw-bold text-muted mb-0" style="font-size:0.85rem">No hay médicos registrados.</p></div></div>
+                    @endforelse
+                </div>
+            </div>
+            @endif
+            </div>
         </div>
         @if ($user->esMedico() || $user->esPaciente())
         <div class="col-12 col-lg-4 mt-3 mt-lg-0">
@@ -51,7 +84,7 @@
     #role-calendar .fc-daygrid-event { font-size: 0.6rem !important; padding: 0 2px !important; margin: 0 !important; border-radius: 2px !important; }
     #role-calendar .fc-header-toolbar { margin-bottom: 0.4rem !important; }
     #role-calendar .fc-toolbar-title { font-size: 0.85rem !important; }
-    #role-calendar .fc-button { font-size: 0.7rem !important; padding: 0.15rem 0.4rem !important; }
+    #role-calendar .fc-button { font-size: 0.7rem !important; padding: 0.3rem 0.6rem !important; }
     #role-calendar .fc-col-header-cell-cushion { font-size: 0.65rem !important; padding: 2px 0 !important; }
     #role-calendar .fc-scrollgrid { border: none !important; }
     #role-calendar .fc-theme-standard td, #role-calendar .fc-theme-standard th { border-color: rgba(0,0,0,0.06) !important; }
@@ -169,36 +202,6 @@
         </div>
         @endif
     @else
-        @if ($user->esPaciente())
-        <div class="mb-4">
-            <h5 class="fw-bold mb-3" style="color:var(--text-primary)">Médicos Disponibles</h5>
-            <div class="row g-3">
-                @forelse ($medicos as $medico)
-                <div class="col-12 col-md-4 col-lg-3">
-                    <a href="{{ route('paciente.medicos.show', $medico->id) }}" class="text-decoration-none">
-                        <div class="card shadow-2 p-3 text-center h-100" style="border-radius:12px;cursor:pointer;">
-                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
-                                 style="width:56px;height:56px;background:#1266f1;color:#121212;font-size:1.4rem;font-weight:bold;overflow:hidden">
-                                @if ($medico->foto_url)
-                                    <img src="{{ Storage::url($medico->foto_url) }}" alt="Foto"
-                                         style="width:100%;height:100%;object-fit:cover;cursor:pointer"
-                                         onclick="window.open('{{ Storage::url($medico->foto_url) }}','_blank')">
-                                @else
-                                    {{ strtoupper(substr($medico->name, 0, 1)) }}
-                                @endif
-                            </div>
-                            <h6 class="mb-1" style="font-size:0.85rem;color:var(--text-emphasis)">{{ $medico->name }}</h6>
-                            <small class="text-muted">{{ optional(optional($medico->medicoPerfil)->tipoMedico)->nombre_tipo_medico ?? 'General' }}</small>
-                        </div>
-                    </a>
-                </div>
-                @empty
-                <div class="col-12"><div class="d-flex flex-column align-items-center py-4"><i class="fa fa-user-doctor fa-2x text-muted opacity-50 mb-2"></i><p class="fw-bold text-muted mb-0" style="font-size:1.1rem">No hay médicos registrados.</p></div></div>
-                @endforelse
-            </div>
-        </div>
-        @endif
-
         @if ($user->esMedico())
         @php $medPerfil = $user->medicoPerfil; @endphp
         @if (!$medPerfil || !$medPerfil->aprobado)

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Channels\WebPushChannel;
 use App\Models\CitaMedica;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -21,11 +20,7 @@ class CitaEstadoNotificacion extends Notification
 
     public function via(object $notifiable): array
     {
-        $channels = ['mail', 'database'];
-        if ($notifiable->esMedico()) {
-            $channels[] = WebPushChannel::class;
-        }
-        return $channels;
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -97,33 +92,10 @@ class CitaEstadoNotificacion extends Notification
             'cita_id' => $this->cita->id,
             'tipo' => $this->tipo,
             'message' => $message,
+            'estado' => $this->cita->estado,
             'paciente' => $this->cita->paciente->name ?? null,
             'medico' => $this->cita->medico->name ?? null,
             'fecha' => $this->cita->fecha_hora->format('d/m/Y H:i'),
-        ];
-    }
-
-    public function toWebPush(object $notifiable): array
-    {
-        $esMedico = $notifiable->esMedico();
-        $message = match ($this->tipo) {
-            'creada' => $esMedico
-                ? 'Nueva cita: ' . $this->cita->paciente->name . ' - ' . $this->cita->fecha_hora->format('d/m/Y H:i')
-                : 'Cita agendada con Dr/a. ' . $this->cita->medico->name . ' - ' . $this->cita->fecha_hora->format('d/m/Y H:i'),
-            'reprogramacion_confirmada' => $this->cita->paciente->name . ' confirmó la reprogramación - ' . $this->cita->fecha_hora->format('d/m/Y H:i'),
-            'reprogramacion_rechazada' => $this->cita->paciente->name . ' rechazó la reprogramación',
-            default => $esMedico
-                ? 'Cita de ' . $this->cita->paciente->name . ': ' . ($this->estadoAnterior ?? '—') . ' → ' . ($this->estadoNuevo ?? '—')
-                : 'Tu cita con Dr/a. ' . $this->cita->medico->name . ': ' . ($this->estadoAnterior ?? '—') . ' → ' . ($this->estadoNuevo ?? '—'),
-        };
-
-        return [
-            'title' => 'Citas Médicas',
-            'body'  => $message,
-            'data'  => [
-                'url'     => route('dashboard'),
-                'cita_id' => $this->cita->id,
-            ],
         ];
     }
 }

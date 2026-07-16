@@ -65,7 +65,7 @@ class DashboardController extends Controller
         if ($user->esMedico()) {
             $citas = CitaMedica::where('medico_id', $user->id)
                 ->with('paciente', 'ultimaReceta')
-                ->orderBy('fecha_hora')
+                ->latest('created_at')
                 ->get();
 
             return view('dashboard.index', compact('citas'));
@@ -76,7 +76,7 @@ class DashboardController extends Controller
             $citasPendientes = CitaMedica::where('estado', 'pendiente')->count();
             $citasHoy = CitaMedica::whereDate('fecha_hora', today())->count();
             $citas = CitaMedica::with('paciente', 'medico.medicoPerfil.tipoMedico')
-                ->orderBy('fecha_hora')
+                ->latest('created_at')
                 ->paginate(20);
 
             return view('dashboard.index', compact('totalCitas', 'citasPendientes', 'citasHoy', 'citas'));
@@ -84,7 +84,7 @@ class DashboardController extends Controller
 
         $citas = CitaMedica::where('paciente_id', $user->id)
             ->with('medico', 'ultimaReceta')
-            ->orderBy('fecha_hora')
+            ->latest('created_at')
             ->get();
 
         $medicos = User::where('role', 'medico')

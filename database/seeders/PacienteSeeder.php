@@ -48,6 +48,34 @@ class PacienteSeeder extends Seeder
                 'alergias' => [5 => 'leve'], 'enfermedades' => [1 => 'Diagnosticado en 2018, controlado con dieta', 2 => 'Diagnosticado en 2019, controlado con losartán'],
                 'contacto' => ['nombre_completo' => 'Laura Ramírez Morales', 'telefono' => '555-100-2005', 'email' => 'laura.ramirez@email.com', 'parentesco' => 'Hija'],
             ],
+            [
+                'name' => 'Carmen Flores García', 'email' => 'carmen.flores@email.com', 'password' => 'paciente123',
+                'fecha_nacimiento' => '1993-04-18', 'telefono' => '555-300-1006',
+                'direccion' => 'Calle Roble 345, Lomas Altas', 'observaciones' => null,
+                'alergias' => [], 'enfermedades' => [],
+                'contacto' => ['nombre_completo' => 'José Flores Martínez', 'telefono' => '555-100-2006', 'email' => 'jose.flores@email.com', 'parentesco' => 'Hermano'],
+            ],
+            [
+                'name' => 'Gabriel Torres Miranda', 'email' => 'gabriel.torres@email.com', 'password' => 'paciente123',
+                'fecha_nacimiento' => '1987-11-28', 'telefono' => '555-300-1007',
+                'direccion' => 'Av. Las Palmas 678, Del Valle', 'observaciones' => null,
+                'alergias' => [], 'enfermedades' => [],
+                'contacto' => ['nombre_completo' => 'Sofía Miranda Campos', 'telefono' => '555-100-2007', 'email' => 'sofia.miranda@email.com', 'parentesco' => 'Madre'],
+            ],
+            [
+                'name' => 'Laura Pineda Soto', 'email' => 'laura.pineda@email.com', 'password' => 'paciente123',
+                'fecha_nacimiento' => '1995-09-12', 'telefono' => '555-300-1008',
+                'direccion' => 'Calle Hiedra 901, Jardines del Sur', 'observaciones' => null,
+                'alergias' => [], 'enfermedades' => [],
+                'contacto' => ['nombre_completo' => 'Ricardo Pineda López', 'telefono' => '555-100-2008', 'email' => 'ricardo.pineda@email.com', 'parentesco' => 'Padre'],
+            ],
+            [
+                'name' => 'Fernando Medina Rivas', 'email' => 'fernando.medina@email.com', 'password' => 'paciente123',
+                'fecha_nacimiento' => '1972-03-05', 'telefono' => '555-300-1009',
+                'direccion' => 'Blvd. Central 234, Centro', 'observaciones' => null,
+                'alergias' => [], 'enfermedades' => [],
+                'contacto' => ['nombre_completo' => 'Diana Rivas Alarcón', 'telefono' => '555-100-2009', 'email' => 'diana.rivas@email.com', 'parentesco' => 'Esposa'],
+            ],
         ];
 
         foreach ($pacientes as $p) {
@@ -59,9 +87,13 @@ class PacienteSeeder extends Seeder
             $p['password'] = Hash::make($p['password']);
             $p['role'] = 'paciente';
 
-            $user = User::create($p);
+            $user = User::firstOrCreate(
+                ['email' => $p['email']],
+                $p
+            );
 
-            foreach ($alergias as $alergiaId => $gravedad) {
+            if ($user->wasRecentlyCreated) {
+                foreach ($alergias as $alergiaId => $gravedad) {
                 DB::table('user_alergias')->insert([
                     'user_id' => $user->id,
                     'alergia_id' => $alergiaId,

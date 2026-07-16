@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 
 #[Fillable([
     'name', 'email', 'password', 'role',
-    'fecha_nacimiento', 'telefono', 'direccion', 'observaciones', 'foto_url',
+    'fecha_nacimiento', 'telefono', 'direccion', 'observaciones', 'foto_url', 'created_by',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -89,6 +89,11 @@ class User extends Authenticatable
     public function esRecepcionista(): bool
     {
         return $this->role === 'recepcionista';
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function hasCompleteProfile(): bool

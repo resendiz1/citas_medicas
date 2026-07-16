@@ -9,7 +9,7 @@
         <div class="chat-panel-header text-white fw-bold">
             <div style="display:flex;align-items:center;gap:0.3rem;flex:1;min-width:0">
                 <span id="chat-unread-dot" class="d-none" style="width:8px;height:8px;border-radius:50%;background:#ff4444;flex-shrink:0"></span>
-                <select id="chat-cita-select" class="form-select form-select-sm" style="background:transparent;color:#fff;border:none;font-weight:700;font-size:0.8rem;max-width:220px;padding:0;cursor:pointer;flex:1;min-width:0">
+                <select id="chat-cita-select" class="form-select form-select-sm bg-transparent text-white border-0 fw-bold p-0" style="font-size:0.8rem;max-width:220px;cursor:pointer;flex:1;min-width:0">
                     <option value="">Cargando...</option>
                 </select>
                 <i class="fas fa-chevron-down" style="font-size:0.65rem;color:#fff;opacity:0.7;cursor:pointer;flex-shrink:0" onclick="var s=document.getElementById('chat-cita-select');s.showPicker?s.showPicker():s.focus()"></i>

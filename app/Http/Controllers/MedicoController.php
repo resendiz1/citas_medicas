@@ -11,12 +11,14 @@ use App\Models\MedicoHorario;
 use App\Models\Mensaje;
 use App\Models\TipoMedico;
 use App\Models\User;
+use App\Events\CitaCreada;
 use App\Events\CitaEstadoActualizado;
 use App\Events\MensajeEnviado;
 use App\Notifications\CitaEstadoNotificacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +41,287 @@ class MedicoController extends Controller
         }
 
         return view('medico.paciente-show', compact('paciente', 'citas'));
+    }
+
+    // ========== GESTIÓN DE PACIENTES ==========
+
+    public function pacientesIndex(Request $request)
+    {
+        $query = User::where('role', 'paciente')->where('created_by', Auth::id());
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $pacientes = $query->orderBy('name')->paginate(15);
+        return view('medico.pacientes.index', compact('pacientes'));
+    }
+
+    public function pacientesCreate()
+    {
+        return view('medico.pacientes.create');
+    }
+
+    public function pacientesStore(Request $request)
+    {
+        $data = $request->validate([
+            'name'                        => 'required|string|max:255',
+            'email'                       => 'required|email|unique:users,email',
+            'password'                    => 'required|string|min:8',
+            'fecha_nacimiento'             => 'nullable|date',
+            'telefono'                    => 'nullable|string|max:20',
+            'direccion'                   => 'nullable|string|max:500',
+            'observaciones'               => 'nullable|string|max:1000',
+        ]);
+
+        $data['password'] = Hash::make($data['password']);
+        $data['role'] = 'paciente';
+        $data['created_by'] = Auth::id();
+
+        User::create($data);
+
+        return redirect()->route('medico.pacientes.index')->with('success', 'Paciente creado correctamente.');
+    }
+
+    public function pacientesEdit($id)
+    {
+        $paciente = User::where('role', 'paciente')->where('created_by', Auth::id())->findOrFail($id);
+        return view('medico.pacientes.edit', compact('paciente'));
+    }
+
+    public function pacientesUpdate(Request $request, $id)
+    {
+        $paciente = User::where('role', 'paciente')->where('created_by', Auth::id())->findOrFail($id);
+
+        $data = $request->validate([
+            'name'                        => 'required|string|max:255',
+            'email'                       => 'required|email|unique:users,email,' . $id,
+            'password'                    => 'nullable|string|min:8',
+            'fecha_nacimiento'             => 'nullable|date',
+            'telefono'                    => 'nullable|string|max:20',
+            'direccion'                   => 'nullable|string|max:500',
+            'observaciones'               => 'nullable|string|max:1000',
+        ]);
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $paciente->update($data);
+
+        return redirect()->route('medico.pacientes.index')->with('success', 'Paciente actualizado correctamente.');
+    }
+
+    public function pacientesDestroy($id)
+    {
+        $paciente = User::where('role', 'paciente')->where('created_by', Auth::id())->findOrFail($id);
+        $paciente->delete();
+
+        return redirect()->route('medico.pacientes.index')->with('success', 'Paciente eliminado correctamente.');
+    }
+
+    // ========== AGENDAR CITA ==========
+
+    public function citaCreate(Request $request)
+    {
+        $medicoId = Auth::id();
+
+        $idsPacientesConCitas = CitaMedica::where('medico_id', $medicoId)
+            ->select('paciente_id')->distinct()->pluck('paciente_id');
+
+        $pacientes = User::where('role', 'paciente')
+            ->where(function ($q) use ($medicoId, $idsPacientesConCitas) {
+                $q->where('created_by', $medicoId)
+                  ->orWhereIn('id', $idsPacientesConCitas);
+            })
+            ->orderBy('name')->get();
+        $pacienteSeleccionado = $request->query('paciente_id');
+
+        $bloqueos = MedicoBloqueo::where('medico_id', $medicoId)->get();
+        $bloqueosPorMedico = [];
+        foreach ($bloqueos as $b) {
+            $bloqueosPorMedico[$medicoId][] = [
+                'from'   => $b->fecha_inicio->format('Y-m-d'),
+                'to'     => $b->fecha_fin->format('Y-m-d'),
+                'motivo' => $b->motivo,
+            ];
+        }
+
+        $horarios = MedicoHorario::where('medico_id', $medicoId)->where('activo', true)->get();
+        $horariosPorMedico = [];
+        foreach ($horarios as $h) {
+            $horariosPorMedico[$medicoId][] = [
+                'dia_semana'  => $h->dia_semana,
+                'hora_inicio' => substr($h->hora_inicio, 0, 5),
+                'hora_fin'    => substr($h->hora_fin, 0, 5),
+            ];
+        }
+
+        $perfil = Auth::user()->medicoPerfil;
+        $intervalo = $perfil ? $perfil->intervalo_minutos : 30;
+        $intervalosPorMedico = [$medicoId => $intervalo];
+
+        $citas = CitaMedica::where('medico_id', $medicoId)
+            ->whereIn('estado', ['pendiente', 'confirmada', 'en_espera', 'en_consulta'])
+            ->get();
+        $citasPorMedico = [];
+        foreach ($citas as $c) {
+            $citasPorMedico[$medicoId][] = $c->fecha_hora->format('Y-m-d H:i');
+        }
+
+        return view('medico.citas.create', compact(
+            'pacientes', 'bloqueosPorMedico', 'horariosPorMedico',
+            'citasPorMedico', 'pacienteSeleccionado', 'intervalosPorMedico', 'medicoId'
+        ));
+    }
+
+    public function citaStore(Request $request)
+    {
+        $data = $request->validate([
+            'paciente_id' => 'required|exists:users,id',
+            'fecha_hora'  => 'required|date',
+            'motivo'      => 'required|string|max:1000',
+        ]);
+
+        $medicoId = Auth::id();
+        $idsPacientesConCitas = CitaMedica::where('medico_id', $medicoId)
+            ->select('paciente_id')->distinct()->pluck('paciente_id');
+
+        $paciente = User::where('role', 'paciente')
+            ->where(function ($q) use ($medicoId, $idsPacientesConCitas) {
+                $q->where('created_by', $medicoId)
+                  ->orWhereIn('id', $idsPacientesConCitas);
+            })
+            ->find($data['paciente_id']);
+
+        if (!$paciente) {
+            return redirect()->back()->with('error', 'El paciente seleccionado no existe o no tienes relación con él.')->withInput();
+        }
+
+        $fecha = \Carbon\Carbon::parse($data['fecha_hora']);
+        if ($fecha->lessThan(now()->subMinutes(2))) {
+            return redirect()->back()->with('error', 'La fecha y hora deben ser actuales o futuras.')->withInput();
+        }
+
+        $data['medico_id'] = Auth::id();
+        $medico = Auth::user();
+
+        $diaSemana = $fecha->dayOfWeek;
+        $hora = $fecha->format('H:i');
+
+        $horarios = MedicoHorario::where('medico_id', $data['medico_id'])
+            ->where('dia_semana', $diaSemana)
+            ->where('activo', true)
+            ->get();
+
+        if ($horarios->isEmpty()) {
+            return redirect()->back()->with('error', 'No trabajas en la fecha seleccionada.')->withInput();
+        }
+
+        $enHorario = false;
+        foreach ($horarios as $horario) {
+            if ($hora >= substr($horario->hora_inicio, 0, 5) && $hora <= substr($horario->hora_fin, 0, 5)) {
+                $enHorario = true;
+                break;
+            }
+        }
+        if (!$enHorario) {
+            return redirect()->back()->with('error', 'La hora seleccionada está fuera de tu horario.')->withInput();
+        }
+
+        $intervalo = $medico->medicoPerfil->intervalo_minutos ?? 30;
+        $slotValido = false;
+        foreach ($horarios as $horario) {
+            $inicio = \Carbon\Carbon::parse($horario->hora_inicio);
+            $fin = \Carbon\Carbon::parse($horario->hora_fin);
+            while ($inicio->copy()->addMinutes($intervalo)->lte($fin)) {
+                if ($hora === $inicio->format('H:i')) {
+                    $slotValido = true;
+                    break 2;
+                }
+                $inicio->addMinutes($intervalo);
+            }
+        }
+        if (!$slotValido) {
+            return redirect()->back()->with('error', 'La hora no respeta el intervalo de ' . $intervalo . ' minutos.')->withInput();
+        }
+
+        $bloqueado = MedicoBloqueo::where('medico_id', $data['medico_id'])
+            ->where('fecha_inicio', '<=', $data['fecha_hora'])
+            ->where('fecha_fin', '>=', $data['fecha_hora'])
+            ->exists();
+        if ($bloqueado) {
+            return redirect()->back()->with('error', 'Tienes un bloqueo en la fecha seleccionada.')->withInput();
+        }
+
+        $conflicto = CitaMedica::where('medico_id', $data['medico_id'])
+            ->where('fecha_hora', $data['fecha_hora'])
+            ->whereIn('estado', ['pendiente', 'confirmada', 'en_espera', 'en_consulta'])
+            ->exists();
+        if ($conflicto) {
+            return redirect()->back()->with('error', 'Ya tienes una cita en ese horario.')->withInput();
+        }
+
+        $data['estado'] = 'pendiente';
+        $cita = CitaMedica::create($data);
+
+        CitaHistorial::create([
+            'cita_id'         => $cita->id,
+            'user_id'         => Auth::id(),
+            'estado_anterior' => null,
+            'estado_nuevo'    => 'pendiente',
+            'comentario'      => 'Cita creada por el médico.',
+        ]);
+
+        try {
+            broadcast(new CitaCreada($cita->medico_id, [
+                'cita_id'  => $cita->id,
+                'paciente' => $paciente->name,
+                'fecha'    => $cita->fecha_hora->format('d/m/Y H:i'),
+                'motivo'   => $cita->motivo,
+            ]))->toOthers();
+            broadcast(new CitaCreada($cita->paciente_id, [
+                'cita_id' => $cita->id,
+                'medico'  => $medico->name,
+                'fecha'   => $cita->fecha_hora->format('d/m/Y H:i'),
+                'motivo'  => $cita->motivo,
+            ]))->toOthers();
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        $mensaje = Mensaje::create([
+            'cita_id' => $cita->id,
+            'user_id' => Auth::id(),
+            'mensaje' => '🟢 El Dr. ' . $medico->name . ' ha agendado una cita para el ' . $cita->fecha_hora->format('d/m/Y H:i') . '. Motivo: ' . $cita->motivo,
+        ]);
+        broadcast(new MensajeEnviado(
+            [
+                'id'         => $mensaje->id,
+                'user_id'    => $mensaje->user_id,
+                'nombre'     => $medico->name,
+                'mensaje'    => $mensaje->mensaje,
+                'created_at' => $mensaje->created_at->format('d/m/Y H:i'),
+            ],
+            $cita->id
+        ))->toOthers();
+
+        try {
+            $cita->paciente->notify(new CitaEstadoNotificacion($cita, 'creada'));
+            if ($cita->medico) {
+                $cita->medico->notify(new CitaEstadoNotificacion($cita, 'creada'));
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()->route('dashboard')
+            ->with('success', 'Cita agendada correctamente. El paciente recibirá una notificación.');
     }
 
     public function documentosStore(Request $request)
@@ -140,7 +423,7 @@ class MedicoController extends Controller
 
         $citas = $user->citasComoMedico()
             ->with('paciente', 'consultaMedica', 'medico', 'ultimaReceta')
-            ->orderBy('fecha_hora', 'desc')
+            ->latest('created_at')
             ->paginate(15);
 
         return view('medico.historial-citas', compact('citas'));
@@ -207,7 +490,7 @@ class MedicoController extends Controller
         $context .= "- Horarios: listar_horarios, crear_horario, eliminar_horario\n";
         $context .= "- Bloqueos: listar_bloqueos, crear_bloqueo, eliminar_bloqueo\n";
         $context .= "- Perfil: ver_mi_perfil, actualizar_perfil, actualizar_intervalo, listar_documentos, eliminar_documento\n";
-        $context .= "- Pacientes: ver_perfil_paciente\n";
+        $context .= "- Pacientes: ver_perfil_paciente, listar_mis_pacientes, crear_paciente, editar_paciente, eliminar_paciente\n";
         $context .= "Para acciones destructivas (cancelar cita, no_asistio, eliminar horario, eliminar bloqueo, eliminar_documento), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta. ";
         $context .= "CRÍTICO: Siempre debes llamar a la herramienta real para ejecutar cualquier acción. NUNCA digas 'Listo, ya se actualizó' o 'Hecho' sin haber llamado a la herramienta correspondiente. ";
         $context .= "Si el usuario te pide actualizar su perfil, cambiar intervalo, crear horario/bloqueo, etc., DEBES llamar a la función tool. ";
@@ -283,10 +566,11 @@ class MedicoController extends Controller
                 'recetas.medicamentos',
                 'recetas.documentos',
             ])
-            ->orderBy('fecha_hora', 'desc')
+            ->latest('created_at')
             ->get();
 
         if ($citas->isEmpty()) {
+            $context .= "=== CITAS ===\nNo tienes citas registradas.\n\n";
             $context .= "=== CITAS ===\nNo tienes citas registradas.\n\n";
         } else {
             $context .= "=== CITAS (Total: {$citas->count()}) ===\n\n";
@@ -698,7 +982,7 @@ class MedicoController extends Controller
                     ],
                 ],
             ],
-        ], $this->getProfileToolsArray());
+        ], $this->getProfileToolsArray(), $this->getPatientToolsArray());
     }
 
     private function getProfileToolsArray(): array
@@ -796,6 +1080,79 @@ class MedicoController extends Controller
         ];
     }
 
+    private function getPatientToolsArray(): array
+    {
+        return [
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'crear_paciente',
+                    'description' => 'Registra un nuevo paciente en el sistema. Se requiere nombre, email y contraseña. Opcional: fecha de nacimiento, teléfono, dirección, observaciones.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => ['type' => 'string', 'description' => 'Nombre completo del paciente'],
+                            'email' => ['type' => 'string', 'description' => 'Correo electrónico (debe ser único)'],
+                            'password' => ['type' => 'string', 'description' => 'Contraseña (mínimo 8 caracteres)'],
+                            'fecha_nacimiento' => ['type' => 'string', 'description' => 'Fecha de nacimiento en formato Y-m-d (opcional)'],
+                            'telefono' => ['type' => 'string', 'description' => 'Teléfono (opcional)'],
+                            'direccion' => ['type' => 'string', 'description' => 'Dirección (opcional)'],
+                            'observaciones' => ['type' => 'string', 'description' => 'Observaciones médicas (opcional)'],
+                        ],
+                        'required' => ['name', 'email', 'password'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'listar_mis_pacientes',
+                    'description' => 'Lista todos los pacientes que has registrado como médico. Muestra nombre, email, teléfono y fecha de registro.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => (object)[],
+                        'required' => [],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'editar_paciente',
+                    'description' => 'Actualiza los datos de un paciente que registraste. No puedes editar pacientes registrados por otros médicos.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'paciente_id' => ['type' => 'integer', 'description' => 'ID del paciente a editar'],
+                            'name' => ['type' => 'string', 'description' => 'Nuevo nombre (opcional)'],
+                            'email' => ['type' => 'string', 'description' => 'Nuevo email (opcional)'],
+                            'password' => ['type' => 'string', 'description' => 'Nueva contraseña (opcional, mínimo 8 caracteres)'],
+                            'telefono' => ['type' => 'string', 'description' => 'Nuevo teléfono (opcional)'],
+                            'direccion' => ['type' => 'string', 'description' => 'Nueva dirección (opcional)'],
+                            'fecha_nacimiento' => ['type' => 'string', 'description' => 'Nueva fecha de nacimiento Y-m-d (opcional)'],
+                            'observaciones' => ['type' => 'string', 'description' => 'Nuevas observaciones (opcional)'],
+                        ],
+                        'required' => ['paciente_id'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'eliminar_paciente',
+                    'description' => 'Elimina permanentemente un paciente que registraste. Solo puedes eliminar pacientes que tú hayas creado. Pregunta confirmación antes de ejecutar.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'paciente_id' => ['type' => 'integer', 'description' => 'ID del paciente a eliminar'],
+                        ],
+                        'required' => ['paciente_id'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     private function executeChatTool(string $name, array $args, User $user): array
     {
         return match ($name) {
@@ -818,6 +1175,10 @@ class MedicoController extends Controller
             'eliminar_documento'  => $this->toolEliminarDocumento((int)($args['documento_id'] ?? 0), $user),
             'ver_mi_perfil'       => $this->toolVerMiPerfil($user),
             'ver_perfil_paciente' => $this->toolVerPerfilPaciente((int)($args['paciente_id'] ?? 0), $user),
+            'crear_paciente'      => $this->toolCrearPaciente($args, $user),
+            'listar_mis_pacientes' => $this->toolListarMisPacientes($user),
+            'editar_paciente'     => $this->toolEditarPaciente($args, $user),
+            'eliminar_paciente'   => $this->toolEliminarPaciente((int)($args['paciente_id'] ?? 0), $user),
             default               => ['success' => false, 'error' => "Función desconocida: {$name}"],
         };
     }
@@ -1187,6 +1548,111 @@ class MedicoController extends Controller
         }
 
         return ['success' => true, 'message' => 'Datos del perfil:', 'data' => $data];
+    }
+
+    private function toolCrearPaciente(array $args, User $user): array
+    {
+        $validator = validator($args, [
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|unique:users,email',
+            'password'         => 'required|string|min:8',
+            'fecha_nacimiento'  => 'nullable|date',
+            'telefono'         => 'nullable|string|max:20',
+            'direccion'        => 'nullable|string|max:500',
+            'observaciones'    => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return ['success' => false, 'error' => 'Datos inválidos: ' . implode(', ', $validator->errors()->all())];
+        }
+
+        $data = $validator->validated();
+        $data['password'] = Hash::make($data['password']);
+        $data['role'] = 'paciente';
+        $data['created_by'] = $user->id;
+
+        $paciente = User::create($data);
+
+        return ['success' => true, 'message' => "Paciente {$paciente->name} creado correctamente (ID: {$paciente->id})."];
+    }
+
+    private function toolListarMisPacientes(User $user): array
+    {
+        $pacientes = User::where('role', 'paciente')
+            ->where('created_by', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'name', 'email', 'telefono', 'created_at']);
+
+        if ($pacientes->isEmpty()) {
+            return ['success' => true, 'message' => 'No tienes pacientes registrados.', 'data' => []];
+        }
+
+        $data = $pacientes->map(fn($p) => [
+            'id'         => $p->id,
+            'nombre'     => $p->name,
+            'email'      => $p->email,
+            'telefono'   => $p->telefono ?? 'No registrado',
+            'registrado' => $p->created_at->format('d/m/Y'),
+        ])->toArray();
+
+        return ['success' => true, 'message' => count($data) . ' paciente(s) encontrado(s).', 'data' => $data];
+    }
+
+    private function toolEditarPaciente(array $args, User $user): array
+    {
+        $pacienteId = (int)($args['paciente_id'] ?? 0);
+        $paciente = User::where('role', 'paciente')->where('created_by', $user->id)->find($pacienteId);
+
+        if (!$paciente) {
+            return ['success' => false, 'error' => "Paciente #{$pacienteId} no encontrado o no fue registrado por ti."];
+        }
+
+        $rules = [
+            'name'             => 'nullable|string|max:255',
+            'email'            => 'nullable|email|unique:users,email,' . $paciente->id,
+            'password'         => 'nullable|string|min:8',
+            'fecha_nacimiento'  => 'nullable|date',
+            'telefono'         => 'nullable|string|max:20',
+            'direccion'        => 'nullable|string|max:500',
+            'observaciones'    => 'nullable|string|max:1000',
+        ];
+
+        $params = array_intersect_key($args, array_flip(['name', 'email', 'password', 'fecha_nacimiento', 'telefono', 'direccion', 'observaciones']));
+
+        $validator = validator($params, $rules);
+
+        if ($validator->fails()) {
+            return ['success' => false, 'error' => 'Datos inválidos: ' . implode(', ', $validator->errors()->all())];
+        }
+
+        $data = $validator->validated();
+        $data = array_filter($data, fn($v) => $v !== null && $v !== '');
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        if (empty($data)) {
+            return ['success' => false, 'error' => 'No se enviaron campos para actualizar.'];
+        }
+
+        $paciente->update($data);
+
+        return ['success' => true, 'message' => "Paciente {$paciente->name} actualizado correctamente."];
+    }
+
+    private function toolEliminarPaciente(int $pacienteId, User $user): array
+    {
+        $paciente = User::where('role', 'paciente')->where('created_by', $user->id)->find($pacienteId);
+
+        if (!$paciente) {
+            return ['success' => false, 'error' => "Paciente #{$pacienteId} no encontrado o no fue registrado por ti."];
+        }
+
+        $nombre = $paciente->name;
+        $paciente->delete();
+
+        return ['success' => true, 'message' => "Paciente {$nombre} eliminado correctamente."];
     }
 
     private function toolVerPerfilPaciente(int $pacienteId, User $user): array

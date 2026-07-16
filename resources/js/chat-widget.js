@@ -55,19 +55,19 @@ function abrirChat() {
     detenerPoll();
     chatCitaActual = null;
     var sel = document.getElementById('chat-cita-select');
-    sel.innerHTML = '<option value="">Cargando...</option>';
+    sel.innerHTML = '<option class="text-primary" value="">Cargando...</option>';
 
     fetch(chatCitasUrl)
         .then(function (r) { return r.json(); })
         .then(function (citas) {
             chatCitasList = citas;
             if (!citas.length) {
-                sel.innerHTML = '<option value="">Sin citas</option>';
+                sel.innerHTML = '<option class="text-primary" value="">Sin citas</option>';
                 document.getElementById('chat-mensajes').innerHTML = '<div class="text-center text-muted small p-3">Sin citas</div>';
                 return;
             }
             sel.innerHTML = citas.map(function (c) {
-                return '<option value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
+                return '<option class="text-primary" value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
             }).join('');
             if (chatCitaActual && citas.some(function (c) { return c.id === chatCitaActual; })) {
                 sel.value = chatCitaActual;
@@ -77,7 +77,7 @@ function abrirChat() {
             }
         })
         .catch(function () {
-            sel.innerHTML = '<option value="">Error</option>';
+            sel.innerHTML = '<option class="text-primary" value="">Error</option>';
             document.getElementById('chat-mensajes').innerHTML = '<div class="text-center text-muted small p-3">Error al cargar</div>';
         });
 }
@@ -161,7 +161,7 @@ function actualizarBadge() {
     var sel = document.getElementById('chat-cita-select');
     if (sel && chatCitasList.length) {
         sel.innerHTML = chatCitasList.map(function (c) {
-            return '<option value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
+            return '<option class="text-primary" value="' + c.id + '">' + (chatNoLeidos[c.id] ? '● ' : '') + escapeHtml(c['con quien']) + ' (' + c.fecha + ')</option>';
         }).join('');
         sel.value = chatCitaActual;
     }

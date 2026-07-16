@@ -20,27 +20,47 @@ class NotificacionController extends Controller
             return $payload;
         });
 
-        $notifications->each(function ($n) {
-            $tipo = $n->data['tipo'] ?? null;
-            if ($tipo !== 'mensaje') {
-                $n->markAsRead();
-            }
-        });
-
         return response()->json($data);
     }
 
-    public function marcarChatLeidas(Request $request)
+    public function dropdown(Request $request)
     {
-        $request->validate(['cita_id' => 'required|integer']);
         $user = $request->user();
+        $unreadCount = $user->unreadNotifications()->where('data->tipo', '!=', 'mensaje')->count();
+        $notifications = $user->notifications()->where('data->tipo', '!=', 'mensaje')->latest()->take(10)->get()->map(function ($n) {
+            return [
+                'id'       => $n->id,
+                'message'  => $n->data['message'] ?? 'Notificación',
+                'read_at'  => $n->read_at,
+                'time'     => $n->created_at->diffForHumans(),
+                'cita_id'  => $n->data['cita_id'] ?? null,
+                'estado'   => $n->data['estado'] ?? null,
+            ];
+        });
 
-        $user->unreadNotifications()
-            ->where('data->tipo', 'mensaje')
-            ->where('data->cita_id', $request->cita_id)
-            ->get()
-            ->each->markAsRead();
+        return response()->json([
+            'unread' => $unreadCount,
+            'items'  => $notifications,
+        ]);
+    }
 
+    public function markAsRead($id)
+    {
+        $notif = DatabaseNotification::findOrFail($id);
+        if ($notif->notifiable_id === auth()->id()) {
+            $notif->markAsRead();
+        }
         return response()->json(['ok' => true]);
+    }
+
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $notifications = $user->notifications()
+            ->where('data->tipo', '!=', 'mensaje')
+            ->latest()
+            ->simplePaginate(20);
+
+        return view('notificaciones.index', compact('notifications'));
     }
 }

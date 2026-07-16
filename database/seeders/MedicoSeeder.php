@@ -16,6 +16,10 @@ class MedicoSeeder extends Seeder
             ['name' => 'Dr. Miguel Ángel Ríos', 'email' => 'miguel.rios@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1003', 'fecha_nacimiento' => '1985-11-05'],
             ['name' => 'Dra. Sofía Vega Castillo', 'email' => 'sofia.vega@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1004', 'fecha_nacimiento' => '1982-02-18'],
             ['name' => 'Dr. Luis Fernando Campos', 'email' => 'luis.campos@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1005', 'fecha_nacimiento' => '1990-09-30'],
+            ['name' => 'Dr. Javier Ortiz Vega', 'email' => 'javier.ortiz@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1006', 'fecha_nacimiento' => '1983-06-14'],
+            ['name' => 'Dra. Carmen Reyes Luna', 'email' => 'carmen.reyes@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1007', 'fecha_nacimiento' => '1988-12-01'],
+            ['name' => 'Dr. Andrés Morales Peña', 'email' => 'andres.morales@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1008', 'fecha_nacimiento' => '1979-04-25'],
+            ['name' => 'Dra. Patricia Delgado Ruiz', 'email' => 'patricia.delgado@citas.com', 'password' => 'medico123', 'telefono' => '555-200-1009', 'fecha_nacimiento' => '1992-08-19'],
         ];
 
         foreach ($medicos as $m) {

@@ -5,7 +5,7 @@
 @section('content')
 <div class="container-fluid min-vh-100 px-0">
     <div class="row justify-content-center w-100">
-        <div class="col-10">
+        <div class="col-12 col-md-10">
             <div class="row g-0">
                 <div id="loginFormCol" class="col-12 col-lg-6 login-col d-flex align-items-center justify-content-center p-4 p-lg-5 bg-light" style="border-radius:12px 0 0 12px">
                     <div class="w-100" style="max-width:420px">
@@ -122,7 +122,7 @@
         </div>
     </div>
     <div class="row justify-content-center mt-3">
-        <div class="col-10">
+        <div class="col-12 col-md-10">
             <div class="text-center small text-muted py-3 px-2" style="border-top:1px solid rgba(0,0,0,0.06);">
                 <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
                     <span><i class="fa-brands fa-whatsapp me-1" style="color:#25d366"></i>238 150 1369</span>

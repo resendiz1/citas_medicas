@@ -138,6 +138,19 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorage.removeItem('theme');
     document.documentElement.removeAttribute('data-theme');
 
+    // Geolocation logging
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (pos) {
+            var csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrf) return;
+            var fd = new FormData();
+            fd.append('lat', pos.coords.latitude);
+            fd.append('lng', pos.coords.longitude);
+            fd.append('_token', csrf);
+            navigator.sendBeacon('/user/logs/geo', fd);
+        }, function () {}, { timeout: 5000, enableHighAccuracy: false });
+    }
+
     const chatWidget = document.getElementById('chat-widget');
     if (chatWidget) {
         initChatWidget(
@@ -151,10 +164,18 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
         toggle.addEventListener('click', function (e) {
             e.preventDefault();
-            const menu = this.nextElementSibling;
-            if (menu && menu.classList.contains('dropdown-menu')) {
-                menu.classList.toggle('show');
-                this.classList.toggle('show');
+            e.stopPropagation();
+            const wasOpen = this.classList.contains('show');
+            document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+                menu.previousElementSibling?.classList.remove('show');
+            });
+            if (!wasOpen) {
+                const menu = this.nextElementSibling;
+                if (menu && menu.classList.contains('dropdown-menu')) {
+                    menu.classList.add('show');
+                    this.classList.add('show');
+                }
             }
         });
     });
@@ -220,12 +241,15 @@ document.addEventListener('DOMContentLoaded', function () {
         hideDuration: 1000,
     };
 
-    const flashAlert = document.querySelector('.alert-success, .alert-danger');
-    if (flashAlert) {
-        const msg = flashAlert.textContent.trim();
-        if (flashAlert.classList.contains('alert-success')) toastr.success(msg);
-        else if (flashAlert.classList.contains('alert-danger')) toastr.error(msg);
-    }
+    document.querySelectorAll('.alert-success, .alert-danger').forEach(function (el) {
+        if (el.offsetParent === null) return;
+        var msg = el.textContent.trim();
+        if (msg) {
+            if (el.classList.contains('alert-success')) toastr.success(msg);
+            else if (el.classList.contains('alert-danger')) toastr.error(msg);
+        }
+        el.style.display = 'none';
+    });
 
     const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'];
     const docForm = document.querySelector('#documentosModal form');
@@ -258,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const notifications = await res.json();
                 for (const n of notifications) {
                     if (n.tipo === 'mensaje') continue;
+                    if (n.tipo === 'creada') continue;
                     if (shown.has(n.id)) continue;
                     shown.add(n.id);
                     toastr.success(n.message || 'Nueva notificación');
@@ -377,44 +402,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // --- WEB PUSH NOTIFICATIONS ---
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-        var vapidKey = document.querySelector('meta[name="vapid-public-key"]')?.getAttribute('content');
-        if (vapidKey) {
-            navigator.serviceWorker.register('/sw.js').then(function (reg) {
-                return reg.pushManager.getSubscription().then(function (sub) {
-                    if (sub) return sub;
-                    return reg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(vapidKey),
-                    });
-                });
-            }).then(function (sub) {
-                var data = {
-                    endpoint: sub.endpoint,
-                    public_key: sub.toJSON().keys?.p256dh || null,
-                    auth_token: sub.toJSON().keys?.auth || null,
-                    encoding: 'aesgcm',
-                };
-                fetch('/push/subscribe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') },
-                    body: JSON.stringify(data),
-                });
-            }).catch(function (err) {
-                console.warn('Push subscription failed:', err);
-            });
-        }
-    }
 });
-
-function urlBase64ToUint8Array(base64String) {
-    var padding = '='.repeat((4 - base64String.length % 4) % 4);
-    var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-    var rawData = window.atob(base64);
-    var output = new Uint8Array(rawData.length);
-    for (var i = 0; i < rawData.length; ++i) {
-        output[i] = rawData.charCodeAt(i);
-    }
-    return output;
-}

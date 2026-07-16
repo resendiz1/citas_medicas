@@ -14,7 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'role'    => \App\Http\Middleware\CheckRole::class,
+            'log.activity' => \App\Http\Middleware\LogUserActivity::class,
+        ]);
+        $middleware->web(append: [
+            \App\Http\Middleware\LogUserActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

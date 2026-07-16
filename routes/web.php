@@ -14,11 +14,14 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\EstadisticaController;
 use App\Http\Controllers\GoogleAuthController;
-use App\Http\Controllers\PushSubscriptionController;
+use App\Http\Controllers\BugReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::middleware('guest')->group(function () {
@@ -35,13 +38,17 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 Route::middleware('auth')->group(function () {
     Route::get('/ayuda', function () { return view('ayuda'); })->name('ayuda');
+    Route::get('/bug-report', [BugReportController::class, 'create'])->name('bug-report.create');
+    Route::post('/bug-report', [BugReportController::class, 'store'])->name('bug-report.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/citas/check', [DashboardController::class, 'checkNuevas'])->name('dashboard.citas.check');
 
     Route::get('/notificaciones/poll', [NotificacionController::class, 'poll'])->name('notificaciones.poll');
+    Route::get('/notificaciones/dropdown', [NotificacionController::class, 'dropdown'])->name('notificaciones.dropdown');
+    Route::post('/notificaciones/{id}/leida', [NotificacionController::class, 'markAsRead'])->name('notificaciones.leida');
+    Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificaciones.index');
     Route::post('/notificaciones/chat-leidas', [NotificacionController::class, 'marcarChatLeidas'])->name('notificaciones.chat-leidas');
-    Route::post('/push/subscribe', [PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
-    Route::post('/push/unsubscribe', [PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
+    Route::post('/user/logs/geo', [\App\Http\Controllers\UserLogController::class, 'storeGeo'])->name('user.logs.store');
 
     Route::middleware('role:paciente')->group(function () {
         Route::get('/paciente/perfil', [PacienteController::class, 'perfilShow'])->name('paciente.perfil');
@@ -56,6 +63,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/paciente/enfermedades', [PacienteController::class, 'enfermedadStore'])->name('paciente.enfermedades.store');
         Route::put('/paciente/enfermedades/{enfermedadImportante}', [PacienteController::class, 'enfermedadUpdate'])->name('paciente.enfermedades.update');
         Route::delete('/paciente/enfermedades/{enfermedadImportante}', [PacienteController::class, 'enfermedadDestroy'])->name('paciente.enfermedades.destroy');
+        Route::get('/paciente/chat-ia', [PacienteController::class, 'chatIAIndex'])->name('paciente.chat-ia.index');
         Route::get('/paciente/chat-ia/historial', [PacienteController::class, 'chatIAHistorial'])->name('paciente.chat-ia.historial');
         Route::post('/paciente/chat-ia', [PacienteController::class, 'chatIA'])->name('paciente.chat-ia');
         Route::get('/citas/crear', [CitaController::class, 'create'])->name('citas.create');
@@ -74,10 +82,19 @@ Route::middleware('auth')->group(function () {
 
             return view('paciente.medico-show', compact('medico'));
         })->name('paciente.medicos.show');
+
     });
 
     Route::middleware('role:medico')->group(function () {
+        Route::get('/medico/pacientes', [MedicoController::class, 'pacientesIndex'])->name('medico.pacientes.index');
+        Route::get('/medico/pacientes/crear', [MedicoController::class, 'pacientesCreate'])->name('medico.pacientes.create');
+        Route::post('/medico/pacientes', [MedicoController::class, 'pacientesStore'])->name('medico.pacientes.store');
+        Route::get('/medico/pacientes/{id}/editar', [MedicoController::class, 'pacientesEdit'])->name('medico.pacientes.edit');
+        Route::put('/medico/pacientes/{id}', [MedicoController::class, 'pacientesUpdate'])->name('medico.pacientes.update');
+        Route::delete('/medico/pacientes/{id}', [MedicoController::class, 'pacientesDestroy'])->name('medico.pacientes.destroy');
         Route::get('/medico/pacientes/{id}', [MedicoController::class, 'pacienteShow'])->name('medico.paciente.show');
+        Route::get('/medico/citas/crear', [MedicoController::class, 'citaCreate'])->name('medico.citas.create');
+        Route::post('/medico/citas', [MedicoController::class, 'citaStore'])->name('medico.citas.store');
         Route::get('/medico/perfil', [MedicoController::class, 'perfilShow'])->name('medico.perfil');
         Route::put('/medico/perfil', [MedicoController::class, 'perfilUpdate'])->name('medico.perfil.update');
         Route::post('/medico/toggle-activo', [MedicoController::class, 'toggleActivo'])->name('medico.toggle-activo');
@@ -99,6 +116,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/medico/chat-ia', [MedicoController::class, 'chatIASend'])->name('medico.chat-ia.send');
         Route::post('/medico/documentos', [MedicoController::class, 'documentosStore'])->name('medico.documentos.store');
         Route::delete('/medico/documentos/{id}', [MedicoController::class, 'documentosDestroy'])->name('medico.documentos.destroy');
+
     });
 
     Route::put('/citas/{cita}/estado', [CitaController::class, 'updateEstado'])->name('citas.estado');
@@ -147,6 +165,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/pacientes/{id}/editar', [AdminController::class, 'pacientesEdit'])->name('pacientes.edit');
         Route::put('/pacientes/{id}', [AdminController::class, 'pacientesUpdate'])->name('pacientes.update');
         Route::delete('/pacientes/{id}', [AdminController::class, 'pacientesDestroy'])->name('pacientes.destroy');
+        Route::get('/bug-reports', [AdminController::class, 'bugReports'])->name('bug-reports');
+        Route::post('/bug-reports/{id}/responder', [AdminController::class, 'bugReportResponder'])->name('bug-reports.responder');
+        Route::get('/logs', [AdminController::class, 'logs'])->name('logs');
         Route::post('/reset', [AdminController::class, 'reset'])->name('reset');
     });
 

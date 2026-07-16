@@ -137,15 +137,26 @@ class CitaController extends Controller
         $data['paciente_id'] = auth()->id();
         $data['estado'] = 'pendiente';
 
-        $cita = CitaMedica::create($data);
+        try {
+            $cita = CitaMedica::create($data);
+        } catch (\Throwable $e) {
+            \Log::error('CitaController@store: Error al crear cita: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al crear la cita.')->withInput();
+        }
 
-        CitaHistorial::create([
-            'cita_id'       => $cita->id,
-            'user_id'       => auth()->id(),
-            'estado_anterior' => null,
-            'estado_nuevo'  => 'pendiente',
-            'comentario'    => 'Cita creada por el paciente.',
-        ]);
+        try {
+            CitaHistorial::create([
+                'cita_id'       => $cita->id,
+                'user_id'       => auth()->id(),
+                'estado_anterior' => null,
+                'estado_nuevo'  => 'pendiente',
+                'comentario'    => 'Cita creada por el paciente.',
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('CitaController@store: Error al crear historial: ' . $e->getMessage());
+        }
+
+        \Log::info('CitaController@store: Cita creada exitosamente ID=' . $cita->id);
 
         try {
             broadcast(new CitaCreada($cita->medico_id, [
@@ -162,36 +173,35 @@ class CitaController extends Controller
                     'motivo'     => $cita->motivo,
                 ]))->toOthers();
             }
-        } catch (\Throwable $e) {
-            report($e);
-        }
 
-        $mensaje = Mensaje::create([
-            'cita_id' => $cita->id,
-            'user_id' => auth()->id(),
-            'mensaje' => '🟢 Se ha agendado una cita para el ' . $cita->fecha_hora->format('d/m/Y H:i') . '. Motivo: ' . $cita->motivo,
-        ]);
-        broadcast(new MensajeEnviado(
-            [
-                'id'         => $mensaje->id,
-                'user_id'    => $mensaje->user_id,
-                'nombre'     => auth()->user()->name,
-                'mensaje'    => $mensaje->mensaje,
-                'created_at' => $mensaje->created_at->format('d/m/Y H:i'),
-            ],
-            $cita->id
-        ))->toOthers();
+            $mensaje = Mensaje::create([
+                'cita_id' => $cita->id,
+                'user_id' => auth()->id(),
+                'mensaje' => '🟢 Se ha agendado una cita para el ' . $cita->fecha_hora->format('d/m/Y H:i') . '. Motivo: ' . $cita->motivo,
+            ]);
+            broadcast(new MensajeEnviado(
+                [
+                    'id'         => $mensaje->id,
+                    'user_id'    => $mensaje->user_id,
+                    'nombre'     => auth()->user()->name,
+                    'mensaje'    => $mensaje->mensaje,
+                    'created_at' => $mensaje->created_at->format('d/m/Y H:i'),
+                ],
+                $cita->id
+            ))->toOthers();
 
-        try {
             $cita->medico->notify(new CitaEstadoNotificacion($cita, 'creada'));
             if ($cita->paciente) {
                 $cita->paciente->notify(new CitaEstadoNotificacion($cita, 'creada'));
             }
         } catch (\Throwable $e) {
+            \Log::error('CitaController@store: Error en post-creation: ' . $e->getMessage());
             report($e);
         }
 
-        return redirect()->route('dashboard')->with('success', 'Cita creada correctamente. Se está esperando la confirmación del médico.');
+        \Log::info('CitaController@store: Redirigiendo a /dashboard');
+
+        return redirect()->to('/dashboard')->with('success', 'Cita creada correctamente. Se está esperando la confirmación del médico.');
     }
 
     public function updateEstado(Request $request, $id)

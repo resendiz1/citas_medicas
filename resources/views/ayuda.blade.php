@@ -43,7 +43,13 @@
             @if (auth()->user()->esAdmin())
             <a href="#manual-admin" class="p-3 text-decoration-none" style="background:rgba(228,161,27,0.08);border-radius:12px;border-left:4px solid #e4a11b">
                 <span class="fw-bold" style="color:#e4a11b"><i class="fa fa-shield-halved me-2"></i>Administrador</span>
-                <small class="d-block text-muted mt-1">Gestión de médicos, pacientes y citas</small>
+                <small class="d-block text-muted mt-1">Gestión de médicos, pacientes, citas, logs y reportes</small>
+            </a>
+            @endif
+            @if (auth()->user()->esRecepcionista())
+            <a href="#manual-recepcionista" class="p-3 text-decoration-none" style="background:rgba(111,66,193,0.08);border-radius:12px;border-left:4px solid #6f42c1">
+                <span class="fw-bold" style="color:#6f42c1"><i class="fa fa-headset me-2"></i>Recepcionista</span>
+                <small class="d-block text-muted mt-1">Gestión de citas, estadísticas, dashboard</small>
             </a>
             @endif
         </div>
@@ -87,6 +93,10 @@
                     <p class="small text-muted mb-0">Solo puedes cancelar citas en estado <strong>"Pendiente"</strong>. Desde el Dashboard, haz clic en <strong>"Cancelar"</strong> en la cita correspondiente. Las citas confirmadas o en proceso no pueden cancelarse por el paciente.</p>
                 </div>
                 <div class="mb-3">
+                    <h6 style="color:#3b71ca"><i class="fa fa-calendar-clock me-1"></i>Reprogramar una Cita</h6>
+                    <p class="small text-muted mb-0">Si el médico o administrador marca tu cita como <strong>"Reprogramada"</strong>, aparecerá un botón para <strong>confirmar</strong> o <strong>cancelar</strong> la reprogramación desde el Dashboard. Al confirmar, podrás seleccionar una nueva fecha y horario disponible.</p>
+                </div>
+                <div class="mb-3">
                     <h6 style="color:#3b71ca"><i class="fa fa-message me-1"></i>Chat con el Médico</h6>
                     <ol class="small text-muted mb-0" style="line-height:1.8">
                         <li>Desde cualquier página, haz clic en el <strong>botón flotante de chat</strong> (esquina inferior derecha).</li>
@@ -99,6 +109,22 @@
                 <div class="mb-3">
                     <h6 style="color:#3b71ca"><i class="fa fa-clock-rotate-left me-1"></i>Historial de Citas</h6>
                     <p class="small text-muted mb-0">En tu perfil de paciente, encontrarás la sección <strong>"Mis Citas"</strong> con todas tus citas ordenadas por fecha descendente. También puedes acceder desde <strong>"Mi Historial"</strong> en la página de perfil.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#3b71ca"><i class="fa fa-robot me-1"></i>Asistente Virtual IA</h6>
+                    <p class="small text-muted mb-0">Widget flotante en la esquina inferior derecha (ícono de robot).</p>
+                    <ol class="small text-muted mb-0" style="line-height:1.8">
+                        <li><strong>Medicamentos</strong> — pregunta sobre dosis, frecuencia, duración, vía de administración y horarios de tus medicamentos recetados.</li>
+                        <li><strong>Diagnósticos</strong> — consulta tus diagnósticos con código CIE-10, tipo y descripción.</li>
+                        <li><strong>Signos vitales</strong> — revisa tu presión arterial, temperatura, frecuencia cardíaca y peso registrados.</li>
+                        <li><strong>Recomendaciones médicas</strong> — el asistente conoce las recomendaciones y signos de alarma de tus consultas.</li>
+                        <li><strong>Cancelar citas</strong> — puedes pedirle que cancele una cita pendiente (siempre pide confirmación primero).</li>
+                        <li>El asistente usa TUS datos clínicos reales; si no sabe algo, te lo dirá. Sus respuestas son solo informativas y no reemplazan la consulta médica.</li>
+                    </ol>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#3b71ca"><i class="fa fa-bug me-1"></i>Reportar un Bug</h6>
+                    <p class="small text-muted mb-0">Si encuentras un error en el sistema, ve a <strong>"Soporte → Reportar bug"</strong> en el menú. Describe el problema y lo que esperabas que ocurriera. El administrador recibirá tu reporte y podrá dar seguimiento.</p>
                 </div>
                 <div class="mb-0">
                     <h6 style="color:#3b71ca"><i class="fa fa-user-pen me-1"></i>Completar tu Perfil</h6>
@@ -131,6 +157,25 @@
                         <li>En la sección <strong>"Mis Documentos"</strong>, sube tu cédula profesional y otros documentos (PDF o imágenes, máximo 20MB).</li>
                         <li>Haz clic en <strong>"Guardar cambios"</strong>.</li>
                         <li>Espera la <strong>aprobación del administrador</strong> para que los pacientes puedan ver tu perfil.</li>
+                    </ol>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#14a44d"><i class="fa fa-users me-1"></i>Gestionar Pacientes</h6>
+                    <ol class="small text-muted mb-0" style="line-height:1.8">
+                        <li>Ve a <strong>"Pacientes"</strong> en el menú superior.</li>
+                        <li>Aquí puedes <strong>crear</strong>, <strong>editar</strong>, <strong>eliminar</strong> y <strong>buscar</strong> pacientes.</li>
+                        <li>Haz clic en el nombre de un paciente para ver su <strong>perfil completo</strong> con datos personales, contacto de emergencia, alergias y enfermedades.</li>
+                        <li>Desde el perfil del paciente puedes <strong>agendar una cita</strong> directamente.</li>
+                    </ol>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#14a44d"><i class="fa fa-calendar-plus me-1"></i>Agendar Cita para un Paciente</h6>
+                    <ol class="small text-muted mb-0" style="line-height:1.8">
+                        <li>Ve a <strong>"Citas → Agendar cita"</strong> en el menú.</li>
+                        <li>Selecciona el <strong>paciente</strong> del menú desplegable.</li>
+                        <li>Elige una <strong>fecha</strong> y <strong>horario</strong> disponible.</li>
+                        <li>Escribe el <strong>motivo</strong> de la consulta.</li>
+                        <li>También puedes agendar desde el perfil del paciente.</li>
                     </ol>
                 </div>
                 <div class="mb-3">
@@ -189,8 +234,41 @@
                     <p class="small text-muted mb-0">Usa el botón flotante de chat (esquina inferior derecha) para comunicarte con tus pacientes. Selecciona la cita del paciente en el menú desplegable. También puedes abrir el chat directamente desde el botón <strong>"Chat"</strong> en la lista de citas de tu Dashboard.</p>
                 </div>
                 <div class="mb-3">
+                    <h6 style="color:#14a44d"><i class="fa fa-robot me-1"></i>Asistente IA</h6>
+                    <p class="small text-muted mb-0">Página completa en <strong>"Asistente IA"</strong> del menú superior. El asistente tiene acceso a TODOS tus datos y puede ejecutar acciones por ti.</p>
+                    <p class="small fw-bold mb-1 mt-2" style="color:#14a44d">Acciones que puede realizar:</p>
+                    <ul class="small text-muted mb-0" style="line-height:1.8">
+                        <li><strong>Citas</strong> — confirmar, cancelar, reprogramar, marcar como "No asistió", pasar a "En espera", "En consulta" y "Finalizar".</li>
+                        <li><strong>Horarios</strong> — listar, crear y eliminar horarios de atención.</li>
+                        <li><strong>Bloqueos</strong> — listar, crear y eliminar bloqueos de disponibilidad.</li>
+                        <li><strong>Perfil</strong> — ver y actualizar tus datos personales y profesionales, cambiar el intervalo de citas.</li>
+                        <li><strong>Documentos</strong> — listar y eliminar documentos profesionales subidos.</li>
+                        <li><strong>Pacientes</strong> — crear, editar, eliminar pacientes y ver perfiles completos (alergias, enfermedades, contactos).</li>
+                    </ul>
+                    <p class="small fw-bold mb-1 mt-2" style="color:#14a44d">Información a la que tiene acceso:</p>
+                    <ul class="small text-muted mb-0" style="line-height:1.8">
+                        <li>Datos de tus pacientes: alergias, enfermedades importantes, contactos de emergencia.</li>
+                        <li>Todas tus citas con diagnósticos (CIE-10), medicamentos, signos vitales, exploración física, síntomas y dolores.</li>
+                        <li>Recetas médicas con medicamentos, indicaciones y documentos adjuntos.</li>
+                        <li>Puede encadenar varias acciones en una sola conversación (hasta 5 pasos seguidos).</li>
+                        <li>Siempre pide confirmación antes de acciones destructivas (cancelar, eliminar, etc.).</li>
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#14a44d"><i class="fa fa-chart-simple me-1"></i>Estadísticas</h6>
+                    <p class="small text-muted mb-0">Ve a <strong>"Citas → Estadísticas"</strong> para ver gráficos detallados de tus citas, pacientes atendidos, consultas realizadas y más indicadores de tu práctica médica.</p>
+                </div>
+                <div class="mb-3">
                     <h6 style="color:#14a44d"><i class="fa fa-clock-rotate-left me-1"></i>Historial de Citas</h6>
-                    <p class="small text-muted mb-0">Ve a <strong>"Historial de citas"</strong> en el menú superior para ver todas tus citas pasadas con paginación.</p>
+                    <p class="small text-muted mb-0">Ve a <strong>"Citas → Historial de citas"</strong> para ver todas tus citas pasadas con paginación.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#14a44d"><i class="fa fa-bug me-1"></i>Reportar un Bug</h6>
+                    <p class="small text-muted mb-0">Si encuentras un error, ve a <strong>"Soporte → Reportar bug"</strong> en el menú y describe el problema.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#14a44d"><i class="fa fa-bell me-1"></i>Notificaciones</h6>
+                    <p class="small text-muted mb-0">Recibirás notificaciones en tiempo real (toast) cuando un paciente agende una cita o cuando cambie el estado. También puedes ver el historial completo en <strong>"Ver todas"</strong> desde el menú de notificaciones (campana).</p>
                 </div>
                 <div class="mb-0">
                     <h6 style="color:#14a44d"><i class="fa fa-arrows-rotate me-1"></i>Cambiar Estado de una Cita</h6>
@@ -239,11 +317,69 @@
                 </div>
                 <div class="mb-3">
                     <h6 style="color:#e4a11b"><i class="fa fa-chart-simple me-1"></i>Estadísticas</h6>
-                    <p class="small text-muted mb-0">Ve a <strong>"Estadísticas"</strong> en el menú para ver gráficos y reportes generales del sistema, incluyendo citas por médico, pacientes atendidos y más.</p>
+                    <p class="small text-muted mb-0">Ve a <strong>"Estadísticas"</strong> en el menú para ver gráficos y reportes generales del sistema, incluyendo citas por médico, pacientes atendidos y más. También puedes ver estadísticas detalladas por cada médico.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#e4a11b"><i class="fa fa-clipboard-list me-1"></i>Logs del Sistema</h6>
+                    <p class="small text-muted mb-0">Ve a <strong>"Gestión → Logs"</strong> para ver el registro de actividades del sistema, incluyendo inicios de sesión, cambios de estado, creación de usuarios y más.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#e4a11b"><i class="fa fa-bug me-1"></i>Reportes de Bug</h6>
+                    <p class="small text-muted mb-0">Ve a <strong>"Reportes"</strong> en el menú para ver los bugs reportados por médicos y pacientes. Puedes <strong>responder</strong> a cada reporte para dar seguimiento.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#e4a11b"><i class="fa fa-robot me-1"></i>IA Chat con Médicos</h6>
+                    <p class="small text-muted mb-0">Widget flotante en el <strong>detalle de cada médico</strong>. Conversación aislada por médico (cada uno tiene su propio hilo).</p>
+                    <p class="small fw-bold mb-1 mt-2" style="color:#e4a11b">Acciones que puede realizar sobre el médico:</p>
+                    <ul class="small text-muted mb-0" style="line-height:1.8">
+                        <li><strong>Citas</strong> — confirmar, cancelar, reprogramar, marcar no asistió, pasar a en espera, en consulta y finalizar.</li>
+                        <li><strong>Horarios</strong> — listar, crear y eliminar horarios del médico.</li>
+                        <li><strong>Bloqueos</strong> — listar, crear y eliminar bloqueos del médico.</li>
+                    </ul>
+                    <p class="small fw-bold mb-1 mt-2" style="color:#e4a11b">Información a la que tiene acceso:</p>
+                    <ul class="small text-muted mb-0" style="line-height:1.8">
+                        <li>Datos del médico (especialidad, cédula, email, teléfono).</li>
+                        <li>Todas las citas del médico con pacientes, diagnósticos (CIE-10), medicamentos y signos vitales.</li>
+                        <li>Recetas emitidas por el médico con medicamentos y dosis.</li>
+                        <li>Horarios y bloqueos del médico.</li>
+                        <li>Puede encadenar varias acciones en una sola conversación.</li>
+                    </ul>
                 </div>
                 <div class="mb-0">
                     <h6 style="color:#e4a11b"><i class="fa fa-trash-can me-1"></i>Restablecer Base de Datos</h6>
                     <p class="small text-muted mb-0">En el Dashboard, al final de las tarjetas de estadísticas, encontrarás el botón <strong>"Restablecer BD"</strong>. Esto eliminará todos los datos del sistema (médicos, pacientes, citas, etc.) y solo conservará tu cuenta de administrador. Los datos de referencia (especialidades, alergias, enfermedades) se restauran automáticamente. Usa esta opción con precaución.</p>
+                </div>
+            </div>
+        </details>
+        @endif
+
+        @if (auth()->user()->esRecepcionista())
+        {{-- RECEPCIONISTA --}}
+        <details class="mb-3" id="manual-recepcionista" style="border:1px solid rgba(111,66,193,0.2);border-radius:12px;overflow:hidden" open>
+            <summary class="p-3 fw-bold" style="background:rgba(111,66,193,0.06);color:#6f42c1;cursor:pointer">
+                <i class="fa fa-headset me-2"></i>Guía para Recepcionista
+            </summary>
+            <div class="p-3" style="background:#fff">
+                <div class="mb-3">
+                    <h6 style="color:#6f42c1"><i class="fa fa-chart-simple me-1"></i>Dashboard</h6>
+                    <p class="small text-muted mb-0">Al iniciar sesión verás el panel con <strong>estadísticas generales</strong>: total de citas, citas pendientes y citas de hoy. También verás una tabla con <strong>todas las citas del sistema</strong> ordenadas por fecha de creación.</p>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#6f42c1"><i class="fa fa-arrows-rotate me-1"></i>Gestión de Citas</h6>
+                    <ol class="small text-muted mb-0" style="line-height:1.8">
+                        <li>Desde el Dashboard, en la tabla de citas, usa el menú de <strong>acciones</strong> para cambiar el estado.</li>
+                        <li>Puedes realizar todas las transiciones: Pendiente → Confirmada → En espera → En consulta → Finalizada.</li>
+                        <li>También puedes <strong>cancelar</strong>, marcar como <strong>"No asistió"</strong> o <strong>"Reprogramada"</strong> desde los estados permitidos.</li>
+                        <li>Haz clic en <strong>"Ver detalles"</strong> para ver la información completa de cada cita.</li>
+                    </ol>
+                </div>
+                <div class="mb-3">
+                    <h6 style="color:#6f42c1"><i class="fa fa-bell me-1"></i>Notificaciones</h6>
+                    <p class="small text-muted mb-0">Recibirás notificaciones en tiempo real cuando se creen o modifiquen citas. Haz clic en la <strong>campana</strong> en la barra superior para ver las notificaciones recientes.</p>
+                </div>
+                <div class="mb-0">
+                    <h6 style="color:#6f42c1"><i class="fa fa-user me-1"></i>Ver Perfil de Paciente</h6>
+                    <p class="small text-muted mb-0">Desde el detalle de una cita, haz clic en el nombre del paciente para ver su información de contacto, alergias y enfermedades registradas.</p>
                 </div>
             </div>
         </details>

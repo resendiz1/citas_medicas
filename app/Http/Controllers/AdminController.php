@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BugReport;
 use App\Models\CitaHistorial;
 use App\Models\CitaMedica;
 use App\Models\ConsultaMedica;
@@ -11,9 +12,11 @@ use App\Models\Mensaje;
 use App\Models\RecetaDocumento;
 use App\Models\TipoMedico;
 use App\Models\User;
+use App\Models\UserLog;
 use App\Events\CitaEstadoActualizado;
 use App\Events\MensajeEnviado;
 use App\Events\MedicoAprobado;
+use App\Notifications\BugReportRespuestaNotificacion;
 use App\Notifications\CitaEstadoNotificacion;
 use App\Notifications\MedicoRegistroNotificacion;
 use Illuminate\Http\Request;
@@ -450,7 +453,7 @@ class AdminController extends Controller
             $query->where('estado', $estado);
         }
 
-        $citas = $query->orderBy('fecha_hora')->paginate(20);
+        $citas = $query->latest('created_at')->paginate(20);
         return view('admin.citas.index', compact('citas'));
     }
 
@@ -571,6 +574,49 @@ class AdminController extends Controller
         $paciente->delete();
 
         return redirect()->route('admin.pacientes')->with('success', 'Paciente eliminado correctamente.');
+    }
+
+    public function bugReports(Request $request)
+    {
+        $query = BugReport::with('user')->orderBy('created_at', 'desc');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('titulo', 'like', "%{$search}%")
+                  ->orWhere('descripcion', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($categoria = $request->input('categoria')) {
+            $query->where('categoria', $categoria);
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        $bugReports = $query->paginate(15);
+        return view('admin.bug-reports.index', compact('bugReports'));
+    }
+
+    public function bugReportResponder(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'respuesta' => 'required|string',
+            'status' => 'required|in:pendiente,en_revision,resuelto,rechazado',
+        ]);
+
+        $bugReport = BugReport::findOrFail($id);
+        $bugReport->update(['status' => $validated['status']]);
+
+        $bugReport->user->notify(new BugReportRespuestaNotificacion(
+            $bugReport,
+            $validated['respuesta'],
+            $validated['status']
+        ));
+
+        return redirect()->route('admin.bug-reports')->with('success', 'Respuesta enviada al usuario correctamente.');
     }
 
     public function reset()
@@ -1169,5 +1215,33 @@ class AdminController extends Controller
             Log::error('Admin tool transition error', ['error' => $e->getMessage()]);
             return ['success' => false, 'error' => 'Error al actualizar el estado de la cita.'];
         }
+    }
+
+    public function logs(Request $request)
+    {
+        $query = UserLog::with('user')->orderBy('created_at', 'desc');
+
+        if ($userId = $request->input('user_id')) {
+            $query->where('user_id', $userId);
+        }
+
+        if ($accion = $request->input('accion')) {
+            $query->where('accion', $accion);
+        }
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ip', 'like', "%{$search}%")
+                  ->orWhere('url', 'like', "%{$search}%")
+                  ->orWhere('so', 'like', "%{$search}%")
+                  ->orWhere('navegador', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        $users = User::whereIn('role', ['medico', 'paciente'])->orderBy('name')->get();
+        $logs = $query->simplePaginate(50);
+
+        return view('admin.logs.index', compact('logs', 'users'));
     }
 }
