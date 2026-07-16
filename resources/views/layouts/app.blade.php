@@ -46,13 +46,13 @@
                     @auth
                             <li class="nav-item"><a class="nav-link text-white{{ request()->routeIs('dashboard') ? ' active' : '' }}" href="{{ route('dashboard') }}"><i class="fa fa-house"></i><span class="text-white"> Inicio</span></a></li>
                             @if (auth()->user()->esMedico())
-                            <li class="nav-item"><a class="nav-link text-white{{ request()->routeIs('medico.chat-ia*') ? ' active' : '' }}" href="{{ route('medico.chat-ia') }}"><i class="fa fa-robot"></i><span class="text-white"> Asistente IA</span></a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('medico.chat-ia') }}"><span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm" style="font-size:0.85rem;font-weight:600"><i class="fa fa-robot me-1"></i> Asistente IA</span></a></li>
                             @endif
                             @if (!auth()->user()->esMedico())
                             <li class="nav-item"><a class="nav-link text-white{{ request()->routeIs('estadisticas.*') ? ' active' : '' }}" href="{{ route('estadisticas.index') }}"><i class="fa fa-chart-simple"></i><span class="text-white"> Estadísticas</span></a></li>
                             @endif
                             @if (auth()->user()->esPaciente())
-                            <li class="nav-item"><a class="nav-link text-white{{ request()->routeIs('paciente.chat-ia*') ? ' active' : '' }}" href="{{ route('paciente.chat-ia.index') }}"><i class="fa fa-robot"></i><span class="text-white"> Asistente IA</span></a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ route('paciente.chat-ia.index') }}"><span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm" style="font-size:0.85rem;font-weight:600"><i class="fa fa-robot me-1"></i> Asistente IA</span></a></li>
                             @endif
                         @if (auth()->user()->esAdmin())
                             <li class="nav-item dropdown">

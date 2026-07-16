@@ -190,7 +190,7 @@
         <div class="mt-4">
             <div class="card shadow-2 p-4">
                 <div class="d-flex align-items-center gap-3">
-                    <form action="{{ route('admin.reset') }}" method="POST" onsubmit="return confirm('¿Estás seguro de restablecer la base de datos?\n\nSe eliminarán TODOS los pacientes, médicos, citas, recetas, consultas y mensajes. Solo se conservará tu cuenta de administrador.\n\nEsta acción no se puede deshacer.')">
+                    <form action="{{ route('admin.reset') }}" method="POST" onsubmit="return confirm('¿Estás seguro de restablecer la base de datos?\n\nSe eliminarán TODAS las citas, recetas, consultas, horarios, bloqueos y mensajes. Los usuarios (admin, médicos y pacientes) se conservarán.\n\nEsta acción no se puede deshacer.')">
                         @csrf
                         <button type="submit" class="btn btn-outline-danger">
                             <i class="fa fa-trash-can me-1"></i><span class="btn-text">Restablecer BD</span>

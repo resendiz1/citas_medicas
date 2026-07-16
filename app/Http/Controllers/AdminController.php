@@ -642,17 +642,14 @@ class AdminController extends Controller
         DB::table('user_alergias')->delete();
         DB::table('user_enfermedades_importantes')->delete();
         DB::table('contactos_emergencia')->delete();
-        DB::table('alergias')->delete();
-        DB::table('enfermedades_importantes')->delete();
         DB::table('notifications')->delete();
         DB::table('push_subscriptions')->delete();
-        User::where('role', '!=', 'admin')->delete();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         $this->seedReferenceData();
 
-        return redirect()->route('dashboard')->with('success', 'Base de datos restablecida. Solo se conservó el usuario administrador.');
+        return redirect()->route('dashboard')->with('success', 'Base de datos restablecida. Se conservaron todos los usuarios (admin, médicos y pacientes).');
     }
 
     private function seedReferenceData(): void
