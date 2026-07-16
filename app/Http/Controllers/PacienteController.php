@@ -426,6 +426,14 @@ class PacienteController extends Controller
                 return response()->json(['error' => 'Respuesta inesperada del asistente. Intenta de nuevo.'], 500);
             }
 
+            if (!isset($choice['tool_calls'])) {
+                $parsed = $this->parsePatientToolCallsFromContent($choice['content'] ?? '');
+                if (!empty($parsed)) {
+                    $choice['tool_calls'] = $parsed;
+                    $choice['content'] = trim(preg_replace('/<[^>]+>/', '', $choice['content'] ?? ''));
+                }
+            }
+
             $maxRounds = 5;
             $round = 0;
 
@@ -469,6 +477,14 @@ class PacienteController extends Controller
                     Log::warning('OpenRouter unexpected follow-up response', ['body' => $responseNext->body()]);
                     return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
                 }
+
+                if (!isset($choice['tool_calls'])) {
+                    $parsed = $this->parsePatientToolCallsFromContent($choice['content'] ?? '');
+                    if (!empty($parsed)) {
+                        $choice['tool_calls'] = $parsed;
+                        $choice['content'] = trim(preg_replace('/<[^>]+>/', '', $choice['content'] ?? ''));
+                    }
+                }
             }
 
             $reply = $choice['content'] ?? null;
@@ -491,6 +507,55 @@ class PacienteController extends Controller
             Log::error('OpenRouter exception: ' . $e->getMessage());
             return response()->json(['error' => 'Error de conexión con el asistente.'], 500);
         }
+    }
+
+    private function parsePatientToolCallsFromContent(string $content): array
+    {
+        $toolCalls = [];
+
+        preg_match_all('/<tool_call(?::\w+)?>\s*(\w+)/', $content, $nameMatches);
+        if (empty($nameMatches[1])) {
+            preg_match_all('/<tool_call>\s*(\{[^}]+\})\s*<\/tool_call>/s', $content, $jsonMatches);
+            if (!empty($jsonMatches[1])) {
+                foreach ($jsonMatches[1] as $json) {
+                    $parsed = json_decode($json, true);
+                    if ($parsed && isset($parsed['name'])) {
+                        $toolCalls[] = [
+                            'id' => 'call_' . uniqid(),
+                            'type' => 'function',
+                            'function' => [
+                                'name' => $parsed['name'],
+                                'arguments' => json_encode($parsed['arguments'] ?? []),
+                            ],
+                        ];
+                    }
+                }
+            }
+            return $toolCalls;
+        }
+
+        foreach ($nameMatches[1] as $funcName) {
+            $funcName = trim($funcName);
+            if (empty($funcName)) continue;
+
+            $args = [];
+            if (preg_match_all('/<arg_key(?::\w+)?>\s*(\w+)\s*\n\s*([^\n<]+)/', $content, $argMatches)) {
+                foreach ($argMatches[1] as $j => $key) {
+                    $args[trim($key)] = trim($argMatches[2][$j] ?? '');
+                }
+            }
+
+            $toolCalls[] = [
+                'id' => 'call_' . uniqid(),
+                'type' => 'function',
+                'function' => [
+                    'name' => $funcName,
+                    'arguments' => json_encode($args),
+                ],
+            ];
+        }
+
+        return $toolCalls;
     }
 
     private function getPatientToolsArray(): array

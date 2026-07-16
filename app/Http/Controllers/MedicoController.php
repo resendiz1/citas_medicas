@@ -730,6 +730,14 @@ class MedicoController extends Controller
                 return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
             }
 
+            if (!isset($choice['tool_calls'])) {
+                $parsed = $this->parseToolCallsFromContent($choice['content'] ?? '');
+                if (!empty($parsed)) {
+                    $choice['tool_calls'] = $parsed;
+                    $choice['content'] = trim(preg_replace('/<[^>]+>/', '', $choice['content'] ?? ''));
+                }
+            }
+
             $maxRounds = 5;
             $round = 0;
 
@@ -772,6 +780,14 @@ class MedicoController extends Controller
                     return response()->json(['error' => 'Respuesta inesperada del asistente.'], 500);
                 }
 
+                if (!isset($choice['tool_calls'])) {
+                    $parsed = $this->parseToolCallsFromContent($choice['content'] ?? '');
+                    if (!empty($parsed)) {
+                        $choice['tool_calls'] = $parsed;
+                        $choice['content'] = trim(preg_replace('/<[^>]+>/', '', $choice['content'] ?? ''));
+                    }
+                }
+
                 Log::info('MedicoChat OpenRouter response (round ' . $round . ')', [
                     'has_tool_calls' => isset($choice['tool_calls']),
                     'tool_count' => isset($choice['tool_calls']) ? count($choice['tool_calls']) : 0,
@@ -790,6 +806,9 @@ class MedicoController extends Controller
                 }
             }
 
+            $reply = preg_replace('/<[^>]+>/', '', $reply ?? '');
+            $reply = trim(preg_replace('/\n{3,}/', "\n\n", $reply));
+
             IaChatMensaje::create([
                 'user_id' => $user->id,
                 'role'    => 'assistant',
@@ -801,6 +820,55 @@ class MedicoController extends Controller
             Log::error('OpenRouter exception: ' . $e->getMessage());
             return response()->json(['error' => 'Error de conexión con el asistente.'], 500);
         }
+    }
+
+    private function parseToolCallsFromContent(string $content): array
+    {
+        $toolCalls = [];
+
+        preg_match_all('/<tool_call(?::\w+)?>\s*(\w+)/', $content, $nameMatches);
+        if (empty($nameMatches[1])) {
+            preg_match_all('/<tool_call>\s*(\{[^}]+\})\s*<\/tool_call>/s', $content, $jsonMatches);
+            if (!empty($jsonMatches[1])) {
+                foreach ($jsonMatches[1] as $json) {
+                    $parsed = json_decode($json, true);
+                    if ($parsed && isset($parsed['name'])) {
+                        $toolCalls[] = [
+                            'id' => 'call_' . uniqid(),
+                            'type' => 'function',
+                            'function' => [
+                                'name' => $parsed['name'],
+                                'arguments' => json_encode($parsed['arguments'] ?? []),
+                            ],
+                        ];
+                    }
+                }
+            }
+            return $toolCalls;
+        }
+
+        foreach ($nameMatches[1] as $i => $funcName) {
+            $funcName = trim($funcName);
+            if (empty($funcName)) continue;
+
+            $args = [];
+            if (preg_match_all('/<arg_key(?::\w+)?>\s*(\w+)\s*\n\s*([^\n<]+)/', $content, $argMatches)) {
+                foreach ($argMatches[1] as $j => $key) {
+                    $args[trim($key)] = trim($argMatches[2][$j] ?? '');
+                }
+            }
+
+            $toolCalls[] = [
+                'id' => 'call_' . uniqid(),
+                'type' => 'function',
+                'function' => [
+                    'name' => $funcName,
+                    'arguments' => json_encode($args),
+                ],
+            ];
+        }
+
+        return $toolCalls;
     }
 
     private function getToolsArray(): array
