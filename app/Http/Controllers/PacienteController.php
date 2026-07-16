@@ -300,6 +300,14 @@ class PacienteController extends Controller
         $context .= "- actualizar_perfil: Actualiza tus datos personales (nombre, email, teléfono, etc.)\n";
         $context .= "- listar_consultas: Lista todas tus consultas médicas\n";
         $context .= "- ver_detalle_consulta: Ver el detalle completo de una consulta (diagnósticos, medicamentos, signos vitales)\n";
+        $context .= "REGLAS ESTRICTAS: Antes de EJECUTAR cualquier acción, SIEMPRE consulta los datos reales primero:\n";
+        $context .= "- Para crear cita: llama a ver_horarios_medico y ver_perfil_medico para confirmar el médico y horarios antes de crear.\n";
+        $context .= "- Para cancelar cita: llama a listar_consultas o ver_detalle_consulta para confirmar ID y estado actual de la cita.\n";
+        $context .= "- Para editar perfil: llama primero a la herramienta para ver los datos actuales.\n";
+        $context .= "NUNCA afirmes que algo se creó, canceló o cambió si no hubo una respuesta exitosa real de la herramienta. ";
+        $context .= "Si la herramienta devuelve error, dilo tal cual al usuario y sugiere reintentar.\n";
+        $context .= "SIEMPRE que el usuario pida 'ver', 'listar', 'mostrar', 'cuales son', 'dame' o similar, USA la herramienta correspondiente.";
+        $context .= "No digas 'Listo' o 'Hecho' sin haber ejecutado realmente la herramienta y recibido éxito.\n";
         $context .= "Para acciones destructivas (cancelar_cita), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta.\n";
         $context .= "CRÍTICO: Cuando necesites ejecutar una acción, DEBES usar la herramienta(function calling) del sistema. NUNCA escribas etiquetas como <tool_call>, <tool_calls>, <arg_key>, ni nada similar en tu respuesta de texto. ";
         $context .= "Si necesitas llamar una herramienta, hazlo ÚNICAMENTE a través del mecanismo de function call del API, nunca como texto. ";

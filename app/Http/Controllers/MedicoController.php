@@ -491,6 +491,14 @@ class MedicoController extends Controller
         $context .= "- Bloqueos: listar_bloqueos, crear_bloqueo, eliminar_bloqueo\n";
         $context .= "- Perfil: ver_mi_perfil, actualizar_perfil, actualizar_intervalo, listar_documentos, eliminar_documento\n";
         $context .= "- Pacientes: ver_perfil_paciente, listar_mis_pacientes, crear_paciente, editar_paciente, eliminar_paciente\n";
+        $context .= "REGLAS ESTRICTAS: Antes de EJECUTAR cualquier acción, SIEMPRE consulta los datos reales primero:\n";
+        $context .= "- Para horarios: llama a listar_horarios antes de eliminar o crear, para ver los IDs y tramos reales.\n";
+        $context .= "- Para bloqueos: llama a listar_bloqueos antes de crear o eliminar.\n";
+        $context .= "- Para pacientes: llama a listar_mis_pacientes o ver_perfil_paciente para confirmar el ID correcto antes de editar o borrar.\n";
+        $context .= "- Para citas: confirma el estado y ID de la cita antes de confirmar, cancelar, reprogramar, etc.\n";
+        $context .= "- Para documentos: llama a listar_documentos antes de eliminar.\n";
+        $context .= "NUNCA afirmes que algo se creó, borró o cambió si no hubo una respuesta exitosa real de la herramienta. ";
+        $context .= "Si la herramienta devuelve error, dilo tal cual al usuario y vuelve a consultar la fuente antes de reintentar.\n";
         $context .= "Para acciones destructivas (cancelar cita, no_asistio, eliminar horario, eliminar bloqueo, eliminar_documento), SIEMPRE pregunta primero al usuario si está seguro antes de ejecutar la herramienta. ";
         $context .= "CRÍTICO: Siempre debes llamar a la herramienta real para ejecutar cualquier acción. NUNCA digas 'Listo, ya se actualizó' o 'Hecho' sin haber llamado a la herramienta correspondiente. ";
         $context .= "Si el usuario te pide actualizar su perfil, cambiar intervalo, crear horario/bloqueo, etc., DEBES llamar a la función tool. ";
